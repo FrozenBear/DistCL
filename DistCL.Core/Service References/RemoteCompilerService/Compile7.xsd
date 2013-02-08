@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xs:schema xmlns:tns="http://schemas.datacontract.org/2004/07/DistCL" elementFormDefault="qualified" targetNamespace="http://schemas.datacontract.org/2004/07/DistCL" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:import schemaLocation="http://localhost:8733/Compile?xsd=xsd4" namespace="http://schemas.datacontract.org/2004/07/DistCL.Utils" />
+  <xs:complexType name="CompileStatus">
+    <xs:sequence>
+      <xs:element xmlns:q1="http://schemas.datacontract.org/2004/07/DistCL.Utils" minOccurs="0" name="Cookies" nillable="true" type="q1:ArrayOfCompileArtifactCookie" />
+      <xs:element minOccurs="0" name="ExitCode" type="xs:int" />
+      <xs:element minOccurs="0" name="Success" type="xs:boolean" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="CompileStatus" nillable="true" type="tns:CompileStatus" />
+  <xs:complexType name="ArrayOfAgent">
+    <xs:sequence>
+      <xs:element minOccurs="0" maxOccurs="unbounded" name="Agent" nillable="true" type="tns:Agent" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="ArrayOfAgent" nillable="true" type="tns:ArrayOfAgent" />
+  <xs:complexType name="Agent">
+    <xs:sequence />
+  </xs:complexType>
+  <xs:element name="Agent" nillable="true" type="tns:Agent" />
+</xs:schema>

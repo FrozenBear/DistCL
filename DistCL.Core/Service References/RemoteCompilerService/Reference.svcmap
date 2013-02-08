@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ReferenceGroup xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" ID="85b5d1e2-384c-43c4-9ac2-3396ee52278a" xmlns="urn:schemas-microsoft-com:xml-wcfservicemap">
+  <ClientOptions>
+    <GenerateAsynchronousMethods>false</GenerateAsynchronousMethods>
+    <GenerateTaskBasedAsynchronousMethod>true</GenerateTaskBasedAsynchronousMethod>
+    <EnableDataBinding>true</EnableDataBinding>
+    <ExcludedTypes />
+    <ImportXmlTypes>false</ImportXmlTypes>
+    <GenerateInternalTypes>false</GenerateInternalTypes>
+    <GenerateMessageContracts>false</GenerateMessageContracts>
+    <NamespaceMappings />
+    <CollectionMappings />
+    <GenerateSerializableTypes>true</GenerateSerializableTypes>
+    <Serializer>Auto</Serializer>
+    <UseSerializerForFaults>true</UseSerializerForFaults>
+    <ReferenceAllAssemblies>true</ReferenceAllAssemblies>
+    <ReferencedAssemblies />
+    <ReferencedDataContractTypes />
+    <ServiceContractMappings />
+  </ClientOptions>
+  <MetadataSources>
+    <MetadataSource Address="http://localhost:8733/Compile" Protocol="http" SourceId="1" />
+  </MetadataSources>
+  <Metadata>
+    <MetadataFile FileName="Compile.xsd" MetadataType="Schema" ID="bc40bb9e-5aa0-4faf-a1ae-f5ad373faeac" SourceId="1" SourceUrl="http://localhost:8733/Compile?xsd=xsd5" />
+    <MetadataFile FileName="Compile.disco" MetadataType="Disco" ID="2795bf89-976c-469f-8943-9bf01af5b9b6" SourceId="1" SourceUrl="http://localhost:8733/Compile?disco" />
+    <MetadataFile FileName="Compiler.wsdl" MetadataType="Wsdl" ID="1d2a4554-349e-44fc-b9a5-e963d1dce26b" SourceId="1" SourceUrl="http://localhost:8733/Compile?wsdl" />
+    <MetadataFile FileName="Compile5.xsd" MetadataType="Schema" ID="85cd87c3-2477-441d-8b11-9311fc330df0" SourceId="1" SourceUrl="http://localhost:8733/Compile?xsd=xsd0" />
+    <MetadataFile FileName="Compile6.xsd" MetadataType="Schema" ID="495f7178-d7ce-4eac-8618-a239e4d3002c" SourceId="1" SourceUrl="http://localhost:8733/Compile?xsd=xsd1" />
+    <MetadataFile FileName="Compile1.xsd" MetadataType="Schema" ID="616ef6a7-f461-4d4c-8d57-e059e92707d9" SourceId="1" SourceUrl="http://localhost:8733/Compile?xsd=xsd2" />
+    <MetadataFile FileName="Compile7.xsd" MetadataType="Schema" ID="bf16072c-65a8-4d48-91e7-0d7af4c7c3a9" SourceId="1" SourceUrl="http://localhost:8733/Compile?xsd=xsd3" />
+    <MetadataFile FileName="Compile8.xsd" MetadataType="Schema" ID="bfa4179a-100c-4dee-be93-5bf66cec361a" SourceId="1" SourceUrl="http://localhost:8733/Compile?xsd=xsd4" />
+  </Metadata>
+  <Extensions>
+    <ExtensionFile FileName="configuration91.svcinfo" Name="configuration91.svcinfo" />
+    <ExtensionFile FileName="configuration.svcinfo" Name="configuration.svcinfo" />
+  </Extensions>
+</ReferenceGroup>
