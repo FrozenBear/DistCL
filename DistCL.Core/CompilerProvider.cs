@@ -1,6 +1,5 @@
 ﻿using System;
 using System.ServiceModel;
-using System.ServiceModel.Channels;
 using DistCL.RemoteCompilerService;
 
 namespace DistCL
@@ -21,7 +20,7 @@ namespace DistCL
 			_compiler = compiler;
 			_agent = new Agent(
 				Guid.NewGuid(),
-				Environment.MachineName,
+				CompilerSettings.Default.InstanceName,
 				Math.Max(1, Environment.ProcessorCount - 1),
 				agentPoolUrls, 
 				compilerUrls);
@@ -41,10 +40,12 @@ namespace DistCL
 	internal class RemoteCompilerProvider : ICompilerProvider
 	{
 		private readonly Agent _agent;
+		private readonly Compiler _localCompiler;
 
-		public RemoteCompilerProvider(Agent agent)
+		public RemoteCompilerProvider(Compiler localCompiler, Agent agent)
 		{
 			_agent = agent;
+			_localCompiler = localCompiler;
 		}
 
 		public Agent Agent
@@ -56,19 +57,13 @@ namespace DistCL
 		{
 			foreach (var url in _agent.CompilerUrls)
 			{
-				RemoteCompilerService.ICompiler compiler = new CompilerClient(GetBinding(url), new EndpointAddress(url));
+				RemoteCompilerService.ICompiler compiler = new CompilerClient(_localCompiler.GetBinding(url), new EndpointAddress(url));
 
 				return compiler.IsReady() ? new CompilerProxy(compiler) : null;
 			}
 
 			throw new InvalidOperationException();
 		}
-
-		private Binding GetBinding(Uri url)
-		{
-			throw new NotImplementedException();
-		}
-
 
 		private class CompilerProxy : ICompiler
 		{

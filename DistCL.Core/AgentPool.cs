@@ -5,7 +5,7 @@ using System.Threading;
 
 namespace DistCL
 {
-	internal class AgentPool
+	internal class AgentPool : IAgentPoolInternal
 	{
 		private readonly Dictionary<Guid, RegisteredAgent> _agents = new Dictionary<Guid, RegisteredAgent>();
 
@@ -13,8 +13,6 @@ namespace DistCL
 		private readonly ReaderWriterLock _weightLock = new ReaderWriterLock();
 		private readonly TimeSpan _lockTimeout = TimeSpan.FromMinutes(1);
 		private readonly Random _random = new Random();
-		private int _currentWeightVersion = -1;
-		private int _requiredWeightVersion;
 		private List<MeasuredAgent> _weights;
 
 		// TODO total optimization
@@ -29,14 +27,16 @@ namespace DistCL
 				{
 					agent = new RegisteredAgent(request);
 					_agents.Add(request.Agent.Guid, agent);
-					_requiredWeightVersion++;
+					_weights = null;
+					Logger.Log("AgentPool.RegisterAgent.New", request.Agent);
 				}
 				else
 				{
-					if (!agent.Agent.Equals(request))
+					if (!agent.Agent.Agent.Equals(request.Agent))
 					{
 						_agents[request.Agent.Guid] = new RegisteredAgent(request);
-						_requiredWeightVersion ++;
+						_weights = null;
+						Logger.Log("AgentPool.RegisterAgent.Update", request.Agent);
 					}
 					else
 					{
@@ -50,39 +50,36 @@ namespace DistCL
 			}
 		}
 
-		protected int RequiredWeightVersion
-		{
-			get { return _requiredWeightVersion; }
-		}
-
 		private List<MeasuredAgent> GetWeights()
 		{
 			_agentsLock.AcquireReaderLock(_lockTimeout);
 			try
 			{
-				if (_currentWeightVersion != _requiredWeightVersion)
+				if (_weights == null)
 				{
 					_weightLock.AcquireWriterLock(_lockTimeout);
-					try
+					if (_weights == null)
 					{
-						var weights = new List<MeasuredAgent>();
-						int weightPosition = 0;
-
-						foreach (var agent in _agents.Values)
+						try
 						{
-							var item = new MeasuredAgent(agent.Agent, weightPosition);
-							weightPosition += item.Weight;
-							weights.Add(item);
+							var weights = new List<MeasuredAgent>();
+							int weightPosition = 0;
+
+							foreach (var agent in _agents.Values)
+							{
+								var item = new MeasuredAgent(agent.Agent, weightPosition);
+								weightPosition += item.Weight;
+								weights.Add(item);
+							}
+
+							weights.Sort((a, b) => a.WeightStart.CompareTo(b.WeightStart));
+
+							_weights = weights;
 						}
-
-						weights.Sort((a, b) => a.WeightStart.CompareTo(b.WeightStart));
-
-						_weights = weights;
-						_currentWeightVersion = _requiredWeightVersion;
-					}
-					finally
-					{
-						_weightLock.ReleaseWriterLock();
+						finally
+						{
+							_weightLock.ReleaseWriterLock();
+						}
 					}
 				}
 
@@ -126,10 +123,11 @@ namespace DistCL
 					{
 						foreach (var item in expired)
 						{
+							Logger.Log("AgentPool.RegisterAgent.Remove", _agents[item].Agent.Agent);
 							_agents.Remove(item);
 						}
 
-						_requiredWeightVersion ++;
+						_weights = null;
 					}
 					finally
 					{
@@ -143,17 +141,24 @@ namespace DistCL
 			}
 		}
 
-		public IEnumerable<Agent> GetAgents()
+		public Agent[] GetAgents()
 		{
 			_agentsLock.AcquireReaderLock(_lockTimeout);
 			try
 			{
-				return _agents.Values.Select(agent => agent.Agent.Agent);
+				var agents = _agents.Values.Select(agent => agent.Agent.Agent).ToArray();
+				//agents = new Agent[] { agents[0] };
+				return agents;
 			}
 			finally
 			{
 				_agentsLock.ReleaseReaderLock();
 			}
+		}
+
+		IEnumerable<IAgent> IAgentPoolInternal.GetAgents()
+		{
+			return GetAgents();
 		}
 
 		private class RegisteredAgent

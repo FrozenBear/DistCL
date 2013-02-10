@@ -92,315 +92,21 @@ namespace DistCL.Client.CompileService {
     
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Runtime.Serialization", "4.0.0.0")]
-    [System.Runtime.Serialization.DataContractAttribute(Name="SiteString", Namespace="http://schemas.datacontract.org/2004/07/System.Security.Util")]
+    [System.Runtime.Serialization.DataContractAttribute(Name="Agent", Namespace="http://schemas.datacontract.org/2004/07/DistCL")]
     [System.SerializableAttribute()]
-    [System.Runtime.Serialization.KnownTypeAttribute(typeof(DistCL.Client.CompileService.DirectoryString))]
-    [System.Runtime.Serialization.KnownTypeAttribute(typeof(DistCL.Client.CompileService.LocalSiteString))]
-    [System.Runtime.Serialization.KnownTypeAttribute(typeof(DistCL.Client.CompileService.URLString))]
-    [System.Runtime.Serialization.KnownTypeAttribute(typeof(System.Security.Policy.Url[]))]
-    [System.Runtime.Serialization.KnownTypeAttribute(typeof(System.Security.Policy.Url))]
-    [System.Runtime.Serialization.KnownTypeAttribute(typeof(System.Security.Policy.EvidenceBase))]
-    [System.Runtime.Serialization.KnownTypeAttribute(typeof(object[]))]
-    [System.Runtime.Serialization.KnownTypeAttribute(typeof(DistCL.Client.CompileService.CompileStatus))]
-    [System.Runtime.Serialization.KnownTypeAttribute(typeof(DistCL.Client.CompileService.AgentAddress[]))]
-    [System.Runtime.Serialization.KnownTypeAttribute(typeof(DistCL.Client.CompileService.AgentAddress))]
-    [System.Runtime.Serialization.KnownTypeAttribute(typeof(DistCL.Client.CompileService.AgentInfo))]
-    [System.Runtime.Serialization.KnownTypeAttribute(typeof(DistCL.Utils.CompileArtifactCookie[]))]
-    [System.Runtime.Serialization.KnownTypeAttribute(typeof(DistCL.Utils.CompileArtifactCookie))]
-    [System.Runtime.Serialization.KnownTypeAttribute(typeof(DistCL.Utils.CompileArtifactDescription))]
-    public partial class SiteString : object, System.Runtime.Serialization.IExtensibleDataObject, System.ComponentModel.INotifyPropertyChanged {
+    public partial class Agent : object, System.Runtime.Serialization.IExtensibleDataObject, System.ComponentModel.INotifyPropertyChanged {
         
         [System.NonSerializedAttribute()]
         private System.Runtime.Serialization.ExtensionDataObject extensionDataField;
         
-        private object[] m_separatedSiteField;
-        
-        private string m_siteField;
-        
-        [global::System.ComponentModel.BrowsableAttribute(false)]
-        public System.Runtime.Serialization.ExtensionDataObject ExtensionData {
-            get {
-                return this.extensionDataField;
-            }
-            set {
-                this.extensionDataField = value;
-            }
-        }
-        
-        [System.Runtime.Serialization.DataMemberAttribute(IsRequired=true)]
-        public object[] m_separatedSite {
-            get {
-                return this.m_separatedSiteField;
-            }
-            set {
-                if ((object.ReferenceEquals(this.m_separatedSiteField, value) != true)) {
-                    this.m_separatedSiteField = value;
-                    this.RaisePropertyChanged("m_separatedSite");
-                }
-            }
-        }
-        
-        [System.Runtime.Serialization.DataMemberAttribute(IsRequired=true)]
-        public string m_site {
-            get {
-                return this.m_siteField;
-            }
-            set {
-                if ((object.ReferenceEquals(this.m_siteField, value) != true)) {
-                    this.m_siteField = value;
-                    this.RaisePropertyChanged("m_site");
-                }
-            }
-        }
-        
-        public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
-        
-        protected void RaisePropertyChanged(string propertyName) {
-            System.ComponentModel.PropertyChangedEventHandler propertyChanged = this.PropertyChanged;
-            if ((propertyChanged != null)) {
-                propertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
-            }
-        }
-    }
-    
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Runtime.Serialization", "4.0.0.0")]
-    [System.Runtime.Serialization.DataContractAttribute(Name="DirectoryString", Namespace="http://schemas.datacontract.org/2004/07/System.Security.Util")]
-    [System.SerializableAttribute()]
-    public partial class DirectoryString : DistCL.Client.CompileService.SiteString {
-        
-        private bool m_checkForIllegalCharsField;
-        
-        [System.Runtime.Serialization.DataMemberAttribute(IsRequired=true)]
-        public bool m_checkForIllegalChars {
-            get {
-                return this.m_checkForIllegalCharsField;
-            }
-            set {
-                if ((this.m_checkForIllegalCharsField.Equals(value) != true)) {
-                    this.m_checkForIllegalCharsField = value;
-                    this.RaisePropertyChanged("m_checkForIllegalChars");
-                }
-            }
-        }
-    }
-    
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Runtime.Serialization", "4.0.0.0")]
-    [System.Runtime.Serialization.DataContractAttribute(Name="LocalSiteString", Namespace="http://schemas.datacontract.org/2004/07/System.Security.Util")]
-    [System.SerializableAttribute()]
-    public partial class LocalSiteString : DistCL.Client.CompileService.SiteString {
-    }
-    
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Runtime.Serialization", "4.0.0.0")]
-    [System.Runtime.Serialization.DataContractAttribute(Name="URLString", Namespace="http://schemas.datacontract.org/2004/07/System.Security.Util")]
-    [System.SerializableAttribute()]
-    public partial class URLString : DistCL.Client.CompileService.SiteString {
-        
-        private DistCL.Client.CompileService.DirectoryString m_directoryField;
-        
-        private string m_fullurlField;
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private System.Uri[] AgentPoolUrlsField;
         
         [System.Runtime.Serialization.OptionalFieldAttribute()]
-        private bool m_isUncShareField;
-        
-        private DistCL.Client.CompileService.LocalSiteString m_localSiteField;
+        private System.Uri[] CompilerUrlsField;
         
         [System.Runtime.Serialization.OptionalFieldAttribute()]
-        private bool m_parseDeferredField;
-        
-        [System.Runtime.Serialization.OptionalFieldAttribute()]
-        private bool m_parsedOriginalField;
-        
-        private int m_portField;
-        
-        private string m_protocolField;
-        
-        private DistCL.Client.CompileService.SiteString m_siteStringField;
-        
-        [System.Runtime.Serialization.OptionalFieldAttribute()]
-        private string m_urlOriginalField;
-        
-        [System.Runtime.Serialization.OptionalFieldAttribute()]
-        private string m_userpassField;
-        
-        [System.Runtime.Serialization.DataMemberAttribute(IsRequired=true)]
-        public DistCL.Client.CompileService.DirectoryString m_directory {
-            get {
-                return this.m_directoryField;
-            }
-            set {
-                if ((object.ReferenceEquals(this.m_directoryField, value) != true)) {
-                    this.m_directoryField = value;
-                    this.RaisePropertyChanged("m_directory");
-                }
-            }
-        }
-        
-        [System.Runtime.Serialization.DataMemberAttribute(IsRequired=true)]
-        public string m_fullurl {
-            get {
-                return this.m_fullurlField;
-            }
-            set {
-                if ((object.ReferenceEquals(this.m_fullurlField, value) != true)) {
-                    this.m_fullurlField = value;
-                    this.RaisePropertyChanged("m_fullurl");
-                }
-            }
-        }
-        
-        [System.Runtime.Serialization.DataMemberAttribute()]
-        public bool m_isUncShare {
-            get {
-                return this.m_isUncShareField;
-            }
-            set {
-                if ((this.m_isUncShareField.Equals(value) != true)) {
-                    this.m_isUncShareField = value;
-                    this.RaisePropertyChanged("m_isUncShare");
-                }
-            }
-        }
-        
-        [System.Runtime.Serialization.DataMemberAttribute(IsRequired=true)]
-        public DistCL.Client.CompileService.LocalSiteString m_localSite {
-            get {
-                return this.m_localSiteField;
-            }
-            set {
-                if ((object.ReferenceEquals(this.m_localSiteField, value) != true)) {
-                    this.m_localSiteField = value;
-                    this.RaisePropertyChanged("m_localSite");
-                }
-            }
-        }
-        
-        [System.Runtime.Serialization.DataMemberAttribute()]
-        public bool m_parseDeferred {
-            get {
-                return this.m_parseDeferredField;
-            }
-            set {
-                if ((this.m_parseDeferredField.Equals(value) != true)) {
-                    this.m_parseDeferredField = value;
-                    this.RaisePropertyChanged("m_parseDeferred");
-                }
-            }
-        }
-        
-        [System.Runtime.Serialization.DataMemberAttribute()]
-        public bool m_parsedOriginal {
-            get {
-                return this.m_parsedOriginalField;
-            }
-            set {
-                if ((this.m_parsedOriginalField.Equals(value) != true)) {
-                    this.m_parsedOriginalField = value;
-                    this.RaisePropertyChanged("m_parsedOriginal");
-                }
-            }
-        }
-        
-        [System.Runtime.Serialization.DataMemberAttribute(IsRequired=true)]
-        public int m_port {
-            get {
-                return this.m_portField;
-            }
-            set {
-                if ((this.m_portField.Equals(value) != true)) {
-                    this.m_portField = value;
-                    this.RaisePropertyChanged("m_port");
-                }
-            }
-        }
-        
-        [System.Runtime.Serialization.DataMemberAttribute(IsRequired=true)]
-        public string m_protocol {
-            get {
-                return this.m_protocolField;
-            }
-            set {
-                if ((object.ReferenceEquals(this.m_protocolField, value) != true)) {
-                    this.m_protocolField = value;
-                    this.RaisePropertyChanged("m_protocol");
-                }
-            }
-        }
-        
-        [System.Runtime.Serialization.DataMemberAttribute(IsRequired=true)]
-        public DistCL.Client.CompileService.SiteString m_siteString {
-            get {
-                return this.m_siteStringField;
-            }
-            set {
-                if ((object.ReferenceEquals(this.m_siteStringField, value) != true)) {
-                    this.m_siteStringField = value;
-                    this.RaisePropertyChanged("m_siteString");
-                }
-            }
-        }
-        
-        [System.Runtime.Serialization.DataMemberAttribute()]
-        public string m_urlOriginal {
-            get {
-                return this.m_urlOriginalField;
-            }
-            set {
-                if ((object.ReferenceEquals(this.m_urlOriginalField, value) != true)) {
-                    this.m_urlOriginalField = value;
-                    this.RaisePropertyChanged("m_urlOriginal");
-                }
-            }
-        }
-        
-        [System.Runtime.Serialization.DataMemberAttribute()]
-        public string m_userpass {
-            get {
-                return this.m_userpassField;
-            }
-            set {
-                if ((object.ReferenceEquals(this.m_userpassField, value) != true)) {
-                    this.m_userpassField = value;
-                    this.RaisePropertyChanged("m_userpass");
-                }
-            }
-        }
-    }
-    
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Runtime.Serialization", "4.0.0.0")]
-    [System.Runtime.Serialization.DataContractAttribute(Name="AgentAddress", Namespace="http://schemas.datacontract.org/2004/07/DistCL")]
-    [System.SerializableAttribute()]
-    public partial class AgentAddress : DistCL.Client.CompileService.AgentInfo {
-        
-        [System.Runtime.Serialization.OptionalFieldAttribute()]
-        private float WeightField;
-        
-        [System.Runtime.Serialization.DataMemberAttribute()]
-        public float Weight {
-            get {
-                return this.WeightField;
-            }
-            set {
-                if ((this.WeightField.Equals(value) != true)) {
-                    this.WeightField = value;
-                    this.RaisePropertyChanged("Weight");
-                }
-            }
-        }
-    }
-    
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Runtime.Serialization", "4.0.0.0")]
-    [System.Runtime.Serialization.DataContractAttribute(Name="AgentInfo", Namespace="http://schemas.datacontract.org/2004/07/DistCL")]
-    [System.SerializableAttribute()]
-    [System.Runtime.Serialization.KnownTypeAttribute(typeof(DistCL.Client.CompileService.AgentAddress))]
-    public partial class AgentInfo : object, System.Runtime.Serialization.IExtensibleDataObject, System.ComponentModel.INotifyPropertyChanged {
-        
-        [System.NonSerializedAttribute()]
-        private System.Runtime.Serialization.ExtensionDataObject extensionDataField;
+        private int CoresField;
         
         [System.Runtime.Serialization.OptionalFieldAttribute()]
         private System.Guid GuidField;
@@ -408,9 +114,6 @@ namespace DistCL.Client.CompileService {
         [System.Runtime.Serialization.OptionalFieldAttribute()]
         private string NameField;
         
-        [System.Runtime.Serialization.OptionalFieldAttribute()]
-        private System.Security.Policy.Url[] UrlsField;
-        
         [global::System.ComponentModel.BrowsableAttribute(false)]
         public System.Runtime.Serialization.ExtensionDataObject ExtensionData {
             get {
@@ -418,6 +121,45 @@ namespace DistCL.Client.CompileService {
             }
             set {
                 this.extensionDataField = value;
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public System.Uri[] AgentPoolUrls {
+            get {
+                return this.AgentPoolUrlsField;
+            }
+            set {
+                if ((object.ReferenceEquals(this.AgentPoolUrlsField, value) != true)) {
+                    this.AgentPoolUrlsField = value;
+                    this.RaisePropertyChanged("AgentPoolUrls");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public System.Uri[] CompilerUrls {
+            get {
+                return this.CompilerUrlsField;
+            }
+            set {
+                if ((object.ReferenceEquals(this.CompilerUrlsField, value) != true)) {
+                    this.CompilerUrlsField = value;
+                    this.RaisePropertyChanged("CompilerUrls");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public int Cores {
+            get {
+                return this.CoresField;
+            }
+            set {
+                if ((this.CoresField.Equals(value) != true)) {
+                    this.CoresField = value;
+                    this.RaisePropertyChanged("Cores");
+                }
             }
         }
         
@@ -447,19 +189,6 @@ namespace DistCL.Client.CompileService {
             }
         }
         
-        [System.Runtime.Serialization.DataMemberAttribute()]
-        public System.Security.Policy.Url[] Urls {
-            get {
-                return this.UrlsField;
-            }
-            set {
-                if ((object.ReferenceEquals(this.UrlsField, value) != true)) {
-                    this.UrlsField = value;
-                    this.RaisePropertyChanged("Urls");
-                }
-            }
-        }
-        
         public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
         
         protected void RaisePropertyChanged(string propertyName) {
@@ -474,13 +203,6 @@ namespace DistCL.Client.CompileService {
     [System.ServiceModel.ServiceContractAttribute(ConfigurationName="CompileService.ILocalCompiler")]
     public interface ILocalCompiler {
         
-        // CODEGEN: Generating message contract since the wrapper name (CompileInput) of message CompileInput does not match the default value (Compile)
-        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICompiler/Compile", ReplyAction="http://tempuri.org/ICompiler/CompileResponse")]
-        DistCL.Client.CompileService.CompileOutput Compile(DistCL.Client.CompileService.CompileInput request);
-        
-        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICompiler/Compile", ReplyAction="http://tempuri.org/ICompiler/CompileResponse")]
-        System.Threading.Tasks.Task<DistCL.Client.CompileService.CompileOutput> CompileAsync(DistCL.Client.CompileService.CompileInput request);
-        
         // CODEGEN: Generating message contract since the wrapper name (LocalCompileInput) of message LocalCompileInput does not match the default value (LocalCompile)
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ILocalCompiler/LocalCompile", ReplyAction="http://tempuri.org/ILocalCompiler/LocalCompileResponse")]
         DistCL.Client.CompileService.CompileOutput LocalCompile(DistCL.Client.CompileService.LocalCompileInput request);
@@ -492,28 +214,20 @@ namespace DistCL.Client.CompileService {
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
     [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
-    [System.ServiceModel.MessageContractAttribute(WrapperName="CompileInput", WrapperNamespace="http://tempuri.org/", IsWrapped=true)]
-    public partial class CompileInput {
-        
-        [System.ServiceModel.MessageHeaderAttribute(Namespace="http://tempuri.org/")]
-        public string Arguments;
-        
-        [System.ServiceModel.MessageHeaderAttribute(Namespace="http://tempuri.org/")]
-        public long SrcLength;
-        
-        [System.ServiceModel.MessageHeaderAttribute(Namespace="http://tempuri.org/")]
-        public string SrcName;
+    [System.ServiceModel.MessageContractAttribute(WrapperName="LocalCompileInput", WrapperNamespace="http://tempuri.org/", IsWrapped=true)]
+    public partial class LocalCompileInput {
         
         [System.ServiceModel.MessageBodyMemberAttribute(Namespace="http://tempuri.org/", Order=0)]
-        public System.IO.Stream Src;
+        public string Arguments;
         
-        public CompileInput() {
+        [System.ServiceModel.MessageBodyMemberAttribute(Namespace="http://tempuri.org/", Order=1)]
+        public string Src;
+        
+        public LocalCompileInput() {
         }
         
-        public CompileInput(string Arguments, long SrcLength, string SrcName, System.IO.Stream Src) {
+        public LocalCompileInput(string Arguments, string Src) {
             this.Arguments = Arguments;
-            this.SrcLength = SrcLength;
-            this.SrcName = SrcName;
             this.Src = Src;
         }
     }
@@ -536,27 +250,6 @@ namespace DistCL.Client.CompileService {
         public CompileOutput(DistCL.Client.CompileService.CompileStatus Status, System.IO.Stream ResultData) {
             this.Status = Status;
             this.ResultData = ResultData;
-        }
-    }
-    
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
-    [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
-    [System.ServiceModel.MessageContractAttribute(WrapperName="LocalCompileInput", WrapperNamespace="http://tempuri.org/", IsWrapped=true)]
-    public partial class LocalCompileInput {
-        
-        [System.ServiceModel.MessageBodyMemberAttribute(Namespace="http://tempuri.org/", Order=0)]
-        public string Arguments;
-        
-        [System.ServiceModel.MessageBodyMemberAttribute(Namespace="http://tempuri.org/", Order=1)]
-        public string Src;
-        
-        public LocalCompileInput() {
-        }
-        
-        public LocalCompileInput(string Arguments, string Src) {
-            this.Arguments = Arguments;
-            this.Src = Src;
         }
     }
     
@@ -585,36 +278,6 @@ namespace DistCL.Client.CompileService {
         
         public LocalCompilerClient(System.ServiceModel.Channels.Binding binding, System.ServiceModel.EndpointAddress remoteAddress) : 
                 base(binding, remoteAddress) {
-        }
-        
-        [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
-        DistCL.Client.CompileService.CompileOutput DistCL.Client.CompileService.ILocalCompiler.Compile(DistCL.Client.CompileService.CompileInput request) {
-            return base.Channel.Compile(request);
-        }
-        
-        public DistCL.Client.CompileService.CompileStatus Compile(string Arguments, long SrcLength, string SrcName, System.IO.Stream Src, out System.IO.Stream ResultData) {
-            DistCL.Client.CompileService.CompileInput inValue = new DistCL.Client.CompileService.CompileInput();
-            inValue.Arguments = Arguments;
-            inValue.SrcLength = SrcLength;
-            inValue.SrcName = SrcName;
-            inValue.Src = Src;
-            DistCL.Client.CompileService.CompileOutput retVal = ((DistCL.Client.CompileService.ILocalCompiler)(this)).Compile(inValue);
-            ResultData = retVal.ResultData;
-            return retVal.Status;
-        }
-        
-        [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
-        System.Threading.Tasks.Task<DistCL.Client.CompileService.CompileOutput> DistCL.Client.CompileService.ILocalCompiler.CompileAsync(DistCL.Client.CompileService.CompileInput request) {
-            return base.Channel.CompileAsync(request);
-        }
-        
-        public System.Threading.Tasks.Task<DistCL.Client.CompileService.CompileOutput> CompileAsync(string Arguments, long SrcLength, string SrcName, System.IO.Stream Src) {
-            DistCL.Client.CompileService.CompileInput inValue = new DistCL.Client.CompileService.CompileInput();
-            inValue.Arguments = Arguments;
-            inValue.SrcLength = SrcLength;
-            inValue.SrcName = SrcName;
-            inValue.Src = Src;
-            return ((DistCL.Client.CompileService.ILocalCompiler)(this)).CompileAsync(inValue);
         }
         
         [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
@@ -648,12 +311,47 @@ namespace DistCL.Client.CompileService {
     [System.ServiceModel.ServiceContractAttribute(ConfigurationName="CompileService.ICompiler")]
     public interface ICompiler {
         
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICompiler/IsReady", ReplyAction="http://tempuri.org/ICompiler/IsReadyResponse")]
+        bool IsReady();
+        
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICompiler/IsReady", ReplyAction="http://tempuri.org/ICompiler/IsReadyResponse")]
+        System.Threading.Tasks.Task<bool> IsReadyAsync();
+        
         // CODEGEN: Generating message contract since the wrapper name (CompileInput) of message CompileInput does not match the default value (Compile)
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICompiler/Compile", ReplyAction="http://tempuri.org/ICompiler/CompileResponse")]
         DistCL.Client.CompileService.CompileOutput Compile(DistCL.Client.CompileService.CompileInput request);
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICompiler/Compile", ReplyAction="http://tempuri.org/ICompiler/CompileResponse")]
         System.Threading.Tasks.Task<DistCL.Client.CompileService.CompileOutput> CompileAsync(DistCL.Client.CompileService.CompileInput request);
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
+    [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
+    [System.ServiceModel.MessageContractAttribute(WrapperName="CompileInput", WrapperNamespace="http://tempuri.org/", IsWrapped=true)]
+    public partial class CompileInput {
+        
+        [System.ServiceModel.MessageHeaderAttribute(Namespace="http://tempuri.org/")]
+        public string Arguments;
+        
+        [System.ServiceModel.MessageHeaderAttribute(Namespace="http://tempuri.org/")]
+        public long SrcLength;
+        
+        [System.ServiceModel.MessageHeaderAttribute(Namespace="http://tempuri.org/")]
+        public string SrcName;
+        
+        [System.ServiceModel.MessageBodyMemberAttribute(Namespace="http://tempuri.org/", Order=0)]
+        public System.IO.Stream Src;
+        
+        public CompileInput() {
+        }
+        
+        public CompileInput(string Arguments, long SrcLength, string SrcName, System.IO.Stream Src) {
+            this.Arguments = Arguments;
+            this.SrcLength = SrcLength;
+            this.SrcName = SrcName;
+            this.Src = Src;
+        }
     }
     
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
@@ -681,6 +379,14 @@ namespace DistCL.Client.CompileService {
         
         public CompilerClient(System.ServiceModel.Channels.Binding binding, System.ServiceModel.EndpointAddress remoteAddress) : 
                 base(binding, remoteAddress) {
+        }
+        
+        public bool IsReady() {
+            return base.Channel.IsReady();
+        }
+        
+        public System.Threading.Tasks.Task<bool> IsReadyAsync() {
+            return base.Channel.IsReadyAsync();
         }
         
         [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
@@ -715,105 +421,131 @@ namespace DistCL.Client.CompileService {
     }
     
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
-    [System.ServiceModel.ServiceContractAttribute(ConfigurationName="CompileService.IAgentsPool")]
-    public interface IAgentsPool {
+    [System.ServiceModel.ServiceContractAttribute(ConfigurationName="CompileService.IAgentPool")]
+    public interface IAgentPool {
         
-        // CODEGEN: Generating message contract since the wrapper name (AgentRegistrationRequest) of message AgentRegistrationRequest does not match the default value (RegisterAgent)
-        [System.ServiceModel.OperationContractAttribute(IsOneWay=true, Action="http://tempuri.org/IAgentsPool/RegisterAgent")]
-        void RegisterAgent(DistCL.Client.CompileService.AgentRegistrationRequest request);
+        // CODEGEN: Generating message contract since the wrapper name (AgentReqistrationMessage) of message AgentReqistrationMessage does not match the default value (RegisterAgent)
+        [System.ServiceModel.OperationContractAttribute(IsOneWay=true, Action="http://tempuri.org/ICompileCoordinator/RegisterAgent")]
+        void RegisterAgent(DistCL.Client.CompileService.AgentReqistrationMessage request);
         
-        [System.ServiceModel.OperationContractAttribute(IsOneWay=true, Action="http://tempuri.org/IAgentsPool/RegisterAgent")]
-        System.Threading.Tasks.Task RegisterAgentAsync(DistCL.Client.CompileService.AgentRegistrationRequest request);
+        [System.ServiceModel.OperationContractAttribute(IsOneWay=true, Action="http://tempuri.org/ICompileCoordinator/RegisterAgent")]
+        System.Threading.Tasks.Task RegisterAgentAsync(DistCL.Client.CompileService.AgentReqistrationMessage request);
+        
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IAgentPool/GetAgents", ReplyAction="http://tempuri.org/IAgentPool/GetAgentsResponse")]
+        DistCL.Client.CompileService.Agent[] GetAgents();
+        
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IAgentPool/GetAgents", ReplyAction="http://tempuri.org/IAgentPool/GetAgentsResponse")]
+        System.Threading.Tasks.Task<DistCL.Client.CompileService.Agent[]> GetAgentsAsync();
     }
     
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
     [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
-    [System.ServiceModel.MessageContractAttribute(WrapperName="AgentRegistrationRequest", WrapperNamespace="http://tempuri.org/", IsWrapped=true)]
-    public partial class AgentRegistrationRequest {
-        
-        [System.ServiceModel.MessageHeaderAttribute(Namespace="http://schemas.microsoft.com/net/2006/05/peer/HopCount")]
-        public int Hops;
+    [System.ServiceModel.MessageContractAttribute(WrapperName="AgentReqistrationMessage", WrapperNamespace="http://tempuri.org/", IsWrapped=true)]
+    public partial class AgentReqistrationMessage {
         
         [System.ServiceModel.MessageBodyMemberAttribute(Namespace="http://tempuri.org/", Order=0)]
-        public System.Guid Guid;
+        public System.Uri[] AgentPoolUrls;
         
         [System.ServiceModel.MessageBodyMemberAttribute(Namespace="http://tempuri.org/", Order=1)]
-        public string Name;
+        public System.Uri[] CompilerUrls;
         
         [System.ServiceModel.MessageBodyMemberAttribute(Namespace="http://tempuri.org/", Order=2)]
-        public System.Security.Policy.Url[] Urls;
+        public int Cores;
         
-        public AgentRegistrationRequest() {
+        [System.ServiceModel.MessageBodyMemberAttribute(Namespace="http://tempuri.org/", Order=3)]
+        public System.Guid Guid;
+        
+        [System.ServiceModel.MessageBodyMemberAttribute(Namespace="http://tempuri.org/", Order=4)]
+        public string Name;
+        
+        public AgentReqistrationMessage() {
         }
         
-        public AgentRegistrationRequest(int Hops, System.Guid Guid, string Name, System.Security.Policy.Url[] Urls) {
-            this.Hops = Hops;
+        public AgentReqistrationMessage(System.Uri[] AgentPoolUrls, System.Uri[] CompilerUrls, int Cores, System.Guid Guid, string Name) {
+            this.AgentPoolUrls = AgentPoolUrls;
+            this.CompilerUrls = CompilerUrls;
+            this.Cores = Cores;
             this.Guid = Guid;
             this.Name = Name;
-            this.Urls = Urls;
         }
     }
     
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
-    public interface IAgentsPoolChannel : DistCL.Client.CompileService.IAgentsPool, System.ServiceModel.IClientChannel {
+    public interface IAgentPoolChannel : DistCL.Client.CompileService.IAgentPool, System.ServiceModel.IClientChannel {
     }
     
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
-    public partial class AgentsPoolClient : System.ServiceModel.ClientBase<DistCL.Client.CompileService.IAgentsPool>, DistCL.Client.CompileService.IAgentsPool {
+    public partial class AgentPoolClient : System.ServiceModel.ClientBase<DistCL.Client.CompileService.IAgentPool>, DistCL.Client.CompileService.IAgentPool {
         
-        public AgentsPoolClient() {
+        public AgentPoolClient() {
         }
         
-        public AgentsPoolClient(string endpointConfigurationName) : 
+        public AgentPoolClient(string endpointConfigurationName) : 
                 base(endpointConfigurationName) {
         }
         
-        public AgentsPoolClient(string endpointConfigurationName, string remoteAddress) : 
+        public AgentPoolClient(string endpointConfigurationName, string remoteAddress) : 
                 base(endpointConfigurationName, remoteAddress) {
         }
         
-        public AgentsPoolClient(string endpointConfigurationName, System.ServiceModel.EndpointAddress remoteAddress) : 
+        public AgentPoolClient(string endpointConfigurationName, System.ServiceModel.EndpointAddress remoteAddress) : 
                 base(endpointConfigurationName, remoteAddress) {
         }
         
-        public AgentsPoolClient(System.ServiceModel.Channels.Binding binding, System.ServiceModel.EndpointAddress remoteAddress) : 
+        public AgentPoolClient(System.ServiceModel.Channels.Binding binding, System.ServiceModel.EndpointAddress remoteAddress) : 
                 base(binding, remoteAddress) {
         }
         
         [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
-        void DistCL.Client.CompileService.IAgentsPool.RegisterAgent(DistCL.Client.CompileService.AgentRegistrationRequest request) {
+        void DistCL.Client.CompileService.IAgentPool.RegisterAgent(DistCL.Client.CompileService.AgentReqistrationMessage request) {
             base.Channel.RegisterAgent(request);
         }
         
-        public void RegisterAgent(int Hops, System.Guid Guid, string Name, System.Security.Policy.Url[] Urls) {
-            DistCL.Client.CompileService.AgentRegistrationRequest inValue = new DistCL.Client.CompileService.AgentRegistrationRequest();
-            inValue.Hops = Hops;
+        public void RegisterAgent(System.Uri[] AgentPoolUrls, System.Uri[] CompilerUrls, int Cores, System.Guid Guid, string Name) {
+            DistCL.Client.CompileService.AgentReqistrationMessage inValue = new DistCL.Client.CompileService.AgentReqistrationMessage();
+            inValue.AgentPoolUrls = AgentPoolUrls;
+            inValue.CompilerUrls = CompilerUrls;
+            inValue.Cores = Cores;
             inValue.Guid = Guid;
             inValue.Name = Name;
-            inValue.Urls = Urls;
-            ((DistCL.Client.CompileService.IAgentsPool)(this)).RegisterAgent(inValue);
+            ((DistCL.Client.CompileService.IAgentPool)(this)).RegisterAgent(inValue);
         }
         
         [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
-        System.Threading.Tasks.Task DistCL.Client.CompileService.IAgentsPool.RegisterAgentAsync(DistCL.Client.CompileService.AgentRegistrationRequest request) {
+        System.Threading.Tasks.Task DistCL.Client.CompileService.IAgentPool.RegisterAgentAsync(DistCL.Client.CompileService.AgentReqistrationMessage request) {
             return base.Channel.RegisterAgentAsync(request);
         }
         
-        public System.Threading.Tasks.Task RegisterAgentAsync(int Hops, System.Guid Guid, string Name, System.Security.Policy.Url[] Urls) {
-            DistCL.Client.CompileService.AgentRegistrationRequest inValue = new DistCL.Client.CompileService.AgentRegistrationRequest();
-            inValue.Hops = Hops;
+        public System.Threading.Tasks.Task RegisterAgentAsync(System.Uri[] AgentPoolUrls, System.Uri[] CompilerUrls, int Cores, System.Guid Guid, string Name) {
+            DistCL.Client.CompileService.AgentReqistrationMessage inValue = new DistCL.Client.CompileService.AgentReqistrationMessage();
+            inValue.AgentPoolUrls = AgentPoolUrls;
+            inValue.CompilerUrls = CompilerUrls;
+            inValue.Cores = Cores;
             inValue.Guid = Guid;
             inValue.Name = Name;
-            inValue.Urls = Urls;
-            return ((DistCL.Client.CompileService.IAgentsPool)(this)).RegisterAgentAsync(inValue);
+            return ((DistCL.Client.CompileService.IAgentPool)(this)).RegisterAgentAsync(inValue);
+        }
+        
+        public DistCL.Client.CompileService.Agent[] GetAgents() {
+            return base.Channel.GetAgents();
+        }
+        
+        public System.Threading.Tasks.Task<DistCL.Client.CompileService.Agent[]> GetAgentsAsync() {
+            return base.Channel.GetAgentsAsync();
         }
     }
     
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
     [System.ServiceModel.ServiceContractAttribute(ConfigurationName="CompileService.ICompileManager")]
     public interface ICompileManager {
+        
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICompiler/IsReady", ReplyAction="http://tempuri.org/ICompiler/IsReadyResponse")]
+        bool IsReady();
+        
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICompiler/IsReady", ReplyAction="http://tempuri.org/ICompiler/IsReadyResponse")]
+        System.Threading.Tasks.Task<bool> IsReadyAsync();
         
         // CODEGEN: Generating message contract since the wrapper name (CompileInput) of message CompileInput does not match the default value (Compile)
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICompiler/Compile", ReplyAction="http://tempuri.org/ICompiler/CompileResponse")]
@@ -822,18 +554,18 @@ namespace DistCL.Client.CompileService {
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICompiler/Compile", ReplyAction="http://tempuri.org/ICompiler/CompileResponse")]
         System.Threading.Tasks.Task<DistCL.Client.CompileService.CompileOutput> CompileAsync(DistCL.Client.CompileService.CompileInput request);
         
-        // CODEGEN: Generating message contract since the wrapper name (AgentRegistrationRequest) of message AgentRegistrationRequest does not match the default value (RegisterAgent)
-        [System.ServiceModel.OperationContractAttribute(IsOneWay=true, Action="http://tempuri.org/IAgentsPool/RegisterAgent")]
-        void RegisterAgent(DistCL.Client.CompileService.AgentRegistrationRequest request);
+        // CODEGEN: Generating message contract since the wrapper name (AgentReqistrationMessage) of message AgentReqistrationMessage does not match the default value (RegisterAgent)
+        [System.ServiceModel.OperationContractAttribute(IsOneWay=true, Action="http://tempuri.org/ICompileCoordinator/RegisterAgent")]
+        void RegisterAgent(DistCL.Client.CompileService.AgentReqistrationMessage request);
         
-        [System.ServiceModel.OperationContractAttribute(IsOneWay=true, Action="http://tempuri.org/IAgentsPool/RegisterAgent")]
-        System.Threading.Tasks.Task RegisterAgentAsync(DistCL.Client.CompileService.AgentRegistrationRequest request);
+        [System.ServiceModel.OperationContractAttribute(IsOneWay=true, Action="http://tempuri.org/ICompileCoordinator/RegisterAgent")]
+        System.Threading.Tasks.Task RegisterAgentAsync(DistCL.Client.CompileService.AgentReqistrationMessage request);
         
-        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IAddressBook/GetAgents", ReplyAction="http://tempuri.org/IAddressBook/GetAgentsResponse")]
-        DistCL.Client.CompileService.AgentAddress[] GetAgents();
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IAgentPool/GetAgents", ReplyAction="http://tempuri.org/IAgentPool/GetAgentsResponse")]
+        DistCL.Client.CompileService.Agent[] GetAgents();
         
-        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IAddressBook/GetAgents", ReplyAction="http://tempuri.org/IAddressBook/GetAgentsResponse")]
-        System.Threading.Tasks.Task<DistCL.Client.CompileService.AgentAddress[]> GetAgentsAsync();
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IAgentPool/GetAgents", ReplyAction="http://tempuri.org/IAgentPool/GetAgentsResponse")]
+        System.Threading.Tasks.Task<DistCL.Client.CompileService.Agent[]> GetAgentsAsync();
     }
     
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
@@ -861,6 +593,14 @@ namespace DistCL.Client.CompileService {
         
         public CompileManagerClient(System.ServiceModel.Channels.Binding binding, System.ServiceModel.EndpointAddress remoteAddress) : 
                 base(binding, remoteAddress) {
+        }
+        
+        public bool IsReady() {
+            return base.Channel.IsReady();
+        }
+        
+        public System.Threading.Tasks.Task<bool> IsReadyAsync() {
+            return base.Channel.IsReadyAsync();
         }
         
         [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
@@ -894,38 +634,40 @@ namespace DistCL.Client.CompileService {
         }
         
         [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
-        void DistCL.Client.CompileService.ICompileManager.RegisterAgent(DistCL.Client.CompileService.AgentRegistrationRequest request) {
+        void DistCL.Client.CompileService.ICompileManager.RegisterAgent(DistCL.Client.CompileService.AgentReqistrationMessage request) {
             base.Channel.RegisterAgent(request);
         }
         
-        public void RegisterAgent(int Hops, System.Guid Guid, string Name, System.Security.Policy.Url[] Urls) {
-            DistCL.Client.CompileService.AgentRegistrationRequest inValue = new DistCL.Client.CompileService.AgentRegistrationRequest();
-            inValue.Hops = Hops;
+        public void RegisterAgent(System.Uri[] AgentPoolUrls, System.Uri[] CompilerUrls, int Cores, System.Guid Guid, string Name) {
+            DistCL.Client.CompileService.AgentReqistrationMessage inValue = new DistCL.Client.CompileService.AgentReqistrationMessage();
+            inValue.AgentPoolUrls = AgentPoolUrls;
+            inValue.CompilerUrls = CompilerUrls;
+            inValue.Cores = Cores;
             inValue.Guid = Guid;
             inValue.Name = Name;
-            inValue.Urls = Urls;
             ((DistCL.Client.CompileService.ICompileManager)(this)).RegisterAgent(inValue);
         }
         
         [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
-        System.Threading.Tasks.Task DistCL.Client.CompileService.ICompileManager.RegisterAgentAsync(DistCL.Client.CompileService.AgentRegistrationRequest request) {
+        System.Threading.Tasks.Task DistCL.Client.CompileService.ICompileManager.RegisterAgentAsync(DistCL.Client.CompileService.AgentReqistrationMessage request) {
             return base.Channel.RegisterAgentAsync(request);
         }
         
-        public System.Threading.Tasks.Task RegisterAgentAsync(int Hops, System.Guid Guid, string Name, System.Security.Policy.Url[] Urls) {
-            DistCL.Client.CompileService.AgentRegistrationRequest inValue = new DistCL.Client.CompileService.AgentRegistrationRequest();
-            inValue.Hops = Hops;
+        public System.Threading.Tasks.Task RegisterAgentAsync(System.Uri[] AgentPoolUrls, System.Uri[] CompilerUrls, int Cores, System.Guid Guid, string Name) {
+            DistCL.Client.CompileService.AgentReqistrationMessage inValue = new DistCL.Client.CompileService.AgentReqistrationMessage();
+            inValue.AgentPoolUrls = AgentPoolUrls;
+            inValue.CompilerUrls = CompilerUrls;
+            inValue.Cores = Cores;
             inValue.Guid = Guid;
             inValue.Name = Name;
-            inValue.Urls = Urls;
             return ((DistCL.Client.CompileService.ICompileManager)(this)).RegisterAgentAsync(inValue);
         }
         
-        public DistCL.Client.CompileService.AgentAddress[] GetAgents() {
+        public DistCL.Client.CompileService.Agent[] GetAgents() {
             return base.Channel.GetAgents();
         }
         
-        public System.Threading.Tasks.Task<DistCL.Client.CompileService.AgentAddress[]> GetAgentsAsync() {
+        public System.Threading.Tasks.Task<DistCL.Client.CompileService.Agent[]> GetAgentsAsync() {
             return base.Channel.GetAgentsAsync();
         }
     }

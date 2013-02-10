@@ -42,7 +42,7 @@
   <xs:element name="Arguments" nillable="true" type="xs:string" />
   <xs:element name="SrcLength" type="xs:long" />
   <xs:element name="SrcName" nillable="true" type="xs:string" />
-  <xs:element name="AgentRequest">
+  <xs:element name="AgentReqistrationMessage">
     <xs:complexType>
       <xs:sequence>
         <xs:element xmlns:q4="http://schemas.microsoft.com/2003/10/Serialization/Arrays" minOccurs="0" name="AgentPoolUrls" nillable="true" type="q4:ArrayOfanyURI" />

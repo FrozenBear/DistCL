@@ -59,7 +59,9 @@
     <Compile Include="Contracts\ICompileManager.cs" />
     <Compile Include="Contracts\ICompiler.cs" />
     <Compile Include="Contracts\ILocalCompiler.cs" />
+    <Compile Include="RemoteCompilerService\RemoteCompilerEntities.cs" />
     <Compile Include="GeneralSettings.cs" />
+    <Compile Include="Logger.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Service References\RemoteCompilerService\Reference.cs">
       <AutoGen>True</AutoGen>

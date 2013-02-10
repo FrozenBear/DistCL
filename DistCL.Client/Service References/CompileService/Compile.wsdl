@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<wsdl:definitions xmlns:wsap="http://schemas.xmlsoap.org/ws/2004/08/addressing/policy" xmlns:wsa10="http://www.w3.org/2005/08/addressing" xmlns:tns="http://tempuri.org/" xmlns:msc="http://schemas.microsoft.com/ws/2005/12/wsdl/contract" xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/" xmlns:wsx="http://schemas.xmlsoap.org/ws/2004/09/mex" xmlns:wsp="http://schemas.xmlsoap.org/ws/2004/09/policy" xmlns:wsam="http://www.w3.org/2007/05/addressing/metadata" xmlns:wsa="http://schemas.xmlsoap.org/ws/2004/08/addressing" xmlns:soap12="http://schemas.xmlsoap.org/wsdl/soap12/" xmlns:wsaw="http://www.w3.org/2006/05/addressing/wsdl" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd" xmlns:xsd="http://www.w3.org/2001/XMLSchema" name="TestCompiler" targetNamespace="http://tempuri.org/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
+<wsdl:definitions xmlns:wsap="http://schemas.xmlsoap.org/ws/2004/08/addressing/policy" xmlns:wsa10="http://www.w3.org/2005/08/addressing" xmlns:tns="http://tempuri.org/" xmlns:msc="http://schemas.microsoft.com/ws/2005/12/wsdl/contract" xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/" xmlns:wsx="http://schemas.xmlsoap.org/ws/2004/09/mex" xmlns:wsp="http://schemas.xmlsoap.org/ws/2004/09/policy" xmlns:wsam="http://www.w3.org/2007/05/addressing/metadata" xmlns:wsa="http://schemas.xmlsoap.org/ws/2004/08/addressing" xmlns:soap12="http://schemas.xmlsoap.org/wsdl/soap12/" xmlns:wsaw="http://www.w3.org/2006/05/addressing/wsdl" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd" xmlns:xsd="http://www.w3.org/2001/XMLSchema" name="Compiler" targetNamespace="http://tempuri.org/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
   <wsp:Policy wsu:Id="netTcpEndpoint_policy">
     <wsp:ExactlyOne>
       <wsp:All>
@@ -32,17 +32,29 @@
   </wsp:Policy>
   <wsdl:types>
     <xsd:schema targetNamespace="http://tempuri.org/Imports">
-      <xsd:import schemaLocation="http://localhost:8733/Compile?xsd=xsd1" namespace="http://tempuri.org/" />
-      <xsd:import schemaLocation="http://localhost:8733/Compile?xsd=xsd0" namespace="http://schemas.microsoft.com/Message" />
-      <xsd:import schemaLocation="http://localhost:8733/Compile?xsd=xsd2" namespace="http://schemas.microsoft.com/2003/10/Serialization/" />
+      <xsd:import schemaLocation="http://localhost:8733/Compile?xsd=xsd0" namespace="http://tempuri.org/" />
+      <xsd:import schemaLocation="http://localhost:8733/Compile?xsd=xsd1" namespace="http://schemas.microsoft.com/2003/10/Serialization/" />
+      <xsd:import schemaLocation="http://localhost:8733/Compile?xsd=xsd2" namespace="http://schemas.microsoft.com/Message" />
       <xsd:import schemaLocation="http://localhost:8733/Compile?xsd=xsd3" namespace="http://schemas.datacontract.org/2004/07/DistCL" />
       <xsd:import schemaLocation="http://localhost:8733/Compile?xsd=xsd4" namespace="http://schemas.datacontract.org/2004/07/DistCL.Utils" />
-      <xsd:import schemaLocation="http://localhost:8733/Compile?xsd=xsd8" namespace="http://schemas.microsoft.com/net/2006/05/peer/HopCount" />
-      <xsd:import schemaLocation="http://localhost:8733/Compile?xsd=xsd5" namespace="http://schemas.datacontract.org/2004/07/System.Security.Policy" />
-      <xsd:import schemaLocation="http://localhost:8733/Compile?xsd=xsd6" namespace="http://schemas.datacontract.org/2004/07/System.Security.Util" />
-      <xsd:import schemaLocation="http://localhost:8733/Compile?xsd=xsd7" namespace="http://schemas.microsoft.com/2003/10/Serialization/Arrays" />
+      <xsd:import schemaLocation="http://localhost:8733/Compile?xsd=xsd5" namespace="http://schemas.microsoft.com/2003/10/Serialization/Arrays" />
     </xsd:schema>
   </wsdl:types>
+  <wsdl:message name="LocalCompileInput">
+    <wsdl:part name="parameters" element="tns:LocalCompileInput" />
+  </wsdl:message>
+  <wsdl:message name="CompileOutput">
+    <wsdl:part name="parameters" element="tns:CompileOutput" />
+  </wsdl:message>
+  <wsdl:message name="CompileOutput_Headers">
+    <wsdl:part name="Status" element="tns:Status" />
+  </wsdl:message>
+  <wsdl:message name="ICompiler_IsReady_InputMessage">
+    <wsdl:part name="parameters" element="tns:IsReady" />
+  </wsdl:message>
+  <wsdl:message name="ICompiler_IsReady_OutputMessage">
+    <wsdl:part name="parameters" element="tns:IsReadyResponse" />
+  </wsdl:message>
   <wsdl:message name="CompileInput">
     <wsdl:part name="parameters" element="tns:CompileInput" />
   </wsdl:message>
@@ -51,76 +63,59 @@
     <wsdl:part name="SrcLength" element="tns:SrcLength" />
     <wsdl:part name="SrcName" element="tns:SrcName" />
   </wsdl:message>
-  <wsdl:message name="CompileOutput">
-    <wsdl:part name="parameters" element="tns:CompileOutput" />
+  <wsdl:message name="AgentReqistrationMessage">
+    <wsdl:part name="parameters" element="tns:AgentReqistrationMessage" />
   </wsdl:message>
-  <wsdl:message name="CompileOutput_Headers">
-    <wsdl:part name="Status" element="tns:Status" />
-  </wsdl:message>
-  <wsdl:message name="LocalCompileInput">
-    <wsdl:part name="parameters" element="tns:LocalCompileInput" />
-  </wsdl:message>
-  <wsdl:message name="AgentRegistrationRequest">
-    <wsdl:part name="parameters" element="tns:AgentRegistrationRequest" />
-  </wsdl:message>
-  <wsdl:message name="AgentRegistrationRequest_Headers">
-    <wsdl:part xmlns:q1="http://schemas.microsoft.com/net/2006/05/peer/HopCount" name="Hops" element="q1:Hops" />
-  </wsdl:message>
-  <wsdl:message name="ICompileManager_GetAgents_InputMessage">
+  <wsdl:message name="IAgentPool_GetAgents_InputMessage">
     <wsdl:part name="parameters" element="tns:GetAgents" />
   </wsdl:message>
-  <wsdl:message name="ICompileManager_GetAgents_OutputMessage">
+  <wsdl:message name="IAgentPool_GetAgents_OutputMessage">
     <wsdl:part name="parameters" element="tns:GetAgentsResponse" />
   </wsdl:message>
   <wsdl:portType name="ILocalCompiler">
-    <wsdl:operation name="Compile">
-      <wsdl:input wsaw:Action="http://tempuri.org/ICompiler/Compile" name="CompileInput" message="tns:CompileInput" />
-      <wsdl:output wsaw:Action="http://tempuri.org/ICompiler/CompileResponse" name="CompileOutput" message="tns:CompileOutput" />
-    </wsdl:operation>
     <wsdl:operation name="LocalCompile">
       <wsdl:input wsaw:Action="http://tempuri.org/ILocalCompiler/LocalCompile" name="LocalCompileInput" message="tns:LocalCompileInput" />
       <wsdl:output wsaw:Action="http://tempuri.org/ILocalCompiler/LocalCompileResponse" name="CompileOutput" message="tns:CompileOutput" />
     </wsdl:operation>
   </wsdl:portType>
   <wsdl:portType name="ICompiler">
+    <wsdl:operation name="IsReady">
+      <wsdl:input wsaw:Action="http://tempuri.org/ICompiler/IsReady" message="tns:ICompiler_IsReady_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/ICompiler/IsReadyResponse" message="tns:ICompiler_IsReady_OutputMessage" />
+    </wsdl:operation>
     <wsdl:operation name="Compile">
       <wsdl:input wsaw:Action="http://tempuri.org/ICompiler/Compile" name="CompileInput" message="tns:CompileInput" />
       <wsdl:output wsaw:Action="http://tempuri.org/ICompiler/CompileResponse" name="CompileOutput" message="tns:CompileOutput" />
     </wsdl:operation>
   </wsdl:portType>
-  <wsdl:portType name="IAgentsPool">
+  <wsdl:portType name="IAgentPool">
     <wsdl:operation name="RegisterAgent">
-      <wsdl:input wsaw:Action="http://tempuri.org/IAgentsPool/RegisterAgent" name="AgentRegistrationRequest" message="tns:AgentRegistrationRequest" />
+      <wsdl:input wsaw:Action="http://tempuri.org/ICompileCoordinator/RegisterAgent" name="AgentReqistrationMessage" message="tns:AgentReqistrationMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="GetAgents">
+      <wsdl:input wsaw:Action="http://tempuri.org/IAgentPool/GetAgents" message="tns:IAgentPool_GetAgents_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/IAgentPool/GetAgentsResponse" message="tns:IAgentPool_GetAgents_OutputMessage" />
     </wsdl:operation>
   </wsdl:portType>
   <wsdl:portType name="ICompileManager">
+    <wsdl:operation name="IsReady">
+      <wsdl:input wsaw:Action="http://tempuri.org/ICompiler/IsReady" message="tns:ICompiler_IsReady_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/ICompiler/IsReadyResponse" message="tns:ICompiler_IsReady_OutputMessage" />
+    </wsdl:operation>
     <wsdl:operation name="Compile">
       <wsdl:input wsaw:Action="http://tempuri.org/ICompiler/Compile" name="CompileInput" message="tns:CompileInput" />
       <wsdl:output wsaw:Action="http://tempuri.org/ICompiler/CompileResponse" name="CompileOutput" message="tns:CompileOutput" />
     </wsdl:operation>
     <wsdl:operation name="RegisterAgent">
-      <wsdl:input wsaw:Action="http://tempuri.org/IAgentsPool/RegisterAgent" name="AgentRegistrationRequest" message="tns:AgentRegistrationRequest" />
+      <wsdl:input wsaw:Action="http://tempuri.org/ICompileCoordinator/RegisterAgent" name="AgentReqistrationMessage" message="tns:AgentReqistrationMessage" />
     </wsdl:operation>
     <wsdl:operation name="GetAgents">
-      <wsdl:input wsaw:Action="http://tempuri.org/IAddressBook/GetAgents" message="tns:ICompileManager_GetAgents_InputMessage" />
-      <wsdl:output wsaw:Action="http://tempuri.org/IAddressBook/GetAgentsResponse" message="tns:ICompileManager_GetAgents_OutputMessage" />
+      <wsdl:input wsaw:Action="http://tempuri.org/IAgentPool/GetAgents" message="tns:IAgentPool_GetAgents_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/IAgentPool/GetAgentsResponse" message="tns:IAgentPool_GetAgents_OutputMessage" />
     </wsdl:operation>
   </wsdl:portType>
   <wsdl:binding name="basicHttpEndpoint_LocalCompiler" type="tns:ILocalCompiler">
     <soap:binding transport="http://schemas.xmlsoap.org/soap/http" />
-    <wsdl:operation name="Compile">
-      <soap:operation soapAction="http://tempuri.org/ICompiler/Compile" style="document" />
-      <wsdl:input name="CompileInput">
-        <soap:header message="tns:CompileInput_Headers" part="Arguments" use="literal" />
-        <soap:header message="tns:CompileInput_Headers" part="SrcLength" use="literal" />
-        <soap:header message="tns:CompileInput_Headers" part="SrcName" use="literal" />
-        <soap:body use="literal" />
-      </wsdl:input>
-      <wsdl:output name="CompileOutput">
-        <soap:header message="tns:CompileOutput_Headers" part="Status" use="literal" />
-        <soap:body use="literal" />
-      </wsdl:output>
-    </wsdl:operation>
     <wsdl:operation name="LocalCompile">
       <soap:operation soapAction="http://tempuri.org/ILocalCompiler/LocalCompile" style="document" />
       <wsdl:input name="LocalCompileInput">
@@ -134,6 +129,15 @@
   </wsdl:binding>
   <wsdl:binding name="basicHttpEndpoint_Compiler" type="tns:ICompiler">
     <soap:binding transport="http://schemas.xmlsoap.org/soap/http" />
+    <wsdl:operation name="IsReady">
+      <soap:operation soapAction="http://tempuri.org/ICompiler/IsReady" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
     <wsdl:operation name="Compile">
       <soap:operation soapAction="http://tempuri.org/ICompiler/Compile" style="document" />
       <wsdl:input name="CompileInput">
@@ -148,40 +152,56 @@
       </wsdl:output>
     </wsdl:operation>
   </wsdl:binding>
-  <wsdl:binding name="basicHttpEndpoint_AgentsPool" type="tns:IAgentsPool">
+  <wsdl:binding name="basicHttpEndpoint_AgentPool" type="tns:IAgentPool">
     <soap:binding transport="http://schemas.xmlsoap.org/soap/http" />
     <wsdl:operation name="RegisterAgent">
-      <soap:operation soapAction="http://tempuri.org/IAgentsPool/RegisterAgent" style="document" />
-      <wsdl:input name="AgentRegistrationRequest">
-        <soap:header message="tns:AgentRegistrationRequest_Headers" part="Hops" use="literal" />
-        <soap:body use="literal" />
-      </wsdl:input>
-    </wsdl:operation>
-  </wsdl:binding>
-  <wsdl:binding name="basicHttpEndpoint_CompileManager" type="tns:ICompileManager">
-    <soap:binding transport="http://schemas.xmlsoap.org/soap/http" />
-    <wsdl:operation name="Compile">
-      <soap:operation soapAction="http://tempuri.org/ICompiler/Compile" style="document" />
-      <wsdl:input name="CompileInput">
-        <soap:header message="tns:CompileInput_Headers" part="Arguments" use="literal" />
-        <soap:header message="tns:CompileInput_Headers" part="SrcLength" use="literal" />
-        <soap:header message="tns:CompileInput_Headers" part="SrcName" use="literal" />
-        <soap:body use="literal" />
-      </wsdl:input>
-      <wsdl:output name="CompileOutput">
-        <soap:header message="tns:CompileOutput_Headers" part="Status" use="literal" />
-        <soap:body use="literal" />
-      </wsdl:output>
-    </wsdl:operation>
-    <wsdl:operation name="RegisterAgent">
-      <soap:operation soapAction="http://tempuri.org/IAgentsPool/RegisterAgent" style="document" />
-      <wsdl:input name="AgentRegistrationRequest">
-        <soap:header message="tns:AgentRegistrationRequest_Headers" part="Hops" use="literal" />
+      <soap:operation soapAction="http://tempuri.org/ICompileCoordinator/RegisterAgent" style="document" />
+      <wsdl:input name="AgentReqistrationMessage">
         <soap:body use="literal" />
       </wsdl:input>
     </wsdl:operation>
     <wsdl:operation name="GetAgents">
-      <soap:operation soapAction="http://tempuri.org/IAddressBook/GetAgents" style="document" />
+      <soap:operation soapAction="http://tempuri.org/IAgentPool/GetAgents" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:binding name="basicHttpEndpoint_CompileManager" type="tns:ICompileManager">
+    <soap:binding transport="http://schemas.xmlsoap.org/soap/http" />
+    <wsdl:operation name="IsReady">
+      <soap:operation soapAction="http://tempuri.org/ICompiler/IsReady" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="Compile">
+      <soap:operation soapAction="http://tempuri.org/ICompiler/Compile" style="document" />
+      <wsdl:input name="CompileInput">
+        <soap:header message="tns:CompileInput_Headers" part="Arguments" use="literal" />
+        <soap:header message="tns:CompileInput_Headers" part="SrcLength" use="literal" />
+        <soap:header message="tns:CompileInput_Headers" part="SrcName" use="literal" />
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output name="CompileOutput">
+        <soap:header message="tns:CompileOutput_Headers" part="Status" use="literal" />
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="RegisterAgent">
+      <soap:operation soapAction="http://tempuri.org/ICompileCoordinator/RegisterAgent" style="document" />
+      <wsdl:input name="AgentReqistrationMessage">
+        <soap:body use="literal" />
+      </wsdl:input>
+    </wsdl:operation>
+    <wsdl:operation name="GetAgents">
+      <soap:operation soapAction="http://tempuri.org/IAgentPool/GetAgents" style="document" />
       <wsdl:input>
         <soap:body use="literal" />
       </wsdl:input>
@@ -193,6 +213,15 @@
   <wsdl:binding name="netTcpEndpoint" type="tns:ICompiler">
     <wsp:PolicyReference URI="#netTcpEndpoint_policy" />
     <soap12:binding transport="http://schemas.microsoft.com/soap/tcp" />
+    <wsdl:operation name="IsReady">
+      <soap12:operation soapAction="http://tempuri.org/ICompiler/IsReady" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
     <wsdl:operation name="Compile">
       <soap12:operation soapAction="http://tempuri.org/ICompiler/Compile" style="document" />
       <wsdl:input name="CompileInput">
@@ -207,15 +236,15 @@
       </wsdl:output>
     </wsdl:operation>
   </wsdl:binding>
-  <wsdl:service name="TestCompiler">
+  <wsdl:service name="Compiler">
     <wsdl:port name="basicHttpEndpoint_LocalCompiler" binding="tns:basicHttpEndpoint_LocalCompiler">
       <soap:address location="http://localhost:8733/Compile/Local" />
     </wsdl:port>
     <wsdl:port name="basicHttpEndpoint_Compiler" binding="tns:basicHttpEndpoint_Compiler">
       <soap:address location="http://localhost:8733/Compile/Compiler" />
     </wsdl:port>
-    <wsdl:port name="basicHttpEndpoint_AgentsPool" binding="tns:basicHttpEndpoint_AgentsPool">
-      <soap:address location="http://localhost:8733/Compile/AgentsPool" />
+    <wsdl:port name="basicHttpEndpoint_AgentPool" binding="tns:basicHttpEndpoint_AgentPool">
+      <soap:address location="http://localhost:8733/Compile/AgentPool" />
     </wsdl:port>
     <wsdl:port name="basicHttpEndpoint_CompileManager" binding="tns:basicHttpEndpoint_CompileManager">
       <soap:address location="http://localhost:8733/Compile/Manager" />

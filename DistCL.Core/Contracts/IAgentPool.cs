@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Runtime.Serialization;
 using System.ServiceModel;
 
@@ -9,34 +10,51 @@ namespace DistCL
 	public interface ICompileCoordinator
 	{
 		[OperationContract(IsOneWay = true)]
-		void RegisterAgent(AgentRequest request);
+		void RegisterAgent(AgentReqistrationMessage request);
 	}
 
 	[ServiceContract]
 	public interface IAgentPool : ICompileCoordinator
 	{
 		[OperationContract]
-		IEnumerable<Agent> GetAgents();
+		Agent[] GetAgents();
 	}
 
-//	[CollectionDataContract(ItemName = "item", Namespace = GeneralSettings.Namespace)]
-//	public class AgentList : List<Agent>
-//	{
-//		public AgentList(IEnumerable<Agent> collection) : base(collection)
-//		{
-//		}
-//	}
-
-	[MessageContract]
-	public class AgentRequest : Agent
+	internal interface IAgentPoolInternal
 	{
+		IEnumerable<IAgent> GetAgents();
 	}
 
+	public interface IAgent
+	{
+		Guid Guid { get; }
+
+		string Name { get; }
+
+		int Cores { get; }
+
+		Uri[] AgentPoolUrls { get; }
+
+		Uri[] CompilerUrls { get; }
+	}
+
+	#region Agent
+
 	[MessageContract]
-	public class Agent : IEquatable<Agent>
+	[DataContract]
+	public class Agent : IEquatable<Agent>, IAgent
 	{
 		public Agent()
 		{
+		}
+
+		public Agent(IAgent agent)
+		{
+			Guid = agent.Guid;
+			Name = agent.Name;
+			Cores = agent.Cores;
+			AgentPoolUrls = agent.AgentPoolUrls;
+			CompilerUrls = agent.CompilerUrls;
 		}
 
 		public Agent(Guid guid, string name, int cores, Uri[] agentPoolUrls, Uri[] compilerUrls)
@@ -49,19 +67,35 @@ namespace DistCL
 		}
 
 		[MessageBodyMember]
+		[DataMember]
 		public Guid Guid { get; private set; }
 
 		[MessageBodyMember]
+		[DataMember]
 		public string Name { get; private set; }
 
 		[MessageBodyMember]
+		[DataMember]
 		public Uri[] AgentPoolUrls { get; private set; }
 
 		[MessageBodyMember]
+		[DataMember]
 		public Uri[] CompilerUrls { get; private set; }
 
 		[MessageBodyMember]
+		[DataMember]
 		public int Cores { get; private set; }
+
+		public override string ToString()
+		{
+			return string.Format(
+				"Guid: {0}, Name: {1}, Cores: {2}, AgentPoolUrls: {3}, CompilerUrls: {4}",
+				Guid,
+				Name,
+				Cores,
+				string.Join(", ", AgentPoolUrls.Select(url => url.ToString()).ToArray()),
+				string.Join(", ", CompilerUrls.Select(url => url.ToString()).ToArray()));
+		}
 
 		#region Equals
 
@@ -94,4 +128,12 @@ namespace DistCL
 
 		#endregion
 	}
+
+	[MessageContract]
+	[DataContract]
+	public class AgentReqistrationMessage : Agent
+	{
+	}
+
+	#endregion
 }

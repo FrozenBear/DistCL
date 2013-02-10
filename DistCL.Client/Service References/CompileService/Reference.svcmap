@@ -23,14 +23,11 @@
   </MetadataSources>
   <Metadata>
     <MetadataFile FileName="Compile4.xsd" MetadataType="Schema" ID="c550dc28-23e7-40f4-9dd1-9c3c4897957a" SourceId="1" SourceUrl="http://localhost:8733/Compile?xsd=xsd5" />
-    <MetadataFile FileName="Compile1.xsd" MetadataType="Schema" ID="210550c5-63e7-4e0e-8499-22c28fc3e29b" SourceId="1" SourceUrl="http://localhost:8733/Compile?xsd=xsd2" />
-    <MetadataFile FileName="Compile5.xsd" MetadataType="Schema" ID="0ac635ed-0166-48a6-b901-898502ed319d" SourceId="1" SourceUrl="http://localhost:8733/Compile?xsd=xsd7" />
     <MetadataFile FileName="Compile.disco" MetadataType="Disco" ID="fdeba886-dae4-4ea1-8809-2b6b020c899a" SourceId="1" SourceUrl="http://localhost:8733/Compile?disco" />
-    <MetadataFile FileName="Compile51.xsd" MetadataType="Schema" ID="2edee262-341c-45a1-9a24-dae9fa65d454" SourceId="1" SourceUrl="http://localhost:8733/Compile?xsd=xsd6" />
-    <MetadataFile FileName="Compile6.xsd" MetadataType="Schema" ID="5d50434e-1750-4082-88c0-00f3ba370d80" SourceId="1" SourceUrl="http://localhost:8733/Compile?xsd=xsd8" />
+    <MetadataFile FileName="Compile.wsdl" MetadataType="Wsdl" ID="3ac2094d-0298-4bc7-ac1f-a84d4ca2b741" SourceId="1" SourceUrl="http://localhost:8733/Compile?wsdl" />
     <MetadataFile FileName="Compile.xsd" MetadataType="Schema" ID="c76a128e-d893-4cd5-9919-66f6e10c736d" SourceId="1" SourceUrl="http://localhost:8733/Compile?xsd=xsd0" />
     <MetadataFile FileName="Compile11.xsd" MetadataType="Schema" ID="036e1f11-35b2-437c-8359-b3af542a4747" SourceId="1" SourceUrl="http://localhost:8733/Compile?xsd=xsd1" />
-    <MetadataFile FileName="Compile.wsdl" MetadataType="Wsdl" ID="3ac2094d-0298-4bc7-ac1f-a84d4ca2b741" SourceId="1" SourceUrl="http://localhost:8733/Compile?wsdl" />
+    <MetadataFile FileName="Compile1.xsd" MetadataType="Schema" ID="210550c5-63e7-4e0e-8499-22c28fc3e29b" SourceId="1" SourceUrl="http://localhost:8733/Compile?xsd=xsd2" />
     <MetadataFile FileName="Compile2.xsd" MetadataType="Schema" ID="ad359863-e32e-49cb-85f9-fd5f5ba9c17b" SourceId="1" SourceUrl="http://localhost:8733/Compile?xsd=xsd3" />
     <MetadataFile FileName="Compile3.xsd" MetadataType="Schema" ID="4f03ea5d-2cee-4d02-9080-97b0de86adab" SourceId="1" SourceUrl="http://localhost:8733/Compile?xsd=xsd4" />
   </Metadata>

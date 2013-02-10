@@ -9,13 +9,27 @@
   <xs:complexType name="CompileArtifactCookie">
     <xs:complexContent mixed="false">
       <xs:extension base="tns:CompileArtifactDescription">
-        <xs:sequence />
+        <xs:sequence>
+          <xs:element minOccurs="0" name="Size" type="xs:long" />
+        </xs:sequence>
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>
   <xs:element name="CompileArtifactCookie" nillable="true" type="tns:CompileArtifactCookie" />
   <xs:complexType name="CompileArtifactDescription">
-    <xs:sequence />
+    <xs:sequence>
+      <xs:element minOccurs="0" name="Name" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="Type" type="tns:CompileArtifactType" />
+    </xs:sequence>
   </xs:complexType>
   <xs:element name="CompileArtifactDescription" nillable="true" type="tns:CompileArtifactDescription" />
+  <xs:simpleType name="CompileArtifactType">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="Obj" />
+      <xs:enumeration value="Pdb" />
+      <xs:enumeration value="Out" />
+      <xs:enumeration value="Err" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:element name="CompileArtifactType" nillable="true" type="tns:CompileArtifactType" />
 </xs:schema>

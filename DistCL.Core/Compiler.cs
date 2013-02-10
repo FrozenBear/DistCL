@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.ServiceModel;
+using System.ServiceModel.Channels;
 using DistCL.Utils;
 
 namespace DistCL
@@ -9,7 +11,9 @@ namespace DistCL
 	[ServiceBehavior(InstanceContextMode = InstanceContextMode.Single)]
 	public class Compiler : ICompileManager, ILocalCompiler
 	{
-		private readonly AgentPool _agents = new AgentPool();
+		private readonly AgentPool _agentPool = new AgentPool();
+
+		public IDictionary<string, Binding> Bindings { get; set; }
 
 		public CompileOutput Compile(CompileInput input)
 		{
@@ -42,14 +46,22 @@ namespace DistCL
 			}
 		}
 
-		public void RegisterAgent(AgentRequest request)
+		public void RegisterAgent(AgentReqistrationMessage request)
 		{
-			_agents.RegisterAgent(new RemoteCompilerProvider(request));
+			//Logger.Log("Compiler.RegisterAgent", GetRemoteAddress());
+			_agentPool.RegisterAgent(new RemoteCompilerProvider(this, new Agent(request)));
 		}
 
-		IEnumerable<Agent> IAgentPool.GetAgents()
+		Agent[] IAgentPool.GetAgents()
 		{
-			return _agents.GetAgents();
+			//Logger.Log("Compiler.GetAgents", GetRemoteAddress());
+			return _agentPool.GetAgents();
+		}
+
+		private string GetRemoteAddress()
+		{
+			var endpointMessageProperty = ((RemoteEndpointMessageProperty) OperationContext.Current.IncomingMessageProperties[RemoteEndpointMessageProperty.Name]);
+			return string.Format("{0}:{1}", endpointMessageProperty.Address, endpointMessageProperty.Port);
 		}
 
 		public bool IsReady()
@@ -69,7 +81,7 @@ namespace DistCL
 						SrcName = input.Src
 					};
 
-				using (var remoteOutput = Compile(remoteInput))
+				using (var remoteOutput = AgentPool.GetRandomCompiler().GetCompiler().Compile(remoteInput))
 				{
 					var remoteStreams = new Dictionary<CompileArtifactType, Stream>();
 					var cookies = new List<CompileArtifactCookie>();
@@ -116,9 +128,9 @@ namespace DistCL
 			}
 		}
 
-		internal AgentPool Agents
+		internal AgentPool AgentPool
 		{
-			get { return _agents; }
+			get { return _agentPool; }
 		}
 
 		private CompileArtifactDescription[] FakeCompile(string tmpPath)
@@ -140,6 +152,11 @@ namespace DistCL
 			}
 
 			return artifacts.ToArray();
+		}
+
+		internal Binding GetBinding(Uri url)
+		{
+			return Bindings[url.Scheme.ToLower()];
 		}
 	}
 }

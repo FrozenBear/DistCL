@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<xs:schema xmlns:tns="http://schemas.datacontract.org/2004/07/DistCL" elementFormDefault="qualified" targetNamespace="http://schemas.datacontract.org/2004/07/DistCL" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+<xs:schema xmlns:ser="http://schemas.microsoft.com/2003/10/Serialization/" xmlns:tns="http://schemas.datacontract.org/2004/07/DistCL" elementFormDefault="qualified" targetNamespace="http://schemas.datacontract.org/2004/07/DistCL" xmlns:xs="http://www.w3.org/2001/XMLSchema">
   <xs:import schemaLocation="http://localhost:8733/Compile?xsd=xsd4" namespace="http://schemas.datacontract.org/2004/07/DistCL.Utils" />
+  <xs:import schemaLocation="http://localhost:8733/Compile?xsd=xsd5" namespace="http://schemas.microsoft.com/2003/10/Serialization/Arrays" />
+  <xs:import schemaLocation="http://localhost:8733/Compile?xsd=xsd1" namespace="http://schemas.microsoft.com/2003/10/Serialization/" />
   <xs:complexType name="CompileStatus">
     <xs:sequence>
       <xs:element xmlns:q1="http://schemas.datacontract.org/2004/07/DistCL.Utils" minOccurs="0" name="Cookies" nillable="true" type="q1:ArrayOfCompileArtifactCookie" />
@@ -16,7 +18,13 @@
   </xs:complexType>
   <xs:element name="ArrayOfAgent" nillable="true" type="tns:ArrayOfAgent" />
   <xs:complexType name="Agent">
-    <xs:sequence />
+    <xs:sequence>
+      <xs:element xmlns:q2="http://schemas.microsoft.com/2003/10/Serialization/Arrays" minOccurs="0" name="AgentPoolUrls" nillable="true" type="q2:ArrayOfanyURI" />
+      <xs:element xmlns:q3="http://schemas.microsoft.com/2003/10/Serialization/Arrays" minOccurs="0" name="CompilerUrls" nillable="true" type="q3:ArrayOfanyURI" />
+      <xs:element minOccurs="0" name="Cores" type="xs:int" />
+      <xs:element minOccurs="0" name="Guid" type="ser:guid" />
+      <xs:element minOccurs="0" name="Name" nillable="true" type="xs:string" />
+    </xs:sequence>
   </xs:complexType>
   <xs:element name="Agent" nillable="true" type="tns:Agent" />
 </xs:schema>

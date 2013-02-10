@@ -73,14 +73,8 @@
     <None Include="Service References\CompileService\Compile4.xsd">
       <SubType>Designer</SubType>
     </None>
-    <None Include="Service References\CompileService\Compile5.xsd">
-      <SubType>Designer</SubType>
-    </None>
-    <None Include="Service References\CompileService\Compile51.xsd">
-      <SubType>Designer</SubType>
-    </None>
-    <None Include="Service References\CompileService\Compile6.xsd">
-      <SubType>Designer</SubType>
+    <None Include="Service References\CompileService\DistCL.Client.CompileService.Agent.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
     </None>
     <None Include="Service References\CompileService\DistCL.Client.CompileService.AgentAddress.datasource">
       <DependentUpon>Reference.svcmap</DependentUpon>

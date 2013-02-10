@@ -12,6 +12,9 @@ namespace DistCL.Client
     {
         private static int Main(string[] args)
         {
+			IAgentPool agentsPool = new AgentPoolClient("basicHttpEndpoint_AgentPool");
+			Console.WriteLine(agentsPool.GetAgents());
+
             //return Compile("test arguments", ConfigurationManager.OpenExeConfiguration(typeof(Program).Assembly.Location).FilePath);
             return Compile("test arguments", @"D:\temp\deadlocks\5\poa.debug.log.dev07");
         }
