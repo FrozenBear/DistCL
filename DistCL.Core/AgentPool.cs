@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace DistCL
 {
@@ -156,10 +157,21 @@ namespace DistCL
 			}
 		}
 
+		#region IAgentPoolInternal
+
 		IEnumerable<IAgent> IAgentPoolInternal.GetAgents()
 		{
 			return GetAgents();
 		}
+
+		public Task<IEnumerable<IAgent>> GetAgentsAsync()
+		{
+			return Task.FromResult((IEnumerable<IAgent>)GetAgents());
+		}
+
+		#endregion
+
+		#region RegisteredAgent
 
 		private class RegisteredAgent
 		{
@@ -186,6 +198,10 @@ namespace DistCL
 				_registrationTime = DateTime.Now;
 			}
 		}
+
+		#endregion
+
+		#region MeasuredAgent
 
 		private class MeasuredAgent : IComparable<MeasuredAgent>
 		{
@@ -232,6 +248,21 @@ namespace DistCL
 			public int CompareTo(MeasuredAgent other)
 			{
 				return _weightStart.CompareTo(other._weightStart);
+			}
+		}
+
+		#endregion
+
+		public bool HasAgent(Guid guid)
+		{
+			_agentsLock.AcquireReaderLock(_lockTimeout);
+			try
+			{
+				return _agents.ContainsKey(guid);
+			}
+			finally
+			{
+				_agentsLock.ReleaseReaderLock();
 			}
 		}
 	}

@@ -23,6 +23,7 @@ namespace DistCL
 	internal interface IAgentPoolInternal
 	{
 		IEnumerable<IAgent> GetAgents();
+		System.Threading.Tasks.Task<IEnumerable<IAgent>> GetAgentsAsync();
 	}
 
 	public interface IAgent
