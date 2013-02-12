@@ -6,6 +6,9 @@ namespace DistCL.RemoteCompilerService
 {
 	partial class AgentPoolClient : IAgentPoolInternal
 	{
+		private const int MaxErrorCount = 3;
+		private int _errorCount;
+
 		IEnumerable<IAgent> IAgentPoolInternal.GetAgents()
 		{
 			return GetAgents();
@@ -14,6 +17,15 @@ namespace DistCL.RemoteCompilerService
 		Task<IEnumerable<IAgent>> IAgentPoolInternal.GetAgentsAsync()
 		{
 			return GetAgentsAsync().ContinueWith(task => (IEnumerable<IAgent>) task.Result);
+		}
+
+		public bool IncreaseErrorCount()
+		{
+			return MaxErrorCount <= ++_errorCount;
+		}
+		public void ResetErrorCount()
+		{
+			_errorCount = 0;
 		}
 	}
 

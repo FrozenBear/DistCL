@@ -26,12 +26,12 @@ namespace DistCL
 
 		public static void Log(string source, string message)
 		{
-			Console.WriteLine("[INFO] {0}: {1}", source, message);
+			Console.WriteLine("{0} [INFO] {1}: {2}", DateTime.Now.ToString("s"), source, message);
 		}
 
 		public static void Warning(string source, string message)
 		{
-			Console.WriteLine("[WARNING] {0}: {1}", source, message);
+			Console.WriteLine("{0} [WARNING] {1}: {2}", DateTime.Now.ToString("s"), source, message);
 		}
 	}
 }

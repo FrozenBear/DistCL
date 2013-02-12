@@ -17,6 +17,8 @@ namespace DistCL
 
 		public CompileOutput Compile(CompileInput input)
 		{
+			Logger.Log("Compiler.Compile", input.SrcName);
+
 			var tmpPath = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
 
 			if (!Directory.Exists(tmpPath))
