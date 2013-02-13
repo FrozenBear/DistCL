@@ -11,12 +11,14 @@
     </xs:sequence>
   </xs:complexType>
   <xs:element name="CompileStatus" nillable="true" type="tns:CompileStatus" />
-  <xs:complexType name="ArrayOfAgent">
-    <xs:sequence>
-      <xs:element minOccurs="0" maxOccurs="unbounded" name="Agent" nillable="true" type="tns:Agent" />
-    </xs:sequence>
+  <xs:complexType name="AgentReqistrationMessage">
+    <xs:complexContent mixed="false">
+      <xs:extension base="tns:Agent">
+        <xs:sequence />
+      </xs:extension>
+    </xs:complexContent>
   </xs:complexType>
-  <xs:element name="ArrayOfAgent" nillable="true" type="tns:ArrayOfAgent" />
+  <xs:element name="AgentReqistrationMessage" nillable="true" type="tns:AgentReqistrationMessage" />
   <xs:complexType name="Agent">
     <xs:sequence>
       <xs:element xmlns:q2="http://schemas.microsoft.com/2003/10/Serialization/Arrays" minOccurs="0" name="AgentPoolUrls" nillable="true" type="q2:ArrayOfanyURI" />
@@ -27,4 +29,10 @@
     </xs:sequence>
   </xs:complexType>
   <xs:element name="Agent" nillable="true" type="tns:Agent" />
+  <xs:complexType name="ArrayOfAgent">
+    <xs:sequence>
+      <xs:element minOccurs="0" maxOccurs="unbounded" name="Agent" nillable="true" type="tns:Agent" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="ArrayOfAgent" nillable="true" type="tns:ArrayOfAgent" />
 </xs:schema>

@@ -94,6 +94,7 @@ namespace DistCL.RemoteCompilerService {
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Runtime.Serialization", "4.0.0.0")]
     [System.Runtime.Serialization.DataContractAttribute(Name="Agent", Namespace="http://schemas.datacontract.org/2004/07/DistCL")]
     [System.SerializableAttribute()]
+    [System.Runtime.Serialization.KnownTypeAttribute(typeof(DistCL.RemoteCompilerService.AgentReqistrationMessage))]
     public partial class Agent : object, System.Runtime.Serialization.IExtensibleDataObject, System.ComponentModel.INotifyPropertyChanged {
         
         [System.NonSerializedAttribute()]
@@ -197,6 +198,13 @@ namespace DistCL.RemoteCompilerService {
                 propertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
             }
         }
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Runtime.Serialization", "4.0.0.0")]
+    [System.Runtime.Serialization.DataContractAttribute(Name="AgentReqistrationMessage", Namespace="http://schemas.datacontract.org/2004/07/DistCL")]
+    [System.SerializableAttribute()]
+    public partial class AgentReqistrationMessage : DistCL.RemoteCompilerService.Agent {
     }
     
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
@@ -424,7 +432,6 @@ namespace DistCL.RemoteCompilerService {
     [System.ServiceModel.ServiceContractAttribute(ConfigurationName="RemoteCompilerService.IAgentPool")]
     public interface IAgentPool {
         
-        // CODEGEN: Generating message contract since the wrapper name (AgentReqistrationMessage) of message AgentReqistrationMessage does not match the default value (RegisterAgent)
         [System.ServiceModel.OperationContractAttribute(IsOneWay=true, Action="http://tempuri.org/ICompileCoordinator/RegisterAgent")]
         void RegisterAgent(DistCL.RemoteCompilerService.AgentReqistrationMessage request);
         
@@ -436,39 +443,6 @@ namespace DistCL.RemoteCompilerService {
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IAgentPool/GetAgents", ReplyAction="http://tempuri.org/IAgentPool/GetAgentsResponse")]
         System.Threading.Tasks.Task<DistCL.RemoteCompilerService.Agent[]> GetAgentsAsync();
-    }
-    
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
-    [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
-    [System.ServiceModel.MessageContractAttribute(WrapperName="AgentReqistrationMessage", WrapperNamespace="http://tempuri.org/", IsWrapped=true)]
-    public partial class AgentReqistrationMessage {
-        
-        [System.ServiceModel.MessageBodyMemberAttribute(Namespace="http://tempuri.org/", Order=0)]
-        public System.Uri[] AgentPoolUrls;
-        
-        [System.ServiceModel.MessageBodyMemberAttribute(Namespace="http://tempuri.org/", Order=1)]
-        public System.Uri[] CompilerUrls;
-        
-        [System.ServiceModel.MessageBodyMemberAttribute(Namespace="http://tempuri.org/", Order=2)]
-        public int Cores;
-        
-        [System.ServiceModel.MessageBodyMemberAttribute(Namespace="http://tempuri.org/", Order=3)]
-        public System.Guid Guid;
-        
-        [System.ServiceModel.MessageBodyMemberAttribute(Namespace="http://tempuri.org/", Order=4)]
-        public string Name;
-        
-        public AgentReqistrationMessage() {
-        }
-        
-        public AgentReqistrationMessage(System.Uri[] AgentPoolUrls, System.Uri[] CompilerUrls, int Cores, System.Guid Guid, string Name) {
-            this.AgentPoolUrls = AgentPoolUrls;
-            this.CompilerUrls = CompilerUrls;
-            this.Cores = Cores;
-            this.Guid = Guid;
-            this.Name = Name;
-        }
     }
     
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
@@ -498,34 +472,12 @@ namespace DistCL.RemoteCompilerService {
                 base(binding, remoteAddress) {
         }
         
-        [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
-        void DistCL.RemoteCompilerService.IAgentPool.RegisterAgent(DistCL.RemoteCompilerService.AgentReqistrationMessage request) {
+        public void RegisterAgent(DistCL.RemoteCompilerService.AgentReqistrationMessage request) {
             base.Channel.RegisterAgent(request);
         }
         
-        public void RegisterAgent(System.Uri[] AgentPoolUrls, System.Uri[] CompilerUrls, int Cores, System.Guid Guid, string Name) {
-            DistCL.RemoteCompilerService.AgentReqistrationMessage inValue = new DistCL.RemoteCompilerService.AgentReqistrationMessage();
-            inValue.AgentPoolUrls = AgentPoolUrls;
-            inValue.CompilerUrls = CompilerUrls;
-            inValue.Cores = Cores;
-            inValue.Guid = Guid;
-            inValue.Name = Name;
-            ((DistCL.RemoteCompilerService.IAgentPool)(this)).RegisterAgent(inValue);
-        }
-        
-        [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
-        System.Threading.Tasks.Task DistCL.RemoteCompilerService.IAgentPool.RegisterAgentAsync(DistCL.RemoteCompilerService.AgentReqistrationMessage request) {
+        public System.Threading.Tasks.Task RegisterAgentAsync(DistCL.RemoteCompilerService.AgentReqistrationMessage request) {
             return base.Channel.RegisterAgentAsync(request);
-        }
-        
-        public System.Threading.Tasks.Task RegisterAgentAsync(System.Uri[] AgentPoolUrls, System.Uri[] CompilerUrls, int Cores, System.Guid Guid, string Name) {
-            DistCL.RemoteCompilerService.AgentReqistrationMessage inValue = new DistCL.RemoteCompilerService.AgentReqistrationMessage();
-            inValue.AgentPoolUrls = AgentPoolUrls;
-            inValue.CompilerUrls = CompilerUrls;
-            inValue.Cores = Cores;
-            inValue.Guid = Guid;
-            inValue.Name = Name;
-            return ((DistCL.RemoteCompilerService.IAgentPool)(this)).RegisterAgentAsync(inValue);
         }
         
         public DistCL.RemoteCompilerService.Agent[] GetAgents() {
@@ -554,7 +506,6 @@ namespace DistCL.RemoteCompilerService {
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICompiler/Compile", ReplyAction="http://tempuri.org/ICompiler/CompileResponse")]
         System.Threading.Tasks.Task<DistCL.RemoteCompilerService.CompileOutput> CompileAsync(DistCL.RemoteCompilerService.CompileInput request);
         
-        // CODEGEN: Generating message contract since the wrapper name (AgentReqistrationMessage) of message AgentReqistrationMessage does not match the default value (RegisterAgent)
         [System.ServiceModel.OperationContractAttribute(IsOneWay=true, Action="http://tempuri.org/ICompileCoordinator/RegisterAgent")]
         void RegisterAgent(DistCL.RemoteCompilerService.AgentReqistrationMessage request);
         
@@ -633,34 +584,12 @@ namespace DistCL.RemoteCompilerService {
             return ((DistCL.RemoteCompilerService.ICompileManager)(this)).CompileAsync(inValue);
         }
         
-        [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
-        void DistCL.RemoteCompilerService.ICompileManager.RegisterAgent(DistCL.RemoteCompilerService.AgentReqistrationMessage request) {
+        public void RegisterAgent(DistCL.RemoteCompilerService.AgentReqistrationMessage request) {
             base.Channel.RegisterAgent(request);
         }
         
-        public void RegisterAgent(System.Uri[] AgentPoolUrls, System.Uri[] CompilerUrls, int Cores, System.Guid Guid, string Name) {
-            DistCL.RemoteCompilerService.AgentReqistrationMessage inValue = new DistCL.RemoteCompilerService.AgentReqistrationMessage();
-            inValue.AgentPoolUrls = AgentPoolUrls;
-            inValue.CompilerUrls = CompilerUrls;
-            inValue.Cores = Cores;
-            inValue.Guid = Guid;
-            inValue.Name = Name;
-            ((DistCL.RemoteCompilerService.ICompileManager)(this)).RegisterAgent(inValue);
-        }
-        
-        [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
-        System.Threading.Tasks.Task DistCL.RemoteCompilerService.ICompileManager.RegisterAgentAsync(DistCL.RemoteCompilerService.AgentReqistrationMessage request) {
+        public System.Threading.Tasks.Task RegisterAgentAsync(DistCL.RemoteCompilerService.AgentReqistrationMessage request) {
             return base.Channel.RegisterAgentAsync(request);
-        }
-        
-        public System.Threading.Tasks.Task RegisterAgentAsync(System.Uri[] AgentPoolUrls, System.Uri[] CompilerUrls, int Cores, System.Guid Guid, string Name) {
-            DistCL.RemoteCompilerService.AgentReqistrationMessage inValue = new DistCL.RemoteCompilerService.AgentReqistrationMessage();
-            inValue.AgentPoolUrls = AgentPoolUrls;
-            inValue.CompilerUrls = CompilerUrls;
-            inValue.Cores = Cores;
-            inValue.Guid = Guid;
-            inValue.Name = Name;
-            return ((DistCL.RemoteCompilerService.ICompileManager)(this)).RegisterAgentAsync(inValue);
         }
         
         public DistCL.RemoteCompilerService.Agent[] GetAgents() {

@@ -51,7 +51,7 @@ namespace DistCL
 		public void RegisterAgent(AgentReqistrationMessage request)
 		{
 			//Logger.Log("Compiler.RegisterAgent", GetRemoteAddress());
-			_agentPool.RegisterAgent(new RemoteCompilerProvider(this, new Agent(request)));
+			_agentPool.RegisterAgent(new RemoteCompilerProvider(this, request));
 		}
 
 		Agent[] IAgentPool.GetAgents()

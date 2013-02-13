@@ -41,7 +41,6 @@ namespace DistCL
 
 	#region Agent
 
-	[MessageContract]
 	[DataContract]
 	public class Agent : IEquatable<Agent>, IAgent
 	{
@@ -67,23 +66,18 @@ namespace DistCL
 			CompilerUrls = compilerUrls;
 		}
 
-		[MessageBodyMember]
 		[DataMember]
 		public Guid Guid { get; private set; }
 
-		[MessageBodyMember]
 		[DataMember]
 		public string Name { get; private set; }
 
-		[MessageBodyMember]
 		[DataMember]
 		public Uri[] AgentPoolUrls { get; private set; }
 
-		[MessageBodyMember]
 		[DataMember]
 		public Uri[] CompilerUrls { get; private set; }
 
-		[MessageBodyMember]
 		[DataMember]
 		public int Cores { get; private set; }
 
@@ -130,7 +124,6 @@ namespace DistCL
 		#endregion
 	}
 
-	[MessageContract]
 	[DataContract]
 	public class AgentReqistrationMessage : Agent
 	{

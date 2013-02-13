@@ -2,8 +2,6 @@
 <xs:schema xmlns:tns="http://tempuri.org/" elementFormDefault="qualified" targetNamespace="http://tempuri.org/" xmlns:xs="http://www.w3.org/2001/XMLSchema">
   <xs:import schemaLocation="http://localhost:8733/Compile?xsd=xsd2" namespace="http://schemas.microsoft.com/Message" />
   <xs:import schemaLocation="http://localhost:8733/Compile?xsd=xsd3" namespace="http://schemas.datacontract.org/2004/07/DistCL" />
-  <xs:import schemaLocation="http://localhost:8733/Compile?xsd=xsd5" namespace="http://schemas.microsoft.com/2003/10/Serialization/Arrays" />
-  <xs:import schemaLocation="http://localhost:8733/Compile?xsd=xsd1" namespace="http://schemas.microsoft.com/2003/10/Serialization/" />
   <xs:element name="LocalCompileInput">
     <xs:complexType>
       <xs:sequence>
@@ -42,14 +40,10 @@
   <xs:element name="Arguments" nillable="true" type="xs:string" />
   <xs:element name="SrcLength" type="xs:long" />
   <xs:element name="SrcName" nillable="true" type="xs:string" />
-  <xs:element name="AgentReqistrationMessage">
+  <xs:element name="RegisterAgent">
     <xs:complexType>
       <xs:sequence>
-        <xs:element xmlns:q4="http://schemas.microsoft.com/2003/10/Serialization/Arrays" minOccurs="0" name="AgentPoolUrls" nillable="true" type="q4:ArrayOfanyURI" />
-        <xs:element xmlns:q5="http://schemas.microsoft.com/2003/10/Serialization/Arrays" minOccurs="0" name="CompilerUrls" nillable="true" type="q5:ArrayOfanyURI" />
-        <xs:element minOccurs="0" name="Cores" type="xs:int" />
-        <xs:element xmlns:q6="http://schemas.microsoft.com/2003/10/Serialization/" minOccurs="0" name="Guid" type="q6:guid" />
-        <xs:element minOccurs="0" name="Name" nillable="true" type="xs:string" />
+        <xs:element xmlns:q4="http://schemas.datacontract.org/2004/07/DistCL" minOccurs="0" name="request" nillable="true" type="q4:AgentReqistrationMessage" />
       </xs:sequence>
     </xs:complexType>
   </xs:element>
@@ -61,7 +55,7 @@
   <xs:element name="GetAgentsResponse">
     <xs:complexType>
       <xs:sequence>
-        <xs:element xmlns:q7="http://schemas.datacontract.org/2004/07/DistCL" minOccurs="0" name="GetAgentsResult" nillable="true" type="q7:ArrayOfAgent" />
+        <xs:element xmlns:q5="http://schemas.datacontract.org/2004/07/DistCL" minOccurs="0" name="GetAgentsResult" nillable="true" type="q5:ArrayOfAgent" />
       </xs:sequence>
     </xs:complexType>
   </xs:element>

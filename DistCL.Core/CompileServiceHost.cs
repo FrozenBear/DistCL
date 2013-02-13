@@ -503,7 +503,7 @@ namespace DistCL
 		{
 			if (!pools.TryAdd(pool.Endpoint.ListenUri, pool))
 			{
-				Logger.Warning("CompileServiceHost.UpdateAgents.Init", string.Format("Pool {0} already registered", pool.Endpoint.ListenUri));
+				Logger.Warning("CompileServiceHost.UpdateAgents", string.Format("Pool {0} already registered", pool.Endpoint.ListenUri));
 			}
 			else
 			{

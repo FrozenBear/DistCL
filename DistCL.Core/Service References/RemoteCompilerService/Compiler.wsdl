@@ -63,8 +63,8 @@
     <wsdl:part name="SrcLength" element="tns:SrcLength" />
     <wsdl:part name="SrcName" element="tns:SrcName" />
   </wsdl:message>
-  <wsdl:message name="AgentReqistrationMessage">
-    <wsdl:part name="parameters" element="tns:AgentReqistrationMessage" />
+  <wsdl:message name="IAgentPool_RegisterAgent_InputMessage">
+    <wsdl:part name="parameters" element="tns:RegisterAgent" />
   </wsdl:message>
   <wsdl:message name="IAgentPool_GetAgents_InputMessage">
     <wsdl:part name="parameters" element="tns:GetAgents" />
@@ -90,7 +90,7 @@
   </wsdl:portType>
   <wsdl:portType name="IAgentPool">
     <wsdl:operation name="RegisterAgent">
-      <wsdl:input wsaw:Action="http://tempuri.org/ICompileCoordinator/RegisterAgent" name="AgentReqistrationMessage" message="tns:AgentReqistrationMessage" />
+      <wsdl:input wsaw:Action="http://tempuri.org/ICompileCoordinator/RegisterAgent" message="tns:IAgentPool_RegisterAgent_InputMessage" />
     </wsdl:operation>
     <wsdl:operation name="GetAgents">
       <wsdl:input wsaw:Action="http://tempuri.org/IAgentPool/GetAgents" message="tns:IAgentPool_GetAgents_InputMessage" />
@@ -107,7 +107,7 @@
       <wsdl:output wsaw:Action="http://tempuri.org/ICompiler/CompileResponse" name="CompileOutput" message="tns:CompileOutput" />
     </wsdl:operation>
     <wsdl:operation name="RegisterAgent">
-      <wsdl:input wsaw:Action="http://tempuri.org/ICompileCoordinator/RegisterAgent" name="AgentReqistrationMessage" message="tns:AgentReqistrationMessage" />
+      <wsdl:input wsaw:Action="http://tempuri.org/ICompileCoordinator/RegisterAgent" message="tns:IAgentPool_RegisterAgent_InputMessage" />
     </wsdl:operation>
     <wsdl:operation name="GetAgents">
       <wsdl:input wsaw:Action="http://tempuri.org/IAgentPool/GetAgents" message="tns:IAgentPool_GetAgents_InputMessage" />
@@ -156,7 +156,7 @@
     <soap:binding transport="http://schemas.xmlsoap.org/soap/http" />
     <wsdl:operation name="RegisterAgent">
       <soap:operation soapAction="http://tempuri.org/ICompileCoordinator/RegisterAgent" style="document" />
-      <wsdl:input name="AgentReqistrationMessage">
+      <wsdl:input>
         <soap:body use="literal" />
       </wsdl:input>
     </wsdl:operation>
@@ -196,7 +196,7 @@
     </wsdl:operation>
     <wsdl:operation name="RegisterAgent">
       <soap:operation soapAction="http://tempuri.org/ICompileCoordinator/RegisterAgent" style="document" />
-      <wsdl:input name="AgentReqistrationMessage">
+      <wsdl:input>
         <soap:body use="literal" />
       </wsdl:input>
     </wsdl:operation>

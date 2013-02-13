@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace DistCL.RemoteCompilerService
@@ -21,8 +22,9 @@ namespace DistCL.RemoteCompilerService
 
 		public bool IncreaseErrorCount()
 		{
-			return MaxErrorCount <= ++_errorCount;
+			return Interlocked.Increment(ref _errorCount) >= MaxErrorCount;
 		}
+
 		public void ResetErrorCount()
 		{
 			_errorCount = 0;

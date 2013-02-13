@@ -11,10 +11,12 @@ namespace DistCL
 		private readonly Dictionary<Guid, RegisteredAgent> _agents = new Dictionary<Guid, RegisteredAgent>();
 
 		private readonly ReaderWriterLock _agentsLock = new ReaderWriterLock();
-		private readonly ReaderWriterLock _weightLock = new ReaderWriterLock();
+		private readonly ReaderWriterLock _weightsSnapshotLock = new ReaderWriterLock();
+		private readonly ReaderWriterLock _agentsSnapshotLock = new ReaderWriterLock();
 		private readonly TimeSpan _lockTimeout = TimeSpan.FromMinutes(1);
 		private readonly Random _random = new Random();
-		private List<MeasuredAgent> _weights;
+		private List<MeasuredAgent> _weightsSnapshot;
+		private Agent[] _agentsSnapshot;
 
 		// TODO total optimization
 
@@ -28,7 +30,8 @@ namespace DistCL
 				{
 					agent = new RegisteredAgent(request);
 					_agents.Add(request.Agent.Guid, agent);
-					_weights = null;
+					_weightsSnapshot = null;
+					_agentsSnapshot = null;
 					Logger.Log("AgentPool.RegisterAgent.New", request.Agent);
 				}
 				else
@@ -36,7 +39,8 @@ namespace DistCL
 					if (!agent.Agent.Agent.Equals(request.Agent))
 					{
 						_agents[request.Agent.Guid] = new RegisteredAgent(request);
-						_weights = null;
+						_weightsSnapshot = null;
+						_agentsSnapshot = null;
 						Logger.Log("AgentPool.RegisterAgent.Update", request.Agent);
 					}
 					else
@@ -51,17 +55,59 @@ namespace DistCL
 			}
 		}
 
+		public bool HasAgent(Guid guid)
+		{
+			_agentsLock.AcquireReaderLock(_lockTimeout);
+			try
+			{
+				return _agents.ContainsKey(guid);
+			}
+			finally
+			{
+				_agentsLock.ReleaseReaderLock();
+			}
+		}
+
+		public Agent[] GetAgents()
+		{
+			_agentsLock.AcquireReaderLock(_lockTimeout);
+			try
+			{
+				if (_agentsSnapshot == null)
+				{
+					_agentsSnapshotLock.AcquireWriterLock(_lockTimeout);
+					try
+					{
+						if (_agentsSnapshot == null)
+						{
+							_agentsSnapshot = _agents.Values.Select(agent => new Agent(agent.Agent.Agent)).ToArray();
+						}
+					}
+					finally
+					{
+						_agentsSnapshotLock.ReleaseWriterLock();
+					}
+				}
+
+				return _agentsSnapshot;
+			}
+			finally
+			{
+				_agentsLock.ReleaseReaderLock();
+			}
+		}
+
 		private List<MeasuredAgent> GetWeights()
 		{
 			_agentsLock.AcquireReaderLock(_lockTimeout);
 			try
 			{
-				if (_weights == null)
+				if (_weightsSnapshot == null)
 				{
-					_weightLock.AcquireWriterLock(_lockTimeout);
-					if (_weights == null)
+					_weightsSnapshotLock.AcquireWriterLock(_lockTimeout);
+					try
 					{
-						try
+						if (_weightsSnapshot == null)
 						{
 							var weights = new List<MeasuredAgent>();
 							int weightPosition = 0;
@@ -75,16 +121,16 @@ namespace DistCL
 
 							weights.Sort((a, b) => a.WeightStart.CompareTo(b.WeightStart));
 
-							_weights = weights;
+							_weightsSnapshot = weights;
 						}
-						finally
-						{
-							_weightLock.ReleaseWriterLock();
-						}
+					}
+					finally
+					{
+						_weightsSnapshotLock.ReleaseWriterLock();
 					}
 				}
 
-				return _weights;
+				return _weightsSnapshot;
 			}
 			finally
 			{
@@ -128,28 +174,14 @@ namespace DistCL
 							_agents.Remove(item);
 						}
 
-						_weights = null;
+						_weightsSnapshot = null;
+						_agentsSnapshot = null;
 					}
 					finally
 					{
 						_agentsLock.DowngradeFromWriterLock(ref cookie);
 					}
 				}
-			}
-			finally
-			{
-				_agentsLock.ReleaseReaderLock();
-			}
-		}
-
-		public Agent[] GetAgents()
-		{
-			_agentsLock.AcquireReaderLock(_lockTimeout);
-			try
-			{
-				var agents = _agents.Values.Select(agent => agent.Agent.Agent).ToArray();
-				//agents = new Agent[] { agents[0] };
-				return agents;
 			}
 			finally
 			{
@@ -252,18 +284,5 @@ namespace DistCL
 		}
 
 		#endregion
-
-		public bool HasAgent(Guid guid)
-		{
-			_agentsLock.AcquireReaderLock(_lockTimeout);
-			try
-			{
-				return _agents.ContainsKey(guid);
-			}
-			finally
-			{
-				_agentsLock.ReleaseReaderLock();
-			}
-		}
 	}
 }
