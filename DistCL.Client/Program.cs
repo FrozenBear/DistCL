@@ -8,51 +8,51 @@ using DistCL.Utils;
 
 namespace DistCL.Client
 {
-    class Program
-    {
-        private static int Main(string[] args)
-        {
-			IAgentPool agentsPool = new AgentPoolClient("basicHttpEndpoint_AgentPool");
-			Console.WriteLine(agentsPool.GetAgents());
+	internal class Program
+	{
+		private static int Main(string[] args)
+		{
+			//IAgentPool agentsPool = new AgentPoolClient("basicHttpEndpoint_AgentPool");
+			//Console.WriteLine(agentsPool.GetAgents());
 
-            //return Compile("test arguments", ConfigurationManager.OpenExeConfiguration(typeof(Program).Assembly.Location).FilePath);
-            return Compile("test arguments", @"D:\temp\deadlocks\5\poa.debug.log.dev07");
-        }
+			//return Compile("test arguments", ConfigurationManager.OpenExeConfiguration(typeof(Program).Assembly.Location).FilePath);
+			return Compile("test arguments", @"D:\temp\deadlocks\5\poa.debug.log.dev07");
+		}
 
-        public static int Compile(string arguments, string srcFile)
-        {
-            ILocalCompiler compiler = new LocalCompilerClient("basicHttpEndpoint_LocalCompiler");
+		public static int Compile(string arguments, string srcFile)
+		{
+			ILocalCompiler compiler = new LocalCompilerClient("basicHttpEndpoint_LocalCompiler");
 
-            CompileOutput output = compiler.LocalCompile(new LocalCompileInput {Arguments = arguments, Src = srcFile});
+			CompileOutput output = compiler.LocalCompile(new LocalCompileInput {Arguments = arguments, Src = srcFile});
 
-            var streams = new Dictionary<CompileArtifactType, Stream>();
-            
-            foreach (var artifact in output.Status.Cookies)
-            {
-                switch (artifact.Type)
-                {
-                    case CompileArtifactType.Out:
-                        streams.Add(artifact.Type, Console.OpenStandardOutput());
-                        break;
+			var streams = new Dictionary<CompileArtifactType, Stream>();
 
-                    case CompileArtifactType.Err:
-                        streams.Add(artifact.Type, Console.OpenStandardError());
-                        break;
+			foreach (var artifact in output.Status.Cookies)
+			{
+				switch (artifact.Type)
+				{
+					case CompileArtifactType.Out:
+						streams.Add(artifact.Type, Console.OpenStandardOutput());
+						break;
 
-                    default:
-                        throw new NotSupportedException("Not supported stream type");
-                }
-            }
+					case CompileArtifactType.Err:
+						streams.Add(artifact.Type, Console.OpenStandardError());
+						break;
 
-            CompileResultHelper.Unpack(output.ResultData, output.Status.Cookies, streams);
-            output.ResultData.Close();
+					default:
+						throw new NotSupportedException("Not supported stream type");
+				}
+			}
 
-            foreach (var stream in streams.Values)
-            {
-                stream.Close();
-            }
+			CompileResultHelper.Unpack(output.ResultData, output.Status.Cookies, streams);
+			output.ResultData.Close();
 
-            return output.Status.ExitCode;
-        }
-    }
+			foreach (var stream in streams.Values)
+			{
+				stream.Close();
+			}
+
+			return output.Status.ExitCode;
+		}
+	}
 }
