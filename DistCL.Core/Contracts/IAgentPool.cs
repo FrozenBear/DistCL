@@ -6,14 +6,16 @@ using System.ServiceModel;
 
 namespace DistCL
 {
-	[ServiceContract]
+	[ServiceContract(Namespace = GeneralSettings.Namespace)]
+	//[ServiceContract]
 	public interface ICompileCoordinator
 	{
 		[OperationContract(IsOneWay = true)]
 		void RegisterAgent(AgentReqistrationMessage request);
 	}
 
-	[ServiceContract]
+	[ServiceContract(Namespace = GeneralSettings.Namespace)]
+	//[ServiceContract]
 	public interface IAgentPool : ICompileCoordinator
 	{
 		[OperationContract]
@@ -41,7 +43,8 @@ namespace DistCL
 
 	#region Agent
 
-	[DataContract]
+	[DataContract(Namespace = GeneralSettings.CoordinatorMessageNamespace)]
+	//[DataContract]
 	public class Agent : IEquatable<Agent>, IAgent
 	{
 		public Agent()
@@ -124,7 +127,8 @@ namespace DistCL
 		#endregion
 	}
 
-	[DataContract]
+	[DataContract(Namespace = GeneralSettings.CoordinatorMessageNamespace)]
+	//[DataContract]
 	public class AgentReqistrationMessage : Agent
 	{
 	}

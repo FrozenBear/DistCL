@@ -10,6 +10,7 @@ using System.ServiceModel.Configuration;
 using System.Threading;
 using System.Threading.Tasks;
 using DistCL.RemoteCompilerService;
+using DistCL.Utils;
 
 namespace DistCL
 {
@@ -233,7 +234,7 @@ namespace DistCL
 					CompilerUrls = CompilerProvider.Agent.CompilerUrls
 				};
 
-			Logger.Log("CompileServiceHost.UpdateAgents.Init", localAgent);
+			Logger.LogAgent("CompileServiceHost.UpdateAgents.Init", localAgent.Name);
 
 			lock (_syncRoot)
 			{

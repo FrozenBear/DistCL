@@ -44,6 +44,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CompileService\RemoteCompilerEntities.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Service References\CompileService\Reference.cs">
@@ -58,12 +59,14 @@
     <None Include="Service References\CompileService\Compile.xsd">
       <SubType>Designer</SubType>
     </None>
+    <None Include="Service References\CompileService\Compile1.wsdl" />
     <None Include="Service References\CompileService\Compile1.xsd">
       <SubType>Designer</SubType>
     </None>
     <None Include="Service References\CompileService\Compile11.xsd">
       <SubType>Designer</SubType>
     </None>
+    <None Include="Service References\CompileService\Compile2.wsdl" />
     <None Include="Service References\CompileService\Compile2.xsd">
       <SubType>Designer</SubType>
     </None>
@@ -71,6 +74,12 @@
       <SubType>Designer</SubType>
     </None>
     <None Include="Service References\CompileService\Compile4.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Service References\CompileService\Compile5.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Service References\CompileService\Compile6.xsd">
       <SubType>Designer</SubType>
     </None>
     <None Include="Service References\CompileService\DistCL.Client.CompileService.Agent.datasource">
@@ -102,6 +111,9 @@
     <None Include="Service References\CompileService\configuration.svcinfo" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Service References\CompileService\DistCL.Client.CompileService.LocalCompileOutput.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
     <None Include="Service References\CompileService\Reference.svcmap">
       <Generator>WCF Proxy Generator</Generator>
       <LastGenOutput>Reference.cs</LastGenOutput>

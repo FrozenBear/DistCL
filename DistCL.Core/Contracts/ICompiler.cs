@@ -8,7 +8,8 @@ using DistCL.Utils.Streams;
 
 namespace DistCL
 {
-	[ServiceContract]
+	[ServiceContract(Namespace = GeneralSettings.Namespace)]
+	//[ServiceContract]
 	public interface ICompiler
 	{
 		[OperationContract]
@@ -24,7 +25,8 @@ namespace DistCL
 		TData Src { get; }
 	}
 
-	[DataContract]
+	[DataContract(Namespace = GeneralSettings.CompilerMessageNamespace)]
+	//[DataContract]
 	public class CompileStatus
 	{
 		public CompileStatus(bool success, int exitCode, CompileArtifactCookie[] cookies)
@@ -44,7 +46,8 @@ namespace DistCL
 		public CompileArtifactCookie[] Cookies { get; private set; }
 	}
 
-	[MessageContract]
+	[MessageContract(WrapperNamespace = GeneralSettings.CompilerMessageNamespace)]
+	//[MessageContract]
 	public class CompileInput : ICompileInput<Stream>, IStreamedMessage
 	{
 		public CompileInput()
@@ -84,7 +87,8 @@ namespace DistCL
 		#endregion
 	}
 
-	[MessageContract]
+	[MessageContract(WrapperNamespace = GeneralSettings.CompilerMessageNamespace)]
+	//[MessageContract]
 	public class CompileOutput : IDisposable
 	{
 		private readonly CompileStatus _status;

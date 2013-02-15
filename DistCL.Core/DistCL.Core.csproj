@@ -61,7 +61,6 @@
     <Compile Include="Contracts\ILocalCompiler.cs" />
     <Compile Include="RemoteCompilerService\RemoteCompilerEntities.cs" />
     <Compile Include="GeneralSettings.cs" />
-    <Compile Include="Logger.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Service References\RemoteCompilerService\Reference.cs">
       <AutoGen>True</AutoGen>
@@ -80,10 +79,18 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <SubType>Designer</SubType>
     </None>
+    <None Include="Service References\RemoteCompilerService\Compile.wsdl" />
     <None Include="Service References\RemoteCompilerService\Compile.xsd">
       <SubType>Designer</SubType>
     </None>
+    <None Include="Service References\RemoteCompilerService\Compile1.wsdl" />
     <None Include="Service References\RemoteCompilerService\Compile1.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Service References\RemoteCompilerService\Compile2.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Service References\RemoteCompilerService\Compile21.xsd">
       <SubType>Designer</SubType>
     </None>
     <None Include="Service References\RemoteCompilerService\Compile5.xsd">
@@ -131,6 +138,9 @@
     <None Include="Service References\RemoteCompilerService\configuration.svcinfo" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Service References\RemoteCompilerService\DistCL.RemoteCompilerService.LocalCompileOutput.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
     <None Include="Service References\RemoteCompilerService\Reference.svcmap">
       <Generator>WCF Proxy Generator</Generator>
       <LastGenOutput>Reference.cs</LastGenOutput>

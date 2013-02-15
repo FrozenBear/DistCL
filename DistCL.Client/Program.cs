@@ -5,6 +5,7 @@ using System.IO;
 using System.Security.Policy;
 using DistCL.Client.CompileService;
 using DistCL.Utils;
+using CompileArtifactType = DistCL.Client.CompileService.CompileArtifactType;
 
 namespace DistCL.Client
 {
@@ -23,20 +24,20 @@ namespace DistCL.Client
 		{
 			ILocalCompiler compiler = new LocalCompilerClient("basicHttpEndpoint_LocalCompiler");
 
-			CompileOutput output = compiler.LocalCompile(new LocalCompileInput {Arguments = arguments, Src = srcFile});
+			LocalCompileOutput output = compiler.LocalCompile(new LocalCompileInput {Arguments = arguments, Src = srcFile});
 
-			var streams = new Dictionary<CompileArtifactType, Stream>();
+			var streams = new Dictionary<Utils.CompileArtifactType, Stream>();
 
 			foreach (var artifact in output.Status.Cookies)
 			{
 				switch (artifact.Type)
 				{
 					case CompileArtifactType.Out:
-						streams.Add(artifact.Type, Console.OpenStandardOutput());
+						streams.Add(((ICompileArtifactCookie)artifact).Type, Console.OpenStandardOutput());
 						break;
 
 					case CompileArtifactType.Err:
-						streams.Add(artifact.Type, Console.OpenStandardError());
+						streams.Add(((ICompileArtifactCookie)artifact).Type, Console.OpenStandardError());
 						break;
 
 					default:

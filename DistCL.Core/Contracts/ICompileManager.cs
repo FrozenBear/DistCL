@@ -2,7 +2,8 @@
 
 namespace DistCL
 {
-	[ServiceContract]
+	[ServiceContract(Namespace = GeneralSettings.Namespace)]
+	//[ServiceContract]
 	public interface ICompileManager : ICompiler, IAgentPool
 	{
 

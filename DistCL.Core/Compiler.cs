@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.ServiceModel;
 using System.ServiceModel.Channels;
 using DistCL.Utils;
@@ -9,6 +8,7 @@ using DistCL.Utils;
 namespace DistCL
 {
 	[ServiceBehavior(InstanceContextMode = InstanceContextMode.Single)]
+	[BindingNamespaceBehavior]
 	public class Compiler : ICompileManager, ILocalCompiler
 	{
 		private readonly AgentPool _agentPool = new AgentPool();
@@ -50,20 +50,12 @@ namespace DistCL
 
 		public void RegisterAgent(AgentReqistrationMessage request)
 		{
-			//Logger.Log("Compiler.RegisterAgent", GetRemoteAddress());
 			_agentPool.RegisterAgent(new RemoteCompilerProvider(this, request));
 		}
 
 		Agent[] IAgentPool.GetAgents()
 		{
-			//Logger.Log("Compiler.GetAgents", GetRemoteAddress());
 			return _agentPool.GetAgents();
-		}
-
-		private string GetRemoteAddress()
-		{
-			var endpointMessageProperty = ((RemoteEndpointMessageProperty) OperationContext.Current.IncomingMessageProperties[RemoteEndpointMessageProperty.Name]);
-			return string.Format("{0}:{1}", endpointMessageProperty.Address, endpointMessageProperty.Port);
 		}
 
 		public bool IsReady()
@@ -71,7 +63,7 @@ namespace DistCL
 			return true;
 		}
 
-		public CompileOutput LocalCompile(LocalCompileInput input)
+		public LocalCompileOutput LocalCompile(LocalCompileInput input)
 		{
 			using (var inputStream = File.OpenRead(input.Src))
 			{
@@ -125,7 +117,7 @@ namespace DistCL
 						}
 					}
 
-					return new CompileOutput(true, remoteOutput.Status.ExitCode, localStreams);
+					return new LocalCompileOutput(true, remoteOutput.Status.ExitCode, localStreams);
 				}
 			}
 		}

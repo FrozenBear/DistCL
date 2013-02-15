@@ -15,7 +15,7 @@ namespace DistCL.RemoteCompilerService {
     
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Runtime.Serialization", "4.0.0.0")]
-    [System.Runtime.Serialization.DataContractAttribute(Name="CompileStatus", Namespace="http://schemas.datacontract.org/2004/07/DistCL")]
+    [System.Runtime.Serialization.DataContractAttribute(Name="CompileStatus", Namespace="urn:distcl:compiler:messages")]
     [System.SerializableAttribute()]
     public partial class CompileStatus : object, System.Runtime.Serialization.IExtensibleDataObject, System.ComponentModel.INotifyPropertyChanged {
         
@@ -92,7 +92,7 @@ namespace DistCL.RemoteCompilerService {
     
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Runtime.Serialization", "4.0.0.0")]
-    [System.Runtime.Serialization.DataContractAttribute(Name="Agent", Namespace="http://schemas.datacontract.org/2004/07/DistCL")]
+    [System.Runtime.Serialization.DataContractAttribute(Name="Agent", Namespace="urn:distcl:agents:messages")]
     [System.SerializableAttribute()]
     [System.Runtime.Serialization.KnownTypeAttribute(typeof(DistCL.RemoteCompilerService.AgentReqistrationMessage))]
     public partial class Agent : object, System.Runtime.Serialization.IExtensibleDataObject, System.ComponentModel.INotifyPropertyChanged {
@@ -202,33 +202,33 @@ namespace DistCL.RemoteCompilerService {
     
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Runtime.Serialization", "4.0.0.0")]
-    [System.Runtime.Serialization.DataContractAttribute(Name="AgentReqistrationMessage", Namespace="http://schemas.datacontract.org/2004/07/DistCL")]
+    [System.Runtime.Serialization.DataContractAttribute(Name="AgentReqistrationMessage", Namespace="urn:distcl:agents:messages")]
     [System.SerializableAttribute()]
     public partial class AgentReqistrationMessage : DistCL.RemoteCompilerService.Agent {
     }
     
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
-    [System.ServiceModel.ServiceContractAttribute(ConfigurationName="RemoteCompilerService.ILocalCompiler")]
+    [System.ServiceModel.ServiceContractAttribute(Namespace="urn:distcl", ConfigurationName="RemoteCompilerService.ILocalCompiler")]
     public interface ILocalCompiler {
         
-        // CODEGEN: Generating message contract since the wrapper name (LocalCompileInput) of message LocalCompileInput does not match the default value (LocalCompile)
-        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ILocalCompiler/LocalCompile", ReplyAction="http://tempuri.org/ILocalCompiler/LocalCompileResponse")]
-        DistCL.RemoteCompilerService.CompileOutput LocalCompile(DistCL.RemoteCompilerService.LocalCompileInput request);
+        // CODEGEN: Generating message contract since the wrapper namespace (urn:distcl:compiler:local:messages) of message LocalCompileInput does not match the default value (urn:distcl)
+        [System.ServiceModel.OperationContractAttribute(Action="urn:distcl/ILocalCompiler/LocalCompile", ReplyAction="urn:distcl/ILocalCompiler/LocalCompileResponse")]
+        DistCL.RemoteCompilerService.LocalCompileOutput LocalCompile(DistCL.RemoteCompilerService.LocalCompileInput request);
         
-        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ILocalCompiler/LocalCompile", ReplyAction="http://tempuri.org/ILocalCompiler/LocalCompileResponse")]
-        System.Threading.Tasks.Task<DistCL.RemoteCompilerService.CompileOutput> LocalCompileAsync(DistCL.RemoteCompilerService.LocalCompileInput request);
+        [System.ServiceModel.OperationContractAttribute(Action="urn:distcl/ILocalCompiler/LocalCompile", ReplyAction="urn:distcl/ILocalCompiler/LocalCompileResponse")]
+        System.Threading.Tasks.Task<DistCL.RemoteCompilerService.LocalCompileOutput> LocalCompileAsync(DistCL.RemoteCompilerService.LocalCompileInput request);
     }
     
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
     [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
-    [System.ServiceModel.MessageContractAttribute(WrapperName="LocalCompileInput", WrapperNamespace="http://tempuri.org/", IsWrapped=true)]
+    [System.ServiceModel.MessageContractAttribute(WrapperName="LocalCompileInput", WrapperNamespace="urn:distcl:compiler:local:messages", IsWrapped=true)]
     public partial class LocalCompileInput {
         
-        [System.ServiceModel.MessageBodyMemberAttribute(Namespace="http://tempuri.org/", Order=0)]
+        [System.ServiceModel.MessageBodyMemberAttribute(Namespace="urn:distcl:compiler:local:messages", Order=0)]
         public string Arguments;
         
-        [System.ServiceModel.MessageBodyMemberAttribute(Namespace="http://tempuri.org/", Order=1)]
+        [System.ServiceModel.MessageBodyMemberAttribute(Namespace="urn:distcl:compiler:local:messages", Order=1)]
         public string Src;
         
         public LocalCompileInput() {
@@ -243,19 +243,19 @@ namespace DistCL.RemoteCompilerService {
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
     [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
-    [System.ServiceModel.MessageContractAttribute(WrapperName="CompileOutput", WrapperNamespace="http://tempuri.org/", IsWrapped=true)]
-    public partial class CompileOutput {
+    [System.ServiceModel.MessageContractAttribute(WrapperName="LocalCompileOutput", WrapperNamespace="urn:distcl:compiler:local:messages", IsWrapped=true)]
+    public partial class LocalCompileOutput {
         
-        [System.ServiceModel.MessageHeaderAttribute(Namespace="http://tempuri.org/")]
+        [System.ServiceModel.MessageHeaderAttribute(Namespace="urn:distcl")]
         public DistCL.RemoteCompilerService.CompileStatus Status;
         
-        [System.ServiceModel.MessageBodyMemberAttribute(Namespace="http://tempuri.org/", Order=0)]
+        [System.ServiceModel.MessageBodyMemberAttribute(Namespace="urn:distcl", Order=0)]
         public System.IO.Stream ResultData;
         
-        public CompileOutput() {
+        public LocalCompileOutput() {
         }
         
-        public CompileOutput(DistCL.RemoteCompilerService.CompileStatus Status, System.IO.Stream ResultData) {
+        public LocalCompileOutput(DistCL.RemoteCompilerService.CompileStatus Status, System.IO.Stream ResultData) {
             this.Status = Status;
             this.ResultData = ResultData;
         }
@@ -289,7 +289,7 @@ namespace DistCL.RemoteCompilerService {
         }
         
         [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
-        DistCL.RemoteCompilerService.CompileOutput DistCL.RemoteCompilerService.ILocalCompiler.LocalCompile(DistCL.RemoteCompilerService.LocalCompileInput request) {
+        DistCL.RemoteCompilerService.LocalCompileOutput DistCL.RemoteCompilerService.ILocalCompiler.LocalCompile(DistCL.RemoteCompilerService.LocalCompileInput request) {
             return base.Channel.LocalCompile(request);
         }
         
@@ -297,17 +297,17 @@ namespace DistCL.RemoteCompilerService {
             DistCL.RemoteCompilerService.LocalCompileInput inValue = new DistCL.RemoteCompilerService.LocalCompileInput();
             inValue.Arguments = Arguments;
             inValue.Src = Src;
-            DistCL.RemoteCompilerService.CompileOutput retVal = ((DistCL.RemoteCompilerService.ILocalCompiler)(this)).LocalCompile(inValue);
+            DistCL.RemoteCompilerService.LocalCompileOutput retVal = ((DistCL.RemoteCompilerService.ILocalCompiler)(this)).LocalCompile(inValue);
             ResultData = retVal.ResultData;
             return retVal.Status;
         }
         
         [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
-        System.Threading.Tasks.Task<DistCL.RemoteCompilerService.CompileOutput> DistCL.RemoteCompilerService.ILocalCompiler.LocalCompileAsync(DistCL.RemoteCompilerService.LocalCompileInput request) {
+        System.Threading.Tasks.Task<DistCL.RemoteCompilerService.LocalCompileOutput> DistCL.RemoteCompilerService.ILocalCompiler.LocalCompileAsync(DistCL.RemoteCompilerService.LocalCompileInput request) {
             return base.Channel.LocalCompileAsync(request);
         }
         
-        public System.Threading.Tasks.Task<DistCL.RemoteCompilerService.CompileOutput> LocalCompileAsync(string Arguments, string Src) {
+        public System.Threading.Tasks.Task<DistCL.RemoteCompilerService.LocalCompileOutput> LocalCompileAsync(string Arguments, string Src) {
             DistCL.RemoteCompilerService.LocalCompileInput inValue = new DistCL.RemoteCompilerService.LocalCompileInput();
             inValue.Arguments = Arguments;
             inValue.Src = Src;
@@ -316,39 +316,39 @@ namespace DistCL.RemoteCompilerService {
     }
     
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
-    [System.ServiceModel.ServiceContractAttribute(ConfigurationName="RemoteCompilerService.ICompiler")]
+    [System.ServiceModel.ServiceContractAttribute(Namespace="urn:distcl", ConfigurationName="RemoteCompilerService.ICompiler")]
     public interface ICompiler {
         
-        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICompiler/IsReady", ReplyAction="http://tempuri.org/ICompiler/IsReadyResponse")]
+        [System.ServiceModel.OperationContractAttribute(Action="urn:distcl/ICompiler/IsReady", ReplyAction="urn:distcl/ICompiler/IsReadyResponse")]
         bool IsReady();
         
-        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICompiler/IsReady", ReplyAction="http://tempuri.org/ICompiler/IsReadyResponse")]
+        [System.ServiceModel.OperationContractAttribute(Action="urn:distcl/ICompiler/IsReady", ReplyAction="urn:distcl/ICompiler/IsReadyResponse")]
         System.Threading.Tasks.Task<bool> IsReadyAsync();
         
-        // CODEGEN: Generating message contract since the wrapper name (CompileInput) of message CompileInput does not match the default value (Compile)
-        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICompiler/Compile", ReplyAction="http://tempuri.org/ICompiler/CompileResponse")]
+        // CODEGEN: Generating message contract since the wrapper namespace (urn:distcl:compiler:messages) of message CompileInput does not match the default value (urn:distcl)
+        [System.ServiceModel.OperationContractAttribute(Action="urn:distcl/ICompiler/Compile", ReplyAction="urn:distcl/ICompiler/CompileResponse")]
         DistCL.RemoteCompilerService.CompileOutput Compile(DistCL.RemoteCompilerService.CompileInput request);
         
-        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICompiler/Compile", ReplyAction="http://tempuri.org/ICompiler/CompileResponse")]
+        [System.ServiceModel.OperationContractAttribute(Action="urn:distcl/ICompiler/Compile", ReplyAction="urn:distcl/ICompiler/CompileResponse")]
         System.Threading.Tasks.Task<DistCL.RemoteCompilerService.CompileOutput> CompileAsync(DistCL.RemoteCompilerService.CompileInput request);
     }
     
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
     [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
-    [System.ServiceModel.MessageContractAttribute(WrapperName="CompileInput", WrapperNamespace="http://tempuri.org/", IsWrapped=true)]
+    [System.ServiceModel.MessageContractAttribute(WrapperName="CompileInput", WrapperNamespace="urn:distcl:compiler:messages", IsWrapped=true)]
     public partial class CompileInput {
         
-        [System.ServiceModel.MessageHeaderAttribute(Namespace="http://tempuri.org/")]
+        [System.ServiceModel.MessageHeaderAttribute(Namespace="urn:distcl")]
         public string Arguments;
         
-        [System.ServiceModel.MessageHeaderAttribute(Namespace="http://tempuri.org/")]
+        [System.ServiceModel.MessageHeaderAttribute(Namespace="urn:distcl")]
         public long SrcLength;
         
-        [System.ServiceModel.MessageHeaderAttribute(Namespace="http://tempuri.org/")]
+        [System.ServiceModel.MessageHeaderAttribute(Namespace="urn:distcl")]
         public string SrcName;
         
-        [System.ServiceModel.MessageBodyMemberAttribute(Namespace="http://tempuri.org/", Order=0)]
+        [System.ServiceModel.MessageBodyMemberAttribute(Namespace="urn:distcl", Order=0)]
         public System.IO.Stream Src;
         
         public CompileInput() {
@@ -359,6 +359,27 @@ namespace DistCL.RemoteCompilerService {
             this.SrcLength = SrcLength;
             this.SrcName = SrcName;
             this.Src = Src;
+        }
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
+    [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
+    [System.ServiceModel.MessageContractAttribute(WrapperName="CompileOutput", WrapperNamespace="urn:distcl:compiler:messages", IsWrapped=true)]
+    public partial class CompileOutput {
+        
+        [System.ServiceModel.MessageHeaderAttribute(Namespace="urn:distcl")]
+        public DistCL.RemoteCompilerService.CompileStatus Status;
+        
+        [System.ServiceModel.MessageBodyMemberAttribute(Namespace="urn:distcl", Order=0)]
+        public System.IO.Stream ResultData;
+        
+        public CompileOutput() {
+        }
+        
+        public CompileOutput(DistCL.RemoteCompilerService.CompileStatus Status, System.IO.Stream ResultData) {
+            this.Status = Status;
+            this.ResultData = ResultData;
         }
     }
     
@@ -429,19 +450,19 @@ namespace DistCL.RemoteCompilerService {
     }
     
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
-    [System.ServiceModel.ServiceContractAttribute(ConfigurationName="RemoteCompilerService.IAgentPool")]
+    [System.ServiceModel.ServiceContractAttribute(Namespace="urn:distcl", ConfigurationName="RemoteCompilerService.IAgentPool")]
     public interface IAgentPool {
         
-        [System.ServiceModel.OperationContractAttribute(IsOneWay=true, Action="http://tempuri.org/ICompileCoordinator/RegisterAgent")]
+        [System.ServiceModel.OperationContractAttribute(IsOneWay=true, Action="urn:distcl/ICompileCoordinator/RegisterAgent")]
         void RegisterAgent(DistCL.RemoteCompilerService.AgentReqistrationMessage request);
         
-        [System.ServiceModel.OperationContractAttribute(IsOneWay=true, Action="http://tempuri.org/ICompileCoordinator/RegisterAgent")]
+        [System.ServiceModel.OperationContractAttribute(IsOneWay=true, Action="urn:distcl/ICompileCoordinator/RegisterAgent")]
         System.Threading.Tasks.Task RegisterAgentAsync(DistCL.RemoteCompilerService.AgentReqistrationMessage request);
         
-        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IAgentPool/GetAgents", ReplyAction="http://tempuri.org/IAgentPool/GetAgentsResponse")]
+        [System.ServiceModel.OperationContractAttribute(Action="urn:distcl/IAgentPool/GetAgents", ReplyAction="urn:distcl/IAgentPool/GetAgentsResponse")]
         DistCL.RemoteCompilerService.Agent[] GetAgents();
         
-        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IAgentPool/GetAgents", ReplyAction="http://tempuri.org/IAgentPool/GetAgentsResponse")]
+        [System.ServiceModel.OperationContractAttribute(Action="urn:distcl/IAgentPool/GetAgents", ReplyAction="urn:distcl/IAgentPool/GetAgentsResponse")]
         System.Threading.Tasks.Task<DistCL.RemoteCompilerService.Agent[]> GetAgentsAsync();
     }
     
@@ -490,32 +511,32 @@ namespace DistCL.RemoteCompilerService {
     }
     
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
-    [System.ServiceModel.ServiceContractAttribute(ConfigurationName="RemoteCompilerService.ICompileManager")]
+    [System.ServiceModel.ServiceContractAttribute(Namespace="urn:distcl", ConfigurationName="RemoteCompilerService.ICompileManager")]
     public interface ICompileManager {
         
-        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICompiler/IsReady", ReplyAction="http://tempuri.org/ICompiler/IsReadyResponse")]
+        [System.ServiceModel.OperationContractAttribute(Action="urn:distcl/ICompiler/IsReady", ReplyAction="urn:distcl/ICompiler/IsReadyResponse")]
         bool IsReady();
         
-        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICompiler/IsReady", ReplyAction="http://tempuri.org/ICompiler/IsReadyResponse")]
+        [System.ServiceModel.OperationContractAttribute(Action="urn:distcl/ICompiler/IsReady", ReplyAction="urn:distcl/ICompiler/IsReadyResponse")]
         System.Threading.Tasks.Task<bool> IsReadyAsync();
         
-        // CODEGEN: Generating message contract since the wrapper name (CompileInput) of message CompileInput does not match the default value (Compile)
-        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICompiler/Compile", ReplyAction="http://tempuri.org/ICompiler/CompileResponse")]
+        // CODEGEN: Generating message contract since the wrapper namespace (urn:distcl:compiler:messages) of message CompileInput does not match the default value (urn:distcl)
+        [System.ServiceModel.OperationContractAttribute(Action="urn:distcl/ICompiler/Compile", ReplyAction="urn:distcl/ICompiler/CompileResponse")]
         DistCL.RemoteCompilerService.CompileOutput Compile(DistCL.RemoteCompilerService.CompileInput request);
         
-        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICompiler/Compile", ReplyAction="http://tempuri.org/ICompiler/CompileResponse")]
+        [System.ServiceModel.OperationContractAttribute(Action="urn:distcl/ICompiler/Compile", ReplyAction="urn:distcl/ICompiler/CompileResponse")]
         System.Threading.Tasks.Task<DistCL.RemoteCompilerService.CompileOutput> CompileAsync(DistCL.RemoteCompilerService.CompileInput request);
         
-        [System.ServiceModel.OperationContractAttribute(IsOneWay=true, Action="http://tempuri.org/ICompileCoordinator/RegisterAgent")]
+        [System.ServiceModel.OperationContractAttribute(IsOneWay=true, Action="urn:distcl/ICompileCoordinator/RegisterAgent")]
         void RegisterAgent(DistCL.RemoteCompilerService.AgentReqistrationMessage request);
         
-        [System.ServiceModel.OperationContractAttribute(IsOneWay=true, Action="http://tempuri.org/ICompileCoordinator/RegisterAgent")]
+        [System.ServiceModel.OperationContractAttribute(IsOneWay=true, Action="urn:distcl/ICompileCoordinator/RegisterAgent")]
         System.Threading.Tasks.Task RegisterAgentAsync(DistCL.RemoteCompilerService.AgentReqistrationMessage request);
         
-        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IAgentPool/GetAgents", ReplyAction="http://tempuri.org/IAgentPool/GetAgentsResponse")]
+        [System.ServiceModel.OperationContractAttribute(Action="urn:distcl/IAgentPool/GetAgents", ReplyAction="urn:distcl/IAgentPool/GetAgentsResponse")]
         DistCL.RemoteCompilerService.Agent[] GetAgents();
         
-        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IAgentPool/GetAgents", ReplyAction="http://tempuri.org/IAgentPool/GetAgentsResponse")]
+        [System.ServiceModel.OperationContractAttribute(Action="urn:distcl/IAgentPool/GetAgents", ReplyAction="urn:distcl/IAgentPool/GetAgentsResponse")]
         System.Threading.Tasks.Task<DistCL.RemoteCompilerService.Agent[]> GetAgentsAsync();
     }
     

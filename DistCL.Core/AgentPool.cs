@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using DistCL.Utils;
 
 namespace DistCL
 {
@@ -32,7 +33,7 @@ namespace DistCL
 					_agents.Add(request.Agent.Guid, agent);
 					_weightsSnapshot = null;
 					_agentsSnapshot = null;
-					Logger.Log("AgentPool.RegisterAgent.New", request.Agent);
+					Logger.LogAgent("AgentPool.RegisterAgent.New", request.Agent.Name);
 				}
 				else
 				{
@@ -41,7 +42,7 @@ namespace DistCL
 						_agents[request.Agent.Guid] = new RegisteredAgent(request);
 						_weightsSnapshot = null;
 						_agentsSnapshot = null;
-						Logger.Log("AgentPool.RegisterAgent.Update", request.Agent);
+						Logger.LogAgent("AgentPool.RegisterAgent.Update", request.Agent.Name);
 					}
 					else
 					{
@@ -119,7 +120,7 @@ namespace DistCL
 								weights.Add(item);
 							}
 
-							weights.Sort((a, b) => a.WeightStart.CompareTo(b.WeightStart));
+							//weights.Sort((a, b) => a.WeightStart.CompareTo(b.WeightStart));
 
 							_weightsSnapshot = weights;
 						}
@@ -170,7 +171,7 @@ namespace DistCL
 					{
 						foreach (var item in expired)
 						{
-							Logger.Log("AgentPool.RegisterAgent.Remove", _agents[item].Agent.Agent);
+							Logger.LogAgent("AgentPool.RegisterAgent.Remove", _agents[item].Agent.Agent.Name);
 							_agents.Remove(item);
 						}
 
