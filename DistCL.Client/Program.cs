@@ -1,13 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Configuration;
 using System.IO;
-using System.Security.Policy;
 using DistCL.Client.CompileService;
 using DistCL.Utils;
 using LocalCompileService = DistCL.Client.CompileService;
-using CompileArtifactType = DistCL.Client.CompileService.CompileArtifactType;
 
 namespace DistCL.Client
 {

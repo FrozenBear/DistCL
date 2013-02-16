@@ -23,7 +23,7 @@ namespace DistCL.Client.CompileService {
         private System.Runtime.Serialization.ExtensionDataObject extensionDataField;
         
         [System.Runtime.Serialization.OptionalFieldAttribute()]
-        private DistCL.Client.CompileService.CompileArtifactCookie[] CookiesField;
+        private DistCL.Utils.CompileArtifactCookie[] CookiesField;
         
         [System.Runtime.Serialization.OptionalFieldAttribute()]
         private int ExitCodeField;
@@ -42,7 +42,7 @@ namespace DistCL.Client.CompileService {
         }
         
         [System.Runtime.Serialization.DataMemberAttribute()]
-        public DistCL.Client.CompileService.CompileArtifactCookie[] Cookies {
+        public DistCL.Utils.CompileArtifactCookie[] Cookies {
             get {
                 return this.CookiesField;
             }
@@ -88,108 +88,6 @@ namespace DistCL.Client.CompileService {
                 propertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
             }
         }
-    }
-    
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Runtime.Serialization", "4.0.0.0")]
-    [System.Runtime.Serialization.DataContractAttribute(Name="CompileArtifactCookie", Namespace="urn:distcl:utils")]
-    [System.SerializableAttribute()]
-    public partial class CompileArtifactCookie : DistCL.Client.CompileService.CompileArtifactDescription {
-        
-        [System.Runtime.Serialization.OptionalFieldAttribute()]
-        private long SizeField;
-        
-        [System.Runtime.Serialization.DataMemberAttribute()]
-        public long Size {
-            get {
-                return this.SizeField;
-            }
-            set {
-                if ((this.SizeField.Equals(value) != true)) {
-                    this.SizeField = value;
-                    this.RaisePropertyChanged("Size");
-                }
-            }
-        }
-    }
-    
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Runtime.Serialization", "4.0.0.0")]
-    [System.Runtime.Serialization.DataContractAttribute(Name="CompileArtifactDescription", Namespace="urn:distcl:utils")]
-    [System.SerializableAttribute()]
-    [System.Runtime.Serialization.KnownTypeAttribute(typeof(DistCL.Client.CompileService.CompileArtifactCookie))]
-    public partial class CompileArtifactDescription : object, System.Runtime.Serialization.IExtensibleDataObject, System.ComponentModel.INotifyPropertyChanged {
-        
-        [System.NonSerializedAttribute()]
-        private System.Runtime.Serialization.ExtensionDataObject extensionDataField;
-        
-        [System.Runtime.Serialization.OptionalFieldAttribute()]
-        private string NameField;
-        
-        [System.Runtime.Serialization.OptionalFieldAttribute()]
-        private DistCL.Client.CompileService.CompileArtifactType TypeField;
-        
-        [global::System.ComponentModel.BrowsableAttribute(false)]
-        public System.Runtime.Serialization.ExtensionDataObject ExtensionData {
-            get {
-                return this.extensionDataField;
-            }
-            set {
-                this.extensionDataField = value;
-            }
-        }
-        
-        [System.Runtime.Serialization.DataMemberAttribute()]
-        public string Name {
-            get {
-                return this.NameField;
-            }
-            set {
-                if ((object.ReferenceEquals(this.NameField, value) != true)) {
-                    this.NameField = value;
-                    this.RaisePropertyChanged("Name");
-                }
-            }
-        }
-        
-        [System.Runtime.Serialization.DataMemberAttribute()]
-        public DistCL.Client.CompileService.CompileArtifactType Type {
-            get {
-                return this.TypeField;
-            }
-            set {
-                if ((this.TypeField.Equals(value) != true)) {
-                    this.TypeField = value;
-                    this.RaisePropertyChanged("Type");
-                }
-            }
-        }
-        
-        public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
-        
-        protected void RaisePropertyChanged(string propertyName) {
-            System.ComponentModel.PropertyChangedEventHandler propertyChanged = this.PropertyChanged;
-            if ((propertyChanged != null)) {
-                propertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
-            }
-        }
-    }
-    
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Runtime.Serialization", "4.0.0.0")]
-    [System.Runtime.Serialization.DataContractAttribute(Name="CompileArtifactType", Namespace="urn:distcl:utils")]
-    public enum CompileArtifactType : int {
-        
-        [System.Runtime.Serialization.EnumMemberAttribute()]
-        Obj = 0,
-        
-        [System.Runtime.Serialization.EnumMemberAttribute()]
-        Pdb = 1,
-        
-        [System.Runtime.Serialization.EnumMemberAttribute()]
-        Out = 2,
-        
-        [System.Runtime.Serialization.EnumMemberAttribute()]
-        Err = 3,
     }
     
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -332,16 +230,17 @@ namespace DistCL.Client.CompileService {
         
         [System.ServiceModel.MessageBodyMemberAttribute(Namespace="urn:distcl:compiler:local:messages", Order=1)]
         public string Src;
-
-		[System.ServiceModel.MessageBodyMemberAttribute(Namespace = "http://tempuri.org/", Order = 2)]
-		public string SrcName;
-
+        
+        [System.ServiceModel.MessageBodyMemberAttribute(Namespace="urn:distcl:compiler:local:messages", Order=2)]
+        public string SrcName;
+        
         public LocalCompileInput() {
         }
         
-        public LocalCompileInput(string Arguments, string Src) {
+        public LocalCompileInput(string Arguments, string Src, string SrcName) {
             this.Arguments = Arguments;
             this.Src = Src;
+            this.SrcName = SrcName;
         }
     }
     
@@ -398,10 +297,11 @@ namespace DistCL.Client.CompileService {
             return base.Channel.LocalCompile(request);
         }
         
-        public DistCL.Client.CompileService.CompileStatus LocalCompile(string Arguments, string Src, out System.IO.Stream ResultData) {
+        public DistCL.Client.CompileService.CompileStatus LocalCompile(string Arguments, string Src, string SrcName, out System.IO.Stream ResultData) {
             DistCL.Client.CompileService.LocalCompileInput inValue = new DistCL.Client.CompileService.LocalCompileInput();
             inValue.Arguments = Arguments;
             inValue.Src = Src;
+            inValue.SrcName = SrcName;
             DistCL.Client.CompileService.LocalCompileOutput retVal = ((DistCL.Client.CompileService.ILocalCompiler)(this)).LocalCompile(inValue);
             ResultData = retVal.ResultData;
             return retVal.Status;
@@ -412,10 +312,11 @@ namespace DistCL.Client.CompileService {
             return base.Channel.LocalCompileAsync(request);
         }
         
-        public System.Threading.Tasks.Task<DistCL.Client.CompileService.LocalCompileOutput> LocalCompileAsync(string Arguments, string Src) {
+        public System.Threading.Tasks.Task<DistCL.Client.CompileService.LocalCompileOutput> LocalCompileAsync(string Arguments, string Src, string SrcName) {
             DistCL.Client.CompileService.LocalCompileInput inValue = new DistCL.Client.CompileService.LocalCompileInput();
             inValue.Arguments = Arguments;
             inValue.Src = Src;
+            inValue.SrcName = SrcName;
             return ((DistCL.Client.CompileService.ILocalCompiler)(this)).LocalCompileAsync(inValue);
         }
     }
