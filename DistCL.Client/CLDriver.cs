@@ -142,6 +142,7 @@ namespace DistCL.Client
 								throw new ApplicationException(String.Format("Parameter '{0}' requires argument", arg));
 							}
 							localCmdLine.Append(arg);
+							arg = args[idx];
 						}
 
 						localCmdLine.Append(StringUtils.QuoteString(arg) + ArgSeparator);
@@ -170,13 +171,13 @@ namespace DistCL.Client
 						// output object file name
 						_outputFiles.Add(new TOutputArtefact(CompileArtifactType.Obj, arg.Substring(3)));
 					}
-					else if (arg.StartsWith("/EP") || arg.StartsWith("/P") || arg.StartsWith("/E"))
+					else if (arg.Equals("/EP", StringComparison.Ordinal) || arg.Equals("/P", StringComparison.Ordinal) || arg.Equals("/E", StringComparison.Ordinal))
 					{
 						// only local compile is needed
 						localCmdLine.Append(arg + ArgSeparator);
 						_localCompileOnly = true;
 					}
-					else if (arg.StartsWith("/LD") || arg.StartsWith("/LDd") || arg.StartsWith("/LN") || arg.StartsWith("/link"))
+					else if (arg.Equals("/LD", StringComparison.Ordinal) || arg.Equals("/LDd", StringComparison.Ordinal) || arg.Equals("/LN", StringComparison.Ordinal) || arg.StartsWith("/link"))
 					{
 						throw new NotSupportedException(String.Format("Linker option '{0}' is not supported for distributed builds", arg));
 					}
@@ -215,6 +216,10 @@ namespace DistCL.Client
 
 				++idx;
 			} // while
+
+			if (!_localCompileOnly)
+				localCmdLine.Append("/E");
+
 			_localCmdLine = localCmdLine.ToString();
 			_remoteCmdLine = remoteCmdLine.ToString();
 		}

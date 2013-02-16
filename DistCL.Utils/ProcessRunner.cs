@@ -1,14 +1,17 @@
-﻿using System.Diagnostics;
+﻿using System;
+using System.Diagnostics;
 using System.IO;
 using System.Security.Permissions;
+using System.Threading;
 
 namespace DistCL.Utils
 {
 	[SecurityPermission(SecurityAction.LinkDemand, Unrestricted = true)]
 	public sealed class ProcessRunner
 	{
-		public static int Run(
-			string fileName, string arguments, TextWriter stdOutput, TextWriter errOutput)
+
+		public static int Run(string fileName, string arguments,
+							  TextWriter stdOutput, TextWriter stdErr)
 		{
 			var process = new Process();
 			using (process)
@@ -20,26 +23,25 @@ namespace DistCL.Utils
 				process.StartInfo.RedirectStandardOutput = true;
 				process.StartInfo.RedirectStandardError = true;
 
+				process.OutputDataReceived += (sender, args) =>
+					{ if (!String.IsNullOrEmpty(args.Data)) stdOutput.WriteLine(args.Data); };
+
+				process.ErrorDataReceived += (sender, args) =>
+					{ if (!String.IsNullOrEmpty(args.Data)) stdErr.WriteLine(args.Data); };
+
 				process.Start();
 
-				ReadProcessOutput(process, stdOutput, errOutput);
+				process.BeginOutputReadLine();
+				process.BeginErrorReadLine();
+
+				if (!process.HasExited)
+				{
+					process.WaitForExit();
+				}
 
 				return process.ExitCode;
 			}
 		}
-
-		private static void ReadProcessOutput(
-			Process cmdLineProcess, TextWriter stdOutput, TextWriter errorOutput)
-		{
-			cmdLineProcess.OutputDataReceived += (sender, args) => stdOutput.Write(args.Data);
-			cmdLineProcess.ErrorDataReceived += (sender, args) => errorOutput.Write(args.Data);
-			cmdLineProcess.BeginOutputReadLine();
-			cmdLineProcess.BeginErrorReadLine();
-
-			if (!cmdLineProcess.HasExited)
-			{
-				cmdLineProcess.WaitForExit();
-			}
-		}
 	}
 }
+

@@ -135,7 +135,6 @@ namespace DistCL
 			using (StringWriter stdOut = new StringWriter())
             using (StringWriter stdErr = new StringWriter())
             {
-                string arguments;
 				int errCode = ProcessRunner.Run(Utils.CompilerSettings.CLExeFilename, commmandLine, stdOut, stdErr);
                 if (errCode != 0)
                     throw new Win32Exception(errCode, "cl.exe error");
