@@ -332,7 +332,10 @@ namespace DistCL.Client.CompileService {
         
         [System.ServiceModel.MessageBodyMemberAttribute(Namespace="urn:distcl:compiler:local:messages", Order=1)]
         public string Src;
-        
+
+		[System.ServiceModel.MessageBodyMemberAttribute(Namespace = "http://tempuri.org/", Order = 2)]
+		public string SrcName;
+
         public LocalCompileInput() {
         }
         

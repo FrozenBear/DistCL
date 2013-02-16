@@ -6,18 +6,11 @@ using System.Threading.Tasks;
 
 namespace DistCL.Utils
 {
-	public class StringUtils
+	public static class StringUtils
 	{
 		public static string QuoteString(this string text)
 		{
-			if (!(text.StartsWith("\"") && text.EndsWith("\"")))
-			{
-				return "\"" + text + "\"";
-			}
-			else
-			{
-				return text;
-			}
+			return "\"" + text.Replace("\"", "\\\"") + "\"";
 		}
 	}
 }

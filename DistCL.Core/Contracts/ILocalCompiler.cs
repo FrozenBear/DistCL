@@ -15,7 +15,7 @@ namespace DistCL
 
 	[MessageContract(WrapperNamespace = GeneralSettings.LocalCompilerMessageNamespace)]
 	//[MessageContract]
-	public class LocalCompileInput : ICompileInput<string>
+	public class LocalCompileInput
 	{
 		[MessageBodyMember(Namespace = GeneralSettings.LocalCompilerMessageNamespace)]
 		//[MessageBodyMember]
@@ -24,6 +24,9 @@ namespace DistCL
 		[MessageBodyMember(Namespace = GeneralSettings.LocalCompilerMessageNamespace)]
 		//[MessageBodyMember]
 		public string Src { get; set; }
+
+		[MessageBodyMember]
+		public string SrcName { get; set; }
 	}
 
 	[MessageContract(WrapperNamespace = GeneralSettings.LocalCompilerMessageNamespace)]

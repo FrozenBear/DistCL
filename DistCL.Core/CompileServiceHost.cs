@@ -257,7 +257,7 @@ namespace DistCL
 									{
 										if (task.Exception != null)
 										{
-											Logger.Log("CompileServiceHost.UpdateAgents.RegisterAgent", task.Exception.Message);
+											Logger.Info("CompileServiceHost.UpdateAgents.RegisterAgent" + task.Exception.Message);
 										}
 
 										if (task.IsFaulted)
@@ -339,8 +339,8 @@ namespace DistCL
 		{
 			if (getAgentsTask.Exception != null)
 			{
-				Logger.Log("CompileServiceHost.UpdateAgents.ConvertRegisteredAgents2AgentPools.GetAgents",
-							getAgentsTask.Exception.Message);
+				Logger.LogException("CompileServiceHost.UpdateAgents.ConvertRegisteredAgents2AgentPools.GetAgents",
+							getAgentsTask.Exception);
 				return;
 			}
 
@@ -392,7 +392,7 @@ namespace DistCL
 										}
 										if (task.Exception != null)
 										{
-											Logger.Warning("CompileServiceHost.UpdateAgents.ConvertRegisteredAgents2AgentPools ", task.Exception.Message);
+											Logger.WarnFormat("CompileServiceHost.UpdateAgents.ConvertRegisteredAgents2AgentPools: {0}", task.Exception.Message);
 										}
 										return false;
 									},
@@ -409,7 +409,7 @@ namespace DistCL
 										}
 										if (task.Exception != null)
 										{
-											Logger.Warning("CompileServiceHost.UpdateAgents.ConvertRegisteredAgents2AgentPools", task.Exception.Message);
+											Logger.WarnFormat("CompileServiceHost.UpdateAgents.ConvertRegisteredAgents2AgentPools: {0}", task.Exception.Message);
 										}
 
 										((RemoteCompilerService.IAgentPool) pool).RegisterAgent(cookie.LocalAgent);
@@ -427,12 +427,12 @@ namespace DistCL
 				}
 				catch (CommunicationException e)
 				{
-					Logger.Log("CompileServiceHost.UpdateAgents.ConvertRegisteredAgents2AgentPools", e.Message);
+					Logger.LogException("CompileServiceHost.UpdateAgents.ConvertRegisteredAgents2AgentPools", e);
 					// Remove AgentPool from list
 				}
 				catch (TimeoutException e)
 				{
-					Logger.Log("CompileServiceHost.UpdateAgents.ConvertRegisteredAgents2AgentPools", e.Message);
+					Logger.LogException("CompileServiceHost.UpdateAgents.ConvertRegisteredAgents2AgentPools", e);
 					// Remove AgentPool from list
 				}
 			}
@@ -504,11 +504,11 @@ namespace DistCL
 		{
 			if (!pools.TryAdd(pool.Endpoint.ListenUri, pool))
 			{
-				Logger.Warning("CompileServiceHost.UpdateAgents", string.Format("Pool {0} already registered", pool.Endpoint.ListenUri));
+				Logger.WarnFormat("CompileServiceHost.UpdateAgents: Pool {0} already registered", pool.Endpoint.ListenUri);
 			}
 			else
 			{
-				Logger.Log("CompileServiceHost.UpdateAgents", string.Format("Added pool '{0}'", pool.Endpoint.ListenUri));
+				Logger.InfoFormat("CompileServiceHost.UpdateAgents: Added pool '{0}'", pool.Endpoint.ListenUri);
 			}
 		}
 
@@ -516,7 +516,7 @@ namespace DistCL
 		{
 			if (pools.TryRemove(pool.Endpoint.ListenUri, out pool))
 			{
-				Logger.Log("CompileServiceHost.UpdateAgents", string.Format("Removed pool '{0}'", pool.Endpoint.ListenUri));
+				Logger.Info("CompileServiceHost.UpdateAgents:" + string.Format("Removed pool '{0}'", pool.Endpoint.ListenUri));
 			}
 		}
 	}

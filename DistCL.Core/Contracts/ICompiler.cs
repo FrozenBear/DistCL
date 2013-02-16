@@ -19,12 +19,6 @@ namespace DistCL
 		CompileOutput Compile(CompileInput input);
 	}
 
-	public interface ICompileInput<out TData>
-	{
-		string Arguments { get; }
-		TData Src { get; }
-	}
-
 	[DataContract(Namespace = GeneralSettings.CompilerMessageNamespace)]
 	//[DataContract]
 	public class CompileStatus
@@ -48,7 +42,7 @@ namespace DistCL
 
 	[MessageContract(WrapperNamespace = GeneralSettings.CompilerMessageNamespace)]
 	//[MessageContract]
-	public class CompileInput : ICompileInput<Stream>, IStreamedMessage
+	public class CompileInput : IStreamedMessage
 	{
 		public CompileInput()
 		{

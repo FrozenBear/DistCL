@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Configuration;
 using System.IO;
 using System.Security.Policy;
 using DistCL.Client.CompileService;
 using DistCL.Utils;
+using LocalCompileService = DistCL.Client.CompileService;
 using CompileArtifactType = DistCL.Client.CompileService.CompileArtifactType;
 
 namespace DistCL.Client
@@ -16,44 +18,75 @@ namespace DistCL.Client
 			//IAgentPool agentsPool = new AgentPoolClient("basicHttpEndpoint_AgentPool");
 			//Console.WriteLine(agentsPool.GetAgents());
 
-			//return Compile("test arguments", ConfigurationManager.OpenExeConfiguration(typeof(Program).Assembly.Location).FilePath);
-			return Compile("test arguments", @"D:\temp\deadlocks\5\poa.debug.log.dev07");
-		}
+            return Compile(args);
+        }
 
-		public static int Compile(string arguments, string srcFile)
-		{
-			ILocalCompiler compiler = new LocalCompilerClient("basicHttpEndpoint_LocalCompiler");
+        public static int Compile(string[] arguments)
+        {
+			Logger.Info("Start compilation...");
 
-			LocalCompileOutput output = compiler.LocalCompile(new LocalCompileInput {Arguments = arguments, Src = srcFile});
+			CLDriver driver = new CLDriver(arguments);
 
-			var streams = new Dictionary<Utils.CompileArtifactType, Stream>();
-
-			foreach (var artifact in output.Status.Cookies)
+			// Run preprocessor
+			string ppFilename = Path.GetTempFileName();
+			try
 			{
-				switch (artifact.Type)
+				using (FileStream preprocOutput = new FileStream(ppFilename, FileMode.Truncate, FileAccess.Write, FileShare.Read))
+				using (StreamWriter stdOut = new StreamWriter(preprocOutput))
+				using (StringWriter stdErr = new StringWriter())
 				{
-					case CompileArtifactType.Out:
-						streams.Add(((ICompileArtifactCookie)artifact).Type, Console.OpenStandardOutput());
-						break;
-
-					case CompileArtifactType.Err:
-						streams.Add(((ICompileArtifactCookie)artifact).Type, Console.OpenStandardError());
-						break;
-
-					default:
-						throw new NotSupportedException("Not supported stream type");
+					int errCode = ProcessRunner.Run(Compiler.CLExeFilename, driver.LocalCommandLine, stdOut, stdErr);
+					if (errCode != 0)
+						throw new Win32Exception(errCode, String.Format("{0} error: {1}", Compiler.CLExeFilename, stdErr.ToString()));
 				}
+
+				LocalCompileService.ILocalCompiler compiler = new LocalCompilerClient("basicHttpEndpoint_LocalCompiler");
+
+				LocalCompileService.LocalCompileOutput output = compiler.LocalCompile(new LocalCompileService.LocalCompileInput
+				{
+					Arguments = driver.RemoteCommandLine,
+					SrcName = driver.SourceFiles[0],
+					Src = ppFilename
+				});
+
+				var streams = new Dictionary<Utils.CompileArtifactType, Stream>();
+
+				using (FileStream objFile = new FileStream(driver.OutputFiles[0].Path, FileMode.Truncate, FileAccess.Write))
+				{
+					foreach (var artifact in output.Status.Cookies)
+					{
+						switch (artifact.Type)
+						{
+							case CompileArtifactType.Out:
+								streams.Add(((ICompileArtifactCookie)artifact).Type, Console.OpenStandardOutput());
+								break;
+
+							case CompileArtifactType.Err:
+								streams.Add(((ICompileArtifactCookie)artifact).Type, Console.OpenStandardError());
+								break;
+							case CompileArtifactType.Obj:
+								streams.Add(((ICompileArtifactCookie)artifact).Type, objFile);
+								break;
+							default:
+								throw new NotSupportedException("Not supported stream type");
+						}
+					}
+
+					CompileResultHelper.Unpack(output.ResultData, output.Status.Cookies, streams);
+					output.ResultData.Close();
+
+					foreach (var stream in streams.Values)
+					{
+						stream.Close();
+					}
+				}
+
+				return output.Status.ExitCode;
 			}
-
-			CompileResultHelper.Unpack(output.ResultData, output.Status.Cookies, streams);
-			output.ResultData.Close();
-
-			foreach (var stream in streams.Values)
+			finally
 			{
-				stream.Close();
+				File.Delete(ppFilename);
 			}
-
-			return output.Status.ExitCode;
-		}
-	}
+        }
+    }
 }

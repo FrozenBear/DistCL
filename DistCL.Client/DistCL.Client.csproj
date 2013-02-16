@@ -44,6 +44,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CLDriver.cs" />
     <Compile Include="CompileService\RemoteCompilerEntities.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -120,6 +121,10 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\DistCL.Core\DistCL.Core.csproj">
+      <Project>{15b3e0d2-6217-493a-a690-158c497f5318}</Project>
+      <Name>DistCL.Core</Name>
+    </ProjectReference>
     <ProjectReference Include="..\DistCL.Utils\DistCL.Utils.csproj">
       <Project>{c2e20a47-96d7-4057-97b9-e426afc42b08}</Project>
       <Name>DistCL.Utils</Name>

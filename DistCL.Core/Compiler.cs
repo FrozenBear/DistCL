@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.IO;
 using System.ServiceModel;
 using System.ServiceModel.Channels;
@@ -13,11 +14,13 @@ namespace DistCL
 	{
 		private readonly AgentPool _agentPool = new AgentPool();
 
+		public const string CLExeFilename = "cl.exe";
+
 		public IDictionary<string, Binding> Bindings { get; set; }
 
 		public CompileOutput Compile(CompileInput input)
 		{
-			Logger.Log("Compiler.Compile", input.SrcName);
+			Logger.Info(input.SrcName);
 
 			var tmpPath = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
 
@@ -26,19 +29,13 @@ namespace DistCL
 
 			try
 			{
-				using (var src = File.OpenWrite(Path.Combine(tmpPath, Path.GetFileName(input.SrcName))))
+				string srcName = Path.Combine(tmpPath, Path.GetFileName(input.SrcName));
+				using (var src = File.OpenWrite(srcName))
 				{
 					input.Src.CopyTo(src);
 				}
 
-				var artifacts = FakeCompile(tmpPath);
-
-				var streams = new Dictionary<CompileArtifactDescription, Stream>();
-
-				foreach (var artifact in artifacts)
-				{
-					streams.Add(artifact, new TempFileStreamWrapper(Path.Combine(tmpPath, artifact.Name)));
-				}
+				var streams = RunCompiler(input.Arguments, srcName, tmpPath);
 
 				return new CompileOutput(true, 0, streams);
 			}
@@ -72,7 +69,7 @@ namespace DistCL
 						Arguments = input.Arguments,
 						Src = inputStream,
 						SrcLength = inputStream.Length,
-						SrcName = input.Src
+						SrcName = input.SrcName
 					};
 
 				using (var remoteOutput = AgentPool.GetRandomCompiler().GetCompiler().Compile(remoteInput))
@@ -127,25 +124,41 @@ namespace DistCL
 			get { return _agentPool; }
 		}
 
-		private CompileArtifactDescription[] FakeCompile(string tmpPath)
+		private Dictionary<CompileArtifactDescription, Stream> RunCompiler(string commmandLine, string inputPath, string outputPath)
 		{
 			var artifacts = new List<CompileArtifactDescription>
 				{
 					new CompileArtifactDescription(CompileArtifactType.Err, "stderr"),
 					new CompileArtifactDescription(CompileArtifactType.Out, "stdout"),
-					new CompileArtifactDescription(CompileArtifactType.Obj, "myFile.obj"),
-					new CompileArtifactDescription(CompileArtifactType.Pdb, "myFile.pdb")
+					new CompileArtifactDescription(CompileArtifactType.Obj, "myFile.obj")
+					//new CompileArtifactDescription(CompileArtifactType.Pdb, "myFile.pdb")
 				};
+
+			using (StringWriter stdOut = new StringWriter())
+            using (StringWriter stdErr = new StringWriter())
+            {
+                string arguments;
+                int errCode = ProcessRunner.Run(CLExeFilename, commmandLine, stdOut, stdErr);
+                if (errCode != 0)
+                    throw new Win32Exception(errCode, "cl.exe error");
+            }
+
+			var streams = new Dictionary<CompileArtifactDescription, Stream>();
+
+			//foreach (var artifact in artifacts)
+			//{
+				//streams.Add(artifact, new TempFileStreamWrapper(Path.Combine(tmpPath, artifact.Name)));
+			//}
 
 			foreach (var artifact in artifacts)
 			{
-				using (var writer = new StreamWriter(Path.Combine(tmpPath, artifact.Name)))
+				using (var writer = new StreamWriter(Path.Combine(outputPath, artifact.Name)))
 				{
 					writer.WriteLine("{0}: {1} DATA", artifact.Name, artifact.Type);
 				}
 			}
 
-			return artifacts.ToArray();
+			return streams;
 		}
 
 		internal Binding GetBinding(Uri url)
