@@ -35,9 +35,9 @@ namespace DistCL.Client
 				using (StreamWriter stdOut = new StreamWriter(preprocOutput))
 				using (StringWriter stdErr = new StringWriter())
 				{
-					int errCode = ProcessRunner.Run(Compiler.CLExeFilename, driver.LocalCommandLine, stdOut, stdErr);
+					int errCode = ProcessRunner.Run(CompilerSettings.CLExeFilename, driver.LocalCommandLine, stdOut, stdErr);
 					if (errCode != 0)
-						throw new Win32Exception(errCode, String.Format("{0} error: {1}", Compiler.CLExeFilename, stdErr.ToString()));
+						throw new Win32Exception(errCode, String.Format("{0} error: {1}", CompilerSettings.CLExeFilename, stdErr.ToString()));
 				}
 
 				LocalCompileService.ILocalCompiler compiler = new LocalCompilerClient("basicHttpEndpoint_LocalCompiler");

@@ -6,7 +6,6 @@ using DistCL.Utils;
 namespace DistCL
 {
 	[ServiceContract(Namespace = GeneralSettings.Namespace)]
-	//[ServiceContract]
 	public interface ILocalCompiler
 	{
 		[OperationContract]
@@ -14,23 +13,19 @@ namespace DistCL
 	}
 
 	[MessageContract(WrapperNamespace = GeneralSettings.LocalCompilerMessageNamespace)]
-	//[MessageContract]
 	public class LocalCompileInput
 	{
 		[MessageBodyMember(Namespace = GeneralSettings.LocalCompilerMessageNamespace)]
-		//[MessageBodyMember]
 		public string Arguments { get; set; }
 
 		[MessageBodyMember(Namespace = GeneralSettings.LocalCompilerMessageNamespace)]
-		//[MessageBodyMember]
 		public string Src { get; set; }
 
-		[MessageBodyMember]
+		[MessageBodyMember(Namespace = GeneralSettings.LocalCompilerMessageNamespace)]
 		public string SrcName { get; set; }
 	}
 
 	[MessageContract(WrapperNamespace = GeneralSettings.LocalCompilerMessageNamespace)]
-	//[MessageContract]
 	public class LocalCompileOutput : CompileOutput
 	{
 		public LocalCompileOutput(CompileStatus status, Stream resultData) : base(status, resultData)

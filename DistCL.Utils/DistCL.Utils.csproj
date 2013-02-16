@@ -44,6 +44,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CompileResultHelper.cs" />
+    <Compile Include="CompilerSettings.cs" />
     <Compile Include="Logger.cs" />
     <Compile Include="ProcessRunner.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

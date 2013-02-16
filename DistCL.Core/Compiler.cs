@@ -14,8 +14,6 @@ namespace DistCL
 	{
 		private readonly AgentPool _agentPool = new AgentPool();
 
-		public const string CLExeFilename = "cl.exe";
-
 		public IDictionary<string, Binding> Bindings { get; set; }
 
 		public CompileOutput Compile(CompileInput input)
@@ -138,7 +136,7 @@ namespace DistCL
             using (StringWriter stdErr = new StringWriter())
             {
                 string arguments;
-                int errCode = ProcessRunner.Run(CLExeFilename, commmandLine, stdOut, stdErr);
+				int errCode = ProcessRunner.Run(Utils.CompilerSettings.CLExeFilename, commmandLine, stdOut, stdErr);
                 if (errCode != 0)
                     throw new Win32Exception(errCode, "cl.exe error");
             }

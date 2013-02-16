@@ -231,12 +231,16 @@ namespace DistCL.RemoteCompilerService {
         [System.ServiceModel.MessageBodyMemberAttribute(Namespace="urn:distcl:compiler:local:messages", Order=1)]
         public string Src;
         
+        [System.ServiceModel.MessageBodyMemberAttribute(Namespace="urn:distcl:compiler:local:messages", Order=2)]
+        public string SrcName;
+        
         public LocalCompileInput() {
         }
         
-        public LocalCompileInput(string Arguments, string Src) {
+        public LocalCompileInput(string Arguments, string Src, string SrcName) {
             this.Arguments = Arguments;
             this.Src = Src;
+            this.SrcName = SrcName;
         }
     }
     
@@ -293,10 +297,11 @@ namespace DistCL.RemoteCompilerService {
             return base.Channel.LocalCompile(request);
         }
         
-        public DistCL.RemoteCompilerService.CompileStatus LocalCompile(string Arguments, string Src, out System.IO.Stream ResultData) {
+        public DistCL.RemoteCompilerService.CompileStatus LocalCompile(string Arguments, string Src, string SrcName, out System.IO.Stream ResultData) {
             DistCL.RemoteCompilerService.LocalCompileInput inValue = new DistCL.RemoteCompilerService.LocalCompileInput();
             inValue.Arguments = Arguments;
             inValue.Src = Src;
+            inValue.SrcName = SrcName;
             DistCL.RemoteCompilerService.LocalCompileOutput retVal = ((DistCL.RemoteCompilerService.ILocalCompiler)(this)).LocalCompile(inValue);
             ResultData = retVal.ResultData;
             return retVal.Status;
@@ -307,10 +312,11 @@ namespace DistCL.RemoteCompilerService {
             return base.Channel.LocalCompileAsync(request);
         }
         
-        public System.Threading.Tasks.Task<DistCL.RemoteCompilerService.LocalCompileOutput> LocalCompileAsync(string Arguments, string Src) {
+        public System.Threading.Tasks.Task<DistCL.RemoteCompilerService.LocalCompileOutput> LocalCompileAsync(string Arguments, string Src, string SrcName) {
             DistCL.RemoteCompilerService.LocalCompileInput inValue = new DistCL.RemoteCompilerService.LocalCompileInput();
             inValue.Arguments = Arguments;
             inValue.Src = Src;
+            inValue.SrcName = SrcName;
             return ((DistCL.RemoteCompilerService.ILocalCompiler)(this)).LocalCompileAsync(inValue);
         }
     }

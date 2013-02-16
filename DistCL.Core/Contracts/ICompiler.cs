@@ -9,7 +9,6 @@ using DistCL.Utils.Streams;
 namespace DistCL
 {
 	[ServiceContract(Namespace = GeneralSettings.Namespace)]
-	//[ServiceContract]
 	public interface ICompiler
 	{
 		[OperationContract]
@@ -20,7 +19,6 @@ namespace DistCL
 	}
 
 	[DataContract(Namespace = GeneralSettings.CompilerMessageNamespace)]
-	//[DataContract]
 	public class CompileStatus
 	{
 		public CompileStatus(bool success, int exitCode, CompileArtifactCookie[] cookies)
@@ -41,7 +39,6 @@ namespace DistCL
 	}
 
 	[MessageContract(WrapperNamespace = GeneralSettings.CompilerMessageNamespace)]
-	//[MessageContract]
 	public class CompileInput : IStreamedMessage
 	{
 		public CompileInput()
@@ -82,7 +79,6 @@ namespace DistCL
 	}
 
 	[MessageContract(WrapperNamespace = GeneralSettings.CompilerMessageNamespace)]
-	//[MessageContract]
 	public class CompileOutput : IDisposable
 	{
 		private readonly CompileStatus _status;

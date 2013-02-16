@@ -10,16 +10,7 @@ namespace DistCL.Utils
 
 		public static void LogAgent(string source, string agentName)
 		{
-			Info(string.Format("Name='{0}'", agentName));
-			//Log(source, string.Format("Guid='{0}', Name='{1}'", agent.Guid, agent.Name));
-//			Log(source, string.Format(
-//				"\n\tGuid: {0},\n\tName: {1},\n\tCores: {2},\n\tAgentPoolUrls: {3},\n\tCompilerUrls: {4}",
-//				agent.Guid,
-//				agent.Name,
-//				agent.Cores,
-//				string.Join(", ", agent.AgentPoolUrls.Select(url => url.ToString()).ToArray()),
-//				string.Join(", ", agent.CompilerUrls.Select(url => url.ToString()).ToArray()))
-//				);
+			Info(string.Format("{0}: Name='{1}'", source, agentName));
 		}
 
 		public static void Info(string message)

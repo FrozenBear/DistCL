@@ -7,7 +7,6 @@ using System.ServiceModel;
 namespace DistCL
 {
 	[ServiceContract(Namespace = GeneralSettings.Namespace)]
-	//[ServiceContract]
 	public interface ICompileCoordinator
 	{
 		[OperationContract(IsOneWay = true)]
@@ -15,7 +14,6 @@ namespace DistCL
 	}
 
 	[ServiceContract(Namespace = GeneralSettings.Namespace)]
-	//[ServiceContract]
 	public interface IAgentPool : ICompileCoordinator
 	{
 		[OperationContract]
@@ -44,7 +42,6 @@ namespace DistCL
 	#region Agent
 
 	[DataContract(Namespace = GeneralSettings.CoordinatorMessageNamespace)]
-	//[DataContract]
 	public class Agent : IEquatable<Agent>, IAgent
 	{
 		public Agent()
@@ -128,7 +125,6 @@ namespace DistCL
 	}
 
 	[DataContract(Namespace = GeneralSettings.CoordinatorMessageNamespace)]
-	//[DataContract]
 	public class AgentReqistrationMessage : Agent
 	{
 	}

@@ -6,7 +6,6 @@ using DistCL.Utils.Streams;
 namespace DistCL.Utils
 {
 	[DataContract(Namespace = CompileResultHelper.Namespace)]
-	//[DataContract]
 	public enum CompileArtifactType
 	{
 		[EnumMember]
@@ -30,7 +29,6 @@ namespace DistCL.Utils
 	}
 
 	[DataContract(Namespace = CompileResultHelper.Namespace)]
-	//[DataContract]
 	public class CompileArtifactDescription : ICompileArtifactDescription
 	{
 		public CompileArtifactDescription()
@@ -63,7 +61,6 @@ namespace DistCL.Utils
 	}
 
 	[DataContract(Namespace = CompileResultHelper.Namespace)]
-	//[DataContract]
 	public class CompileArtifactCookie : CompileArtifactDescription, ICompileArtifactCookie
 	{
 		public CompileArtifactCookie(CompileArtifactDescription description, long size)

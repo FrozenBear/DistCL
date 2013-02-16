@@ -6,6 +6,7 @@
       <xs:sequence>
         <xs:element minOccurs="0" name="Arguments" nillable="true" type="xs:string" />
         <xs:element minOccurs="0" name="Src" nillable="true" type="xs:string" />
+        <xs:element minOccurs="0" name="SrcName" nillable="true" type="xs:string" />
       </xs:sequence>
     </xs:complexType>
   </xs:element>
