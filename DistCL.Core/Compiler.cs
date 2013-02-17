@@ -178,36 +178,46 @@ namespace DistCL
 
 		private Dictionary<CompileArtifactDescription, Stream> RunCompiler(string commmandLine, string inputPath, string outputPath)
 		{
-			var artifacts = new List<CompileArtifactDescription>
-				{
-					new CompileArtifactDescription(CompileArtifactType.Err, "stderr"),
-					new CompileArtifactDescription(CompileArtifactType.Out, "stdout"),
-					new CompileArtifactDescription(CompileArtifactType.Obj, "myFile.obj")
-					//new CompileArtifactDescription(CompileArtifactType.Pdb, "myFile.pdb")
-				};
-
-			using (StringWriter stdOut = new StringWriter())
-            using (StringWriter stdErr = new StringWriter())
-            {
-				int errCode = ProcessRunner.Run(Utils.CompilerSettings.CLExeFilename, commmandLine, stdOut, stdErr);
-                if (errCode != 0)
-                    throw new Win32Exception(errCode, "cl.exe error");
-            }
-
 			var streams = new Dictionary<CompileArtifactDescription, Stream>();
 
-			//foreach (var artifact in artifacts)
-			//{
-				//streams.Add(artifact, new TempFileStreamWrapper(Path.Combine(tmpPath, artifact.Name)));
-			//}
+			byte[] stdOutBuf = null;
+			byte[] stdErrBuf = null;
+			int stdOutStreamLen = 0;
+			int stdErrStreamLen = 0;
 
-			foreach (var artifact in artifacts)
+			using (MemoryStream stdOutStream = new MemoryStream())
+			using (MemoryStream stdErrStream = new MemoryStream())
+			using (StreamWriter stdWriter = new StreamWriter(stdOutStream))
+			using (StreamWriter errWriter = new StreamWriter(stdErrStream))
 			{
-				using (var writer = new StreamWriter(Path.Combine(outputPath, artifact.Name)))
-				{
-					writer.WriteLine("{0}: {1} DATA", artifact.Name, artifact.Type);
-				}
+				// TODO dirty code.
+				commmandLine += " /Fo" + StringUtils.QuoteString(Path.Combine(outputPath, "myFile.obj"));
+				commmandLine += " " + StringUtils.QuoteString(inputPath);
+				Logger.DebugFormat("Call compiler '{0}' with cmdline '{1}'", Utils.CompilerSettings.CLExeFilename, commmandLine);
+
+				int errCode = ProcessRunner.Run(Utils.CompilerSettings.CLExeFilename, commmandLine, stdWriter, errWriter);
+				Logger.DebugFormat("Compilation is completed.");
+
+				if (errCode != 0)
+					throw new ApplicationException(String.Format("{0}: {1}", Utils.CompilerSettings.CLExeFilename, errCode));
+
+				stdErrStreamLen = (int)stdErrStream.Length;
+				stdErrBuf = stdErrStream.GetBuffer();
+
+				stdOutStreamLen = (int)stdOutStream.Length;
+				stdOutBuf = stdOutStream.GetBuffer();
 			}
+
+			streams.Add(new CompileArtifactDescription(CompileArtifactType.Out, "stdout"),
+				new MemoryStream(stdOutBuf, 0, stdOutStreamLen));
+			streams.Add(new CompileArtifactDescription(CompileArtifactType.Err, "stderr"),
+				new MemoryStream(stdErrBuf, 0, stdErrStreamLen));
+
+			Logger.DebugFormat("stdout: {0}, stderr: {1}", System.Text.UTF8Encoding.UTF8.GetString(stdOutBuf, 0, stdOutStreamLen),
+				System.Text.UTF8Encoding.UTF8.GetString(stdErrBuf, 0, stdErrStreamLen));
+
+			streams.Add(new CompileArtifactDescription(CompileArtifactType.Obj, "myFile.obj"),
+				new TempFileStreamWrapper(Path.Combine(outputPath, "myFile.obj")));
 
 			return streams;
 		}

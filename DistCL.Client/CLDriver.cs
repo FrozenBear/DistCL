@@ -133,7 +133,14 @@ namespace DistCL.Client
 
 				if (arg.IndexOfAny(new[] { '/', '-' }, 0, 1) != -1)
 				{
-					if (arg.StartsWith("/D") || arg.StartsWith("/I"))
+					if (arg.Length < 2)
+					{
+						Logger.WarnFormat("ignoring unknown option '{0}'", arg[0]);
+						++idx;
+						continue;
+					}
+
+					if (arg.StartsWith("D", 1) || arg.StartsWith("I", 1))
 					{
 						if (arg.Length <= 2)
 						{
@@ -148,36 +155,37 @@ namespace DistCL.Client
 
 						localCmdLine.Append(arg.QuoteString() + ArgSeparator);
 					}
-					else if (arg.StartsWith("/V"))
+					else if (arg.StartsWith("V", 1))
 					{
 						// depracated
 					}
-					else if (arg.StartsWith("/FI") || arg.StartsWith("/Yu") || arg.StartsWith("/Fp") || arg.StartsWith("/Fd"))
+					else if (arg.StartsWith("FI", 1) || arg.StartsWith("Yu", 1) || arg.StartsWith("Fp", 1) || arg.StartsWith("Fd", 1))
 					{
 						// skip it
 					}
-					else if (arg.StartsWith("/Yc"))
+					else if (arg.StartsWith("Yc", 1))
 					{
 						Logger.Warn("Pre-compiled headers are not supported for distributed builds. These options will be ignored.");
 						_pchCreation = true;
 					}
-					else if (arg.StartsWith("/Zi") || arg.StartsWith("/ZI"))
+					else if (arg.StartsWith("Zi", 1) || arg.StartsWith("ZI", 1))
 					{
 						// replace with /Z7
 						localCmdLine.Append("/Z7" + ArgSeparator);
 						remoteCmdLine.Append("/Z7" + ArgSeparator);
 					}
-					else if (arg.StartsWith("/Fo"))
+					else if (arg.StartsWith("Fo", 1))
 					{
 						// output object file name
 						_outputFiles.Add(new OutputArtefact(CompileArtifactType.Obj, arg.Substring(3)));
 					}
-					else if (arg.Equals("/EP", StringComparison.Ordinal) || arg.Equals("/P", StringComparison.Ordinal) || arg.Equals("/E", StringComparison.Ordinal))
+					else if ((arg.Length == 3 && arg.EndsWith("EP", StringComparison.Ordinal)) || (arg.Length == 2 && (arg.EndsWith("P", StringComparison.Ordinal) || arg.EndsWith("E", StringComparison.Ordinal))))
 					{
 						// only local compile is needed
 						localCmdLine.Append(arg + ArgSeparator);
 						_localCompileOnly = true;
 					}
+					// TODO fix '-' option flag here
 					else if (arg.Equals("/LD", StringComparison.Ordinal) || arg.Equals("/LDd", StringComparison.Ordinal) || arg.Equals("/LN", StringComparison.Ordinal) || arg.StartsWith("/link"))
 					{
 						throw new NotSupportedException(String.Format("Linker option '{0}' is not supported for distributed builds", arg));
