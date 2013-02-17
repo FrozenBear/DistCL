@@ -24,13 +24,13 @@ namespace DistCL
 		DateTime _nextSample = DateTime.MinValue;
 		private int _cpuUsage;
 
-		public LocalCompilerProvider(ICompiler compiler, Uri[] agentPoolUrls, Uri[] compilerUrls)
+		public LocalCompilerProvider(Compiler compiler, Uri[] agentPoolUrls, Uri[] compilerUrls)
 		{
 			_compiler = compiler;
 			_stub = new Agent(
 				Guid.NewGuid(),
 				CompilerSettings.Default.InstanceName,
-				Math.Max(1, Environment.ProcessorCount - 1),
+				compiler.MaxWorkersCount,
 				-1,
 				agentPoolUrls,
 				compilerUrls);

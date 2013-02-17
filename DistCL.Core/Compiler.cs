@@ -4,6 +4,8 @@ using System.ComponentModel;
 using System.IO;
 using System.ServiceModel;
 using System.ServiceModel.Channels;
+using System.Threading;
+using System.Threading.Tasks;
 using DistCL.Utils;
 
 namespace DistCL
@@ -14,6 +16,19 @@ namespace DistCL
 	{
 		private readonly AgentPool _agentPool = new AgentPool();
 		private readonly Logger _logger = new Logger("COMPILER");
+		private readonly int _maxWorkersCount;
+		private int _workersCount;
+		private readonly object _syncRoot = new object();
+
+		public Compiler()
+		{
+			_maxWorkersCount = Math.Max(1, Environment.ProcessorCount);
+		}
+
+		public int MaxWorkersCount
+		{
+			get { return _maxWorkersCount; }
+		}
 
 		internal IBindingsProvider BindingsProvider { get; set; }
 
@@ -28,6 +43,32 @@ namespace DistCL
 		}
 
 		public CompileOutput Compile(CompileInput input)
+		{
+			lock (_syncRoot)
+			{
+				while (_workersCount >= _maxWorkersCount)
+				{
+					Monitor.Wait(_syncRoot);
+				}
+
+				_workersCount ++;
+			}
+
+			try
+			{
+				return CompileInternal(input);
+			}
+			finally
+			{
+				lock (_syncRoot)
+				{
+					_workersCount--;
+					Monitor.Pulse(_syncRoot);
+				}
+			}
+		}
+
+		public CompileOutput CompileInternal(CompileInput input)
 		{
 			Logger.InfoFormat("Compiling '{0}'...", input.SrcName);
 
