@@ -22,7 +22,7 @@ namespace DistCL
 
 		public Compiler()
 		{
-			_maxWorkersCount = Math.Max(1, Environment.ProcessorCount);
+			_maxWorkersCount = Math.Max(1, Environment.ProcessorCount-1);
 		}
 
 		public int MaxWorkersCount
