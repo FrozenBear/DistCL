@@ -58,5 +58,17 @@ namespace DistCL {
                 this["InstanceName"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("00:03:00")]
+        public global::System.TimeSpan NetworkBuildPeriod {
+            get {
+                return ((global::System.TimeSpan)(this["NetworkBuildPeriod"]));
+            }
+            set {
+                this["NetworkBuildPeriod"] = value;
+            }
+        }
     }
 }

@@ -59,6 +59,7 @@
     <Compile Include="Contracts\ICompileManager.cs" />
     <Compile Include="Contracts\ICompiler.cs" />
     <Compile Include="Contracts\ILocalCompiler.cs" />
+    <Compile Include="NetworkBuilder.cs" />
     <Compile Include="RemoteCompilerService\RemoteCompilerEntities.cs" />
     <Compile Include="GeneralSettings.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

@@ -39,13 +39,13 @@ namespace DistCL
 
 	internal class RemoteCompilerProvider : ICompilerProvider
 	{
+		private readonly IBindingsProvider _bindingsProvider;
 		private readonly Agent _agent;
-		private readonly Compiler _localCompiler;
 
-		public RemoteCompilerProvider(Compiler localCompiler, Agent agent)
+		public RemoteCompilerProvider(IBindingsProvider bindingsProvider, Agent agent)
 		{
+			_bindingsProvider = bindingsProvider;
 			_agent = agent;
-			_localCompiler = localCompiler;
 		}
 
 		public Agent Agent
@@ -57,7 +57,7 @@ namespace DistCL
 		{
 			foreach (var url in _agent.CompilerUrls)
 			{
-				RemoteCompilerService.ICompiler compiler = new CompilerClient(_localCompiler.GetBinding(url), new EndpointAddress(url));
+				RemoteCompilerService.ICompiler compiler = new CompilerClient(_bindingsProvider.GetBinding(url), new EndpointAddress(url));
 
 				return compiler.IsReady() ? new CompilerProxy(compiler) : null;
 			}

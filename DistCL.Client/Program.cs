@@ -10,59 +10,63 @@ namespace DistCL.Client
 {
 	internal class Program
 	{
+		private static readonly Logger Logger = new Logger("CLIENT");
+
 		private static int Main(string[] args)
 		{
 			//IAgentPool agentsPool = new AgentPoolClient("basicHttpEndpoint_AgentPool");
 			//Console.WriteLine(agentsPool.GetAgents());
 
-            return Compile(args);
-        }
+			return Compile(args);
+		}
 
-        public static int Compile(string[] arguments)
-        {
+		public static int Compile(string[] arguments)
+		{
 			Logger.Info("Start compilation...");
 
-			CLDriver driver = new CLDriver(arguments);
+			var driver = new CLDriver(arguments);
 
 			// Run preprocessor
 			string ppFilename = Path.GetTempFileName();
 			try
 			{
-				using (FileStream preprocOutput = new FileStream(ppFilename, FileMode.Truncate, FileAccess.Write, FileShare.Read))
-				using (StreamWriter stdOut = new StreamWriter(preprocOutput))
-				using (StringWriter stdErr = new StringWriter())
+				using (var preprocOutput = new FileStream(ppFilename, FileMode.Truncate, FileAccess.Write, FileShare.Read))
+				using (var stdOut = new StreamWriter(preprocOutput))
+				using (var stdErr = new StringWriter())
 				{
-					int errCode = ProcessRunner.Run(CompilerSettings.CLExeFilename, driver.LocalCommandLine, stdOut, stdErr);
+					var errCode = ProcessRunner.Run(CompilerSettings.CLExeFilename, driver.LocalCommandLine, stdOut, stdErr);
 					if (errCode != 0)
-						throw new Win32Exception(errCode, String.Format("{0} error: {1}", CompilerSettings.CLExeFilename, stdErr.ToString()));
+						throw new Win32Exception(
+							errCode,
+							String.Format("{0} error: {1}", CompilerSettings.CLExeFilename, stdErr));
 				}
 
-				LocalCompileService.ILocalCompiler compiler = new LocalCompilerClient("basicHttpEndpoint_LocalCompiler");
+				ILocalCompiler compiler = new LocalCompilerClient("basicHttpEndpoint_LocalCompiler");
 
-				LocalCompileService.LocalCompileOutput output = compiler.LocalCompile(new LocalCompileService.LocalCompileInput
-				{
-					Arguments = driver.RemoteCommandLine,
-					SrcName = driver.SourceFiles[0],
-					Src = ppFilename
-				});
+				var output = compiler.LocalCompile(new LocalCompileInput
+					{
+						Arguments = driver.RemoteCommandLine,
+						SrcName = driver.SourceFiles[0],
+						Src = ppFilename
+					});
 
-				var streams = new Dictionary<Utils.CompileArtifactType, Stream>();
+				var streams = new Dictionary<CompileArtifactType, Stream>();
 
-				using (FileStream objFile = new FileStream(driver.OutputFiles[0].Path, FileMode.Truncate, FileAccess.Write))
+				using (var objFile = new FileStream(driver.OutputFiles[0].Path, FileMode.Truncate, FileAccess.Write))
 				{
 					foreach (var artifact in output.Status.Cookies)
 					{
 						switch (artifact.Type)
 						{
 							case CompileArtifactType.Out:
-								streams.Add(((ICompileArtifactCookie)artifact).Type, Console.OpenStandardOutput());
+								streams.Add(((ICompileArtifactCookie) artifact).Type, Console.OpenStandardOutput());
 								break;
 
 							case CompileArtifactType.Err:
-								streams.Add(((ICompileArtifactCookie)artifact).Type, Console.OpenStandardError());
+								streams.Add(((ICompileArtifactCookie) artifact).Type, Console.OpenStandardError());
 								break;
 							case CompileArtifactType.Obj:
-								streams.Add(((ICompileArtifactCookie)artifact).Type, objFile);
+								streams.Add(((ICompileArtifactCookie) artifact).Type, objFile);
 								break;
 							default:
 								throw new NotSupportedException("Not supported stream type");
@@ -84,6 +88,6 @@ namespace DistCL.Client
 			{
 				File.Delete(ppFilename);
 			}
-        }
-    }
+		}
+	}
 }

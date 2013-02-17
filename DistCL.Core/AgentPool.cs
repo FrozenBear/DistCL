@@ -7,9 +7,18 @@ using DistCL.Utils;
 
 namespace DistCL
 {
+	internal interface IAgentPoolInternal
+	{
+		string Name { get; }
+		IEnumerable<IAgent> GetAgents();
+		Task<IEnumerable<IAgent>> GetAgentsAsync();
+	}
+
 	internal class AgentPool : IAgentPoolInternal
 	{
 		private readonly Dictionary<Guid, RegisteredAgent> _agents = new Dictionary<Guid, RegisteredAgent>();
+
+		readonly Logger _logger = new Logger("POOL");
 
 		private readonly ReaderWriterLock _agentsLock = new ReaderWriterLock();
 		private readonly ReaderWriterLock _weightsSnapshotLock = new ReaderWriterLock();
@@ -18,6 +27,11 @@ namespace DistCL
 		private readonly Random _random = new Random();
 		private List<MeasuredAgent> _weightsSnapshot;
 		private Agent[] _agentsSnapshot;
+
+		public Logger Logger
+		{
+			get { return _logger; }
+		}
 
 		// TODO total optimization
 
@@ -33,7 +47,7 @@ namespace DistCL
 					_agents.Add(request.Agent.Guid, agent);
 					_weightsSnapshot = null;
 					_agentsSnapshot = null;
-					Logger.LogAgent("AgentPool.RegisterAgent.New", request.Agent.Name);
+					Logger.LogAgent("Add agent", request.Agent.Name);
 				}
 				else
 				{
@@ -42,7 +56,7 @@ namespace DistCL
 						_agents[request.Agent.Guid] = new RegisteredAgent(request);
 						_weightsSnapshot = null;
 						_agentsSnapshot = null;
-						Logger.LogAgent("AgentPool.RegisterAgent.Update", request.Agent.Name);
+						Logger.LogAgent("Update agent", request.Agent.Name);
 					}
 					else
 					{
@@ -81,6 +95,7 @@ namespace DistCL
 					{
 						if (_agentsSnapshot == null)
 						{
+							Logger.Debug("Take agents list snapshot");
 							_agentsSnapshot = _agents.Values.Select(agent => new Agent(agent.Agent.Agent)).ToArray();
 						}
 					}
@@ -110,8 +125,10 @@ namespace DistCL
 					{
 						if (_weightsSnapshot == null)
 						{
+							Logger.Debug("Calculate weights");
+
 							var weights = new List<MeasuredAgent>();
-							int weightPosition = 0;
+							var weightPosition = 0;
 
 							foreach (var agent in _agents.Values)
 							{
@@ -171,7 +188,7 @@ namespace DistCL
 					{
 						foreach (var item in expired)
 						{
-							Logger.LogAgent("AgentPool.RegisterAgent.Remove", _agents[item].Agent.Agent.Name);
+							Logger.LogAgent("Remove agent", _agents[item].Agent.Agent.Name);
 							_agents.Remove(item);
 						}
 
@@ -192,12 +209,14 @@ namespace DistCL
 
 		#region IAgentPoolInternal
 
+		string IAgentPoolInternal.Name { get { return "<local pool>"; } }
+
 		IEnumerable<IAgent> IAgentPoolInternal.GetAgents()
 		{
 			return GetAgents();
 		}
 
-		public Task<IEnumerable<IAgent>> GetAgentsAsync()
+		Task<IEnumerable<IAgent>> IAgentPoolInternal.GetAgentsAsync()
 		{
 			return Task.FromResult((IEnumerable<IAgent>)GetAgents());
 		}
@@ -280,7 +299,7 @@ namespace DistCL
 
 			public int CompareTo(MeasuredAgent other)
 			{
-				return _weightStart.CompareTo(other._weightStart);
+				return WeightStart.CompareTo(other.WeightStart);
 			}
 		}
 

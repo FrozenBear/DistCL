@@ -50,6 +50,9 @@
     <None Include="App.config">
       <SubType>Designer</SubType>
     </None>
+    <None Include="Tests\1\DistCL.ConsoleTest.exe.config" />
+    <None Include="Tests\2\DistCL.ConsoleTest.exe.config" />
+    <None Include="Tests\3\DistCL.ConsoleTest.exe.config" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\DistCL.Core\DistCL.Core.csproj">

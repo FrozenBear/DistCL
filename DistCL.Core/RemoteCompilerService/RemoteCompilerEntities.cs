@@ -10,6 +10,8 @@ namespace DistCL.RemoteCompilerService
 		private const int MaxErrorCount = 3;
 		private int _errorCount;
 
+		public string Name { get { return Endpoint.ListenUri.ToString(); } }
+
 		IEnumerable<IAgent> IAgentPoolInternal.GetAgents()
 		{
 			return GetAgents();

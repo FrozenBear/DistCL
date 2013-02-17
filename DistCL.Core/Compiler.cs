@@ -13,12 +13,23 @@ namespace DistCL
 	public class Compiler : ICompileManager, ILocalCompiler
 	{
 		private readonly AgentPool _agentPool = new AgentPool();
+		private readonly Logger _logger = new Logger("COMPILER");
 
-		public IDictionary<string, Binding> Bindings { get; set; }
+		internal IBindingsProvider BindingsProvider { get; set; }
+
+		public Logger Logger
+		{
+			get { return _logger; }
+		}
+
+		internal AgentPool AgentPool
+		{
+			get { return _agentPool; }
+		}
 
 		public CompileOutput Compile(CompileInput input)
 		{
-			Logger.Info(input.SrcName);
+			Logger.InfoFormat("Compiling '{0}'...", input.SrcName);
 
 			var tmpPath = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
 
@@ -27,13 +38,17 @@ namespace DistCL
 
 			try
 			{
-				string srcName = Path.Combine(tmpPath, Path.GetFileName(input.SrcName));
+				var srcName = Path.Combine(tmpPath, Path.GetFileName(input.SrcName));
 				using (var src = File.OpenWrite(srcName))
 				{
+					Logger.DebugFormat("Copying source to {0}...", srcName);
 					input.Src.CopyTo(src);
+					Logger.Debug("Source copied to local file");
 				}
 
 				var streams = RunCompiler(input.Arguments, srcName, tmpPath);
+
+				Logger.InfoFormat("{0} compiled successfully");
 
 				return new CompileOutput(true, 0, streams);
 			}
@@ -45,7 +60,7 @@ namespace DistCL
 
 		public void RegisterAgent(AgentReqistrationMessage request)
 		{
-			_agentPool.RegisterAgent(new RemoteCompilerProvider(this, request));
+			_agentPool.RegisterAgent(new RemoteCompilerProvider(BindingsProvider, request));
 		}
 
 		Agent[] IAgentPool.GetAgents()
@@ -117,11 +132,6 @@ namespace DistCL
 			}
 		}
 
-		internal AgentPool AgentPool
-		{
-			get { return _agentPool; }
-		}
-
 		private Dictionary<CompileArtifactDescription, Stream> RunCompiler(string commmandLine, string inputPath, string outputPath)
 		{
 			var artifacts = new List<CompileArtifactDescription>
@@ -156,11 +166,6 @@ namespace DistCL
 			}
 
 			return streams;
-		}
-
-		internal Binding GetBinding(Uri url)
-		{
-			return Bindings[url.Scheme.ToLower()];
 		}
 	}
 }

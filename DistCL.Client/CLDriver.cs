@@ -1,10 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.IO;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using DistCL.Utils;
 
 namespace DistCL.Client
@@ -17,10 +14,10 @@ namespace DistCL.Client
 
 	//}
 
-	public struct TOutputArtefact
+	public struct OutputArtefact
 	{
-		private CompileArtifactType _type;
-		private string _path;
+		private readonly CompileArtifactType _type;
+		private readonly string _path;
 
 		public CompileArtifactType Type
 		{
@@ -32,7 +29,7 @@ namespace DistCL.Client
 			get { return _path; }
 		}
 
-		public TOutputArtefact(CompileArtifactType type, string path)
+		public OutputArtefact(CompileArtifactType type, string path)
 		{
 			_type = type;
 			_path = path;
@@ -54,21 +51,25 @@ namespace DistCL.Client
 	/// </summary>
 	public class CLDriver
 	{
-		private const string CLFilename = "cl.exe";
-
-		private List<string> _sourceFiles = new List<string>();
-		private List<TOutputArtefact> _outputFiles = new List<TOutputArtefact>();
+		private readonly Logger _logger = new Logger("CL_DRIVER");
+		private readonly List<string> _sourceFiles = new List<string>();
+		private readonly List<OutputArtefact> _outputFiles = new List<OutputArtefact>();
 		private string _remoteCmdLine;
 		private string _localCmdLine;
-		private bool _localCompileOnly = false;
-		private bool _pchCreation = false;
+		private bool _localCompileOnly;
+		private bool _pchCreation;
 
 		private const char ArgSeparator = ' ';
 
-		private readonly HashSet<string> _sourceExtensions = new HashSet<string>() { ".cpp", ".cc", ".c" };
+		private readonly HashSet<string> _sourceExtensions = new HashSet<string> { ".cpp", ".cc", ".c" };
 
-		private HashSet<string> _optionsForIgnore = new HashSet<string>() { "Fm", "Fd", "Fm", "Fe", "Fo", "Fr", "Fp", "FR", "doc", "FU", };
-		private HashSet<string> _optionsWithArgs = new HashSet<string>() { "Fa", "Fd", "Fm", "Fp", "FR", "FA", "Fe", "Fo", "Fr", "doc" };
+		//private HashSet<string> _optionsForIgnore = new HashSet<string>() { "Fm", "Fd", "Fm", "Fe", "Fo", "Fr", "Fp", "FR", "doc", "FU", };
+		//private HashSet<string> _optionsWithArgs = new HashSet<string>() { "Fa", "Fd", "Fm", "Fp", "FR", "FA", "Fe", "Fo", "Fr", "doc" };
+
+		public Logger Logger
+		{
+			get { return _logger; }
+		}
 
 		public CLDriver(string[] args)
 		{
@@ -83,7 +84,7 @@ namespace DistCL.Client
 			}
 		}
 
-		public IList<TOutputArtefact> OutputFiles
+		public IList<OutputArtefact> OutputFiles
 		{
 			get
 			{
@@ -119,10 +120,10 @@ namespace DistCL.Client
 
 		private void Parse(string[] args)
 		{
-			StringBuilder remoteCmdLine = new StringBuilder(" ");
-			StringBuilder localCmdLine = new StringBuilder(" ");
+			var remoteCmdLine = new StringBuilder(" ");
+			var localCmdLine = new StringBuilder(" ");
 
-			int idx = 0;
+			var idx = 0;
 			while (idx < args.Length)
 			{
 				if (String.IsNullOrEmpty(args[idx]))
@@ -130,7 +131,7 @@ namespace DistCL.Client
 
 				string arg = args[idx];
 
-				if (arg.IndexOfAny(new char[] { '/', '-' }, 0, 1) != -1)
+				if (arg.IndexOfAny(new[] { '/', '-' }, 0, 1) != -1)
 				{
 					if (arg.StartsWith("/D") || arg.StartsWith("/I"))
 					{
@@ -145,7 +146,7 @@ namespace DistCL.Client
 							arg = args[idx];
 						}
 
-						localCmdLine.Append(StringUtils.QuoteString(arg) + ArgSeparator);
+						localCmdLine.Append(arg.QuoteString() + ArgSeparator);
 					}
 					else if (arg.StartsWith("/V"))
 					{
@@ -157,7 +158,7 @@ namespace DistCL.Client
 					}
 					else if (arg.StartsWith("/Yc"))
 					{
-						Logger.Warn("Pre-compiled headers are not supported for distributed builds. TheThese options will be ignored.");
+						Logger.Warn("Pre-compiled headers are not supported for distributed builds. These options will be ignored.");
 						_pchCreation = true;
 					}
 					else if (arg.StartsWith("/Zi") || arg.StartsWith("/ZI"))
@@ -169,7 +170,7 @@ namespace DistCL.Client
 					else if (arg.StartsWith("/Fo"))
 					{
 						// output object file name
-						_outputFiles.Add(new TOutputArtefact(CompileArtifactType.Obj, arg.Substring(3)));
+						_outputFiles.Add(new OutputArtefact(CompileArtifactType.Obj, arg.Substring(3)));
 					}
 					else if (arg.Equals("/EP", StringComparison.Ordinal) || arg.Equals("/P", StringComparison.Ordinal) || arg.Equals("/E", StringComparison.Ordinal))
 					{
@@ -183,8 +184,8 @@ namespace DistCL.Client
 					}
 					else
 					{
-						localCmdLine.Append(StringUtils.QuoteString(arg) + ArgSeparator);
-						remoteCmdLine.Append(StringUtils.QuoteString(arg) + ArgSeparator);
+						localCmdLine.Append(arg.QuoteString() + ArgSeparator);
+						remoteCmdLine.Append(arg.QuoteString() + ArgSeparator);
 					}
 				}
 				else if (arg.StartsWith("@"))
@@ -201,7 +202,7 @@ namespace DistCL.Client
 
 					if (!_sourceExtensions.Contains(Path.GetExtension(arg)))
 					{
-						Logger.Warn(String.Format("Unrecognized source file type. File '{0}' will be ignored.", arg));
+						Logger.WarnFormat("Unrecognized source file type. File '{0}' will be ignored.", arg);
 						continue;
 					}
 
@@ -210,7 +211,7 @@ namespace DistCL.Client
 						throw new NotSupportedException("Several input source files aren't supported yet");
 
 					_sourceFiles.Add(args[idx]);
-					localCmdLine.Append(StringUtils.QuoteString(arg) + ArgSeparator);
+					localCmdLine.Append(arg.QuoteString() + ArgSeparator);
 
 				}
 

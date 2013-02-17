@@ -11,5 +11,8 @@
     <Setting Name="InstanceName" Type="System.String" Scope="User">
       <Value Profile="(Default)">DefaultInstance</Value>
     </Setting>
+    <Setting Name="NetworkBuildPeriod" Type="System.TimeSpan" Scope="User">
+      <Value Profile="(Default)">00:03:00</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

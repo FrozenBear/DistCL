@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.Serialization;
 using System.ServiceModel;
@@ -18,12 +17,6 @@ namespace DistCL
 	{
 		[OperationContract]
 		Agent[] GetAgents();
-	}
-
-	internal interface IAgentPoolInternal
-	{
-		IEnumerable<IAgent> GetAgents();
-		System.Threading.Tasks.Task<IEnumerable<IAgent>> GetAgentsAsync();
 	}
 
 	public interface IAgent
