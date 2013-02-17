@@ -30,7 +30,7 @@ namespace DistCL.Client
 			string ppFilename = Path.GetTempFileName();
 			try
 			{
-				using (var preprocOutput = new FileStream(ppFilename, FileMode.Truncate, FileAccess.Write, FileShare.Read))
+				using (var preprocOutput = new FileStream(ppFilename, FileMode.Create, FileAccess.Write, FileShare.Read))
 				using (var stdOut = new StreamWriter(preprocOutput))
 				using (var stdErr = new StringWriter())
 				{
@@ -52,7 +52,7 @@ namespace DistCL.Client
 
 				var streams = new Dictionary<CompileArtifactType, Stream>();
 
-				using (var objFile = new FileStream(driver.OutputFiles[0].Path, FileMode.Truncate, FileAccess.Write))
+				using (var objFile = new FileStream(driver.OutputFiles[0].Path, FileMode.Create, FileAccess.Write))
 				{
 					foreach (var artifact in output.Status.Cookies)
 					{
