@@ -94,7 +94,7 @@ namespace DistCL.Client.CompileService {
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Runtime.Serialization", "4.0.0.0")]
     [System.Runtime.Serialization.DataContractAttribute(Name="Agent", Namespace="urn:distcl:agents:messages")]
     [System.SerializableAttribute()]
-    [System.Runtime.Serialization.KnownTypeAttribute(typeof(DistCL.Client.CompileService.AgentReqistrationMessage))]
+    [System.Runtime.Serialization.KnownTypeAttribute(typeof(DistCL.Client.CompileService.AgentRegistrationMessage))]
     public partial class Agent : object, System.Runtime.Serialization.IExtensibleDataObject, System.ComponentModel.INotifyPropertyChanged {
         
         [System.NonSerializedAttribute()]
@@ -102,6 +102,9 @@ namespace DistCL.Client.CompileService {
         
         [System.Runtime.Serialization.OptionalFieldAttribute()]
         private System.Uri[] AgentPoolUrlsField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private int CPUUsageField;
         
         [System.Runtime.Serialization.OptionalFieldAttribute()]
         private System.Uri[] CompilerUrlsField;
@@ -134,6 +137,19 @@ namespace DistCL.Client.CompileService {
                 if ((object.ReferenceEquals(this.AgentPoolUrlsField, value) != true)) {
                     this.AgentPoolUrlsField = value;
                     this.RaisePropertyChanged("AgentPoolUrls");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public int CPUUsage {
+            get {
+                return this.CPUUsageField;
+            }
+            set {
+                if ((this.CPUUsageField.Equals(value) != true)) {
+                    this.CPUUsageField = value;
+                    this.RaisePropertyChanged("CPUUsage");
                 }
             }
         }
@@ -202,9 +218,9 @@ namespace DistCL.Client.CompileService {
     
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Runtime.Serialization", "4.0.0.0")]
-    [System.Runtime.Serialization.DataContractAttribute(Name="AgentReqistrationMessage", Namespace="urn:distcl:agents:messages")]
+    [System.Runtime.Serialization.DataContractAttribute(Name="AgentRegistrationMessage", Namespace="urn:distcl:agents:messages")]
     [System.SerializableAttribute()]
-    public partial class AgentReqistrationMessage : DistCL.Client.CompileService.Agent {
+    public partial class AgentRegistrationMessage : DistCL.Client.CompileService.Agent {
     }
     
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
@@ -460,10 +476,10 @@ namespace DistCL.Client.CompileService {
     public interface IAgentPool {
         
         [System.ServiceModel.OperationContractAttribute(IsOneWay=true, Action="urn:distcl/ICompileCoordinator/RegisterAgent")]
-        void RegisterAgent(DistCL.Client.CompileService.AgentReqistrationMessage request);
+        void RegisterAgent(DistCL.Client.CompileService.AgentRegistrationMessage request);
         
         [System.ServiceModel.OperationContractAttribute(IsOneWay=true, Action="urn:distcl/ICompileCoordinator/RegisterAgent")]
-        System.Threading.Tasks.Task RegisterAgentAsync(DistCL.Client.CompileService.AgentReqistrationMessage request);
+        System.Threading.Tasks.Task RegisterAgentAsync(DistCL.Client.CompileService.AgentRegistrationMessage request);
         
         [System.ServiceModel.OperationContractAttribute(Action="urn:distcl/IAgentPool/GetAgents", ReplyAction="urn:distcl/IAgentPool/GetAgentsResponse")]
         DistCL.Client.CompileService.Agent[] GetAgents();
@@ -499,11 +515,11 @@ namespace DistCL.Client.CompileService {
                 base(binding, remoteAddress) {
         }
         
-        public void RegisterAgent(DistCL.Client.CompileService.AgentReqistrationMessage request) {
+        public void RegisterAgent(DistCL.Client.CompileService.AgentRegistrationMessage request) {
             base.Channel.RegisterAgent(request);
         }
         
-        public System.Threading.Tasks.Task RegisterAgentAsync(DistCL.Client.CompileService.AgentReqistrationMessage request) {
+        public System.Threading.Tasks.Task RegisterAgentAsync(DistCL.Client.CompileService.AgentRegistrationMessage request) {
             return base.Channel.RegisterAgentAsync(request);
         }
         
@@ -534,10 +550,10 @@ namespace DistCL.Client.CompileService {
         System.Threading.Tasks.Task<DistCL.Client.CompileService.CompileOutput> CompileAsync(DistCL.Client.CompileService.CompileInput request);
         
         [System.ServiceModel.OperationContractAttribute(IsOneWay=true, Action="urn:distcl/ICompileCoordinator/RegisterAgent")]
-        void RegisterAgent(DistCL.Client.CompileService.AgentReqistrationMessage request);
+        void RegisterAgent(DistCL.Client.CompileService.AgentRegistrationMessage request);
         
         [System.ServiceModel.OperationContractAttribute(IsOneWay=true, Action="urn:distcl/ICompileCoordinator/RegisterAgent")]
-        System.Threading.Tasks.Task RegisterAgentAsync(DistCL.Client.CompileService.AgentReqistrationMessage request);
+        System.Threading.Tasks.Task RegisterAgentAsync(DistCL.Client.CompileService.AgentRegistrationMessage request);
         
         [System.ServiceModel.OperationContractAttribute(Action="urn:distcl/IAgentPool/GetAgents", ReplyAction="urn:distcl/IAgentPool/GetAgentsResponse")]
         DistCL.Client.CompileService.Agent[] GetAgents();
@@ -611,11 +627,11 @@ namespace DistCL.Client.CompileService {
             return ((DistCL.Client.CompileService.ICompileManager)(this)).CompileAsync(inValue);
         }
         
-        public void RegisterAgent(DistCL.Client.CompileService.AgentReqistrationMessage request) {
+        public void RegisterAgent(DistCL.Client.CompileService.AgentRegistrationMessage request) {
             base.Channel.RegisterAgent(request);
         }
         
-        public System.Threading.Tasks.Task RegisterAgentAsync(DistCL.Client.CompileService.AgentReqistrationMessage request) {
+        public System.Threading.Tasks.Task RegisterAgentAsync(DistCL.Client.CompileService.AgentRegistrationMessage request) {
             return base.Channel.RegisterAgentAsync(request);
         }
         

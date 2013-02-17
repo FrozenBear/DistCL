@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.Serialization;
 using System.ServiceModel;
@@ -9,7 +10,7 @@ namespace DistCL
 	public interface ICompileCoordinator
 	{
 		[OperationContract(IsOneWay = true)]
-		void RegisterAgent(AgentReqistrationMessage request);
+		void RegisterAgent(AgentRegistrationMessage request);
 	}
 
 	[ServiceContract(Namespace = GeneralSettings.Namespace)]
@@ -27,6 +28,8 @@ namespace DistCL
 
 		int Cores { get; }
 
+		int CPUUsage { get; }
+
 		Uri[] AgentPoolUrls { get; }
 
 		Uri[] CompilerUrls { get; }
@@ -35,7 +38,7 @@ namespace DistCL
 	#region Agent
 
 	[DataContract(Namespace = GeneralSettings.CoordinatorMessageNamespace)]
-	public class Agent : IEquatable<Agent>, IAgent
+	public class Agent : IEquatable<IAgent>, IAgent
 	{
 		public Agent()
 		{
@@ -46,15 +49,17 @@ namespace DistCL
 			Guid = agent.Guid;
 			Name = agent.Name;
 			Cores = agent.Cores;
+			CPUUsage = agent.CPUUsage;
 			AgentPoolUrls = agent.AgentPoolUrls;
 			CompilerUrls = agent.CompilerUrls;
 		}
 
-		public Agent(Guid guid, string name, int cores, Uri[] agentPoolUrls, Uri[] compilerUrls)
+		public Agent(Guid guid, string name, int cores, int cpuUsage, Uri[] agentPoolUrls, Uri[] compilerUrls)
 		{
 			Guid = guid;
 			Name = name;
 			Cores = cores;
+			CPUUsage = cpuUsage;
 			AgentPoolUrls = agentPoolUrls;
 			CompilerUrls = compilerUrls;
 		}
@@ -74,6 +79,9 @@ namespace DistCL
 		[DataMember]
 		public int Cores { get; private set; }
 
+		[DataMember]
+		public int CPUUsage { get; private set; }
+
 		public override string ToString()
 		{
 			return string.Format(
@@ -87,18 +95,89 @@ namespace DistCL
 
 		#region Equals
 
-		public bool Equals(Agent other)
+		public override bool Equals(object obj)
 		{
-			if (Guid.Equals(other.Guid) &&
-				string.Equals(Name, other.Name) &&
-				Cores == other.Cores &&
-				AgentPoolUrls.Length == other.AgentPoolUrls.Length &&
-				CompilerUrls.Length == other.CompilerUrls.Length)
+			if (ReferenceEquals(null, obj))
 			{
-				return UrlArraysEquals(AgentPoolUrls, other.AgentPoolUrls) && UrlArraysEquals(CompilerUrls, other.CompilerUrls);
+				return false;
 			}
+			if (ReferenceEquals(this, obj))
+			{
+				return true;
+			}
+			if (obj.GetType() != this.GetType())
+			{
+				return false;
+			}
+			return AgentEqualityComparer.AgentComparer.Equals(this, (IAgent) obj);
+		}
 
-			return false;
+		public bool Equals(IAgent other)
+		{
+			return AgentEqualityComparer.AgentComparer.Equals(this, other);
+		}
+
+		public override int GetHashCode()
+		{
+			return AgentEqualityComparer.AgentComparer.GetHashCode(this);
+		}
+
+		#endregion
+	}
+
+	[DataContract(Namespace = GeneralSettings.CoordinatorMessageNamespace)]
+	public class AgentRegistrationMessage : Agent
+	{
+	}
+
+	#endregion
+
+	#region Comparer
+	
+	public sealed class AgentEqualityComparer : IEqualityComparer<IAgent>
+	{
+		private static readonly IEqualityComparer<IAgent> AgentComparerInstance = new AgentEqualityComparer();
+
+		public static IEqualityComparer<IAgent> AgentComparer
+		{
+			get { return AgentComparerInstance; }
+		}
+
+		public bool Equals(IAgent x, IAgent y)
+		{
+			if (ReferenceEquals(x, y))
+			{
+				return true;
+			}
+			if (ReferenceEquals(x, null))
+			{
+				return false;
+			}
+			if (ReferenceEquals(y, null))
+			{
+				return false;
+			}
+			return x.Guid.Equals(y.Guid) &&
+					string.Equals(x.Name, y.Name) &&
+					x.Cores == y.Cores &&
+					x.CPUUsage == y.CPUUsage &&
+					UrlArraysEquals(x.AgentPoolUrls, y.AgentPoolUrls) &&
+					UrlArraysEquals(x.CompilerUrls, y.CompilerUrls);
+		}
+
+		public int GetHashCode(IAgent obj)
+		{
+			unchecked
+			{
+				// TODO url arrays
+				var hashCode = obj.Guid.GetHashCode();
+				hashCode = (hashCode * 397) ^ (obj.Name != null ? obj.Name.GetHashCode() : 0);
+				hashCode = (hashCode * 397) ^ (obj.AgentPoolUrls != null ? obj.AgentPoolUrls.GetHashCode() : 0);
+				hashCode = (hashCode * 397) ^ (obj.CompilerUrls != null ? obj.CompilerUrls.GetHashCode() : 0);
+				hashCode = (hashCode * 397) ^ obj.Cores;
+				hashCode = (hashCode * 397) ^ obj.CPUUsage;
+				return hashCode;
+			}
 		}
 
 		private static bool UrlArraysEquals(Uri[] a, Uri[] b)
@@ -113,14 +192,7 @@ namespace DistCL
 
 			return true;
 		}
-
-		#endregion
 	}
-
-	[DataContract(Namespace = GeneralSettings.CoordinatorMessageNamespace)]
-	public class AgentReqistrationMessage : Agent
-	{
-	}
-
+	
 	#endregion
 }

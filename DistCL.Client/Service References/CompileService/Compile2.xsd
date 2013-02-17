@@ -24,7 +24,7 @@
   <xs:element name="RegisterAgent">
     <xs:complexType>
       <xs:sequence>
-        <xs:element xmlns:q4="urn:distcl:agents:messages" minOccurs="0" name="request" nillable="true" type="q4:AgentReqistrationMessage" />
+        <xs:element xmlns:q4="urn:distcl:agents:messages" minOccurs="0" name="request" nillable="true" type="q4:AgentRegistrationMessage" />
       </xs:sequence>
     </xs:complexType>
   </xs:element>

@@ -94,7 +94,7 @@ namespace DistCL.RemoteCompilerService {
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Runtime.Serialization", "4.0.0.0")]
     [System.Runtime.Serialization.DataContractAttribute(Name="Agent", Namespace="urn:distcl:agents:messages")]
     [System.SerializableAttribute()]
-    [System.Runtime.Serialization.KnownTypeAttribute(typeof(DistCL.RemoteCompilerService.AgentReqistrationMessage))]
+    [System.Runtime.Serialization.KnownTypeAttribute(typeof(DistCL.RemoteCompilerService.AgentRegistrationMessage))]
     public partial class Agent : object, System.Runtime.Serialization.IExtensibleDataObject, System.ComponentModel.INotifyPropertyChanged {
         
         [System.NonSerializedAttribute()]
@@ -102,6 +102,9 @@ namespace DistCL.RemoteCompilerService {
         
         [System.Runtime.Serialization.OptionalFieldAttribute()]
         private System.Uri[] AgentPoolUrlsField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private int CPUUsageField;
         
         [System.Runtime.Serialization.OptionalFieldAttribute()]
         private System.Uri[] CompilerUrlsField;
@@ -134,6 +137,19 @@ namespace DistCL.RemoteCompilerService {
                 if ((object.ReferenceEquals(this.AgentPoolUrlsField, value) != true)) {
                     this.AgentPoolUrlsField = value;
                     this.RaisePropertyChanged("AgentPoolUrls");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public int CPUUsage {
+            get {
+                return this.CPUUsageField;
+            }
+            set {
+                if ((this.CPUUsageField.Equals(value) != true)) {
+                    this.CPUUsageField = value;
+                    this.RaisePropertyChanged("CPUUsage");
                 }
             }
         }
@@ -202,9 +218,9 @@ namespace DistCL.RemoteCompilerService {
     
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Runtime.Serialization", "4.0.0.0")]
-    [System.Runtime.Serialization.DataContractAttribute(Name="AgentReqistrationMessage", Namespace="urn:distcl:agents:messages")]
+    [System.Runtime.Serialization.DataContractAttribute(Name="AgentRegistrationMessage", Namespace="urn:distcl:agents:messages")]
     [System.SerializableAttribute()]
-    public partial class AgentReqistrationMessage : DistCL.RemoteCompilerService.Agent {
+    public partial class AgentRegistrationMessage : DistCL.RemoteCompilerService.Agent {
     }
     
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
@@ -460,10 +476,10 @@ namespace DistCL.RemoteCompilerService {
     public interface IAgentPool {
         
         [System.ServiceModel.OperationContractAttribute(IsOneWay=true, Action="urn:distcl/ICompileCoordinator/RegisterAgent")]
-        void RegisterAgent(DistCL.RemoteCompilerService.AgentReqistrationMessage request);
+        void RegisterAgent(DistCL.RemoteCompilerService.AgentRegistrationMessage request);
         
         [System.ServiceModel.OperationContractAttribute(IsOneWay=true, Action="urn:distcl/ICompileCoordinator/RegisterAgent")]
-        System.Threading.Tasks.Task RegisterAgentAsync(DistCL.RemoteCompilerService.AgentReqistrationMessage request);
+        System.Threading.Tasks.Task RegisterAgentAsync(DistCL.RemoteCompilerService.AgentRegistrationMessage request);
         
         [System.ServiceModel.OperationContractAttribute(Action="urn:distcl/IAgentPool/GetAgents", ReplyAction="urn:distcl/IAgentPool/GetAgentsResponse")]
         DistCL.RemoteCompilerService.Agent[] GetAgents();
@@ -499,11 +515,11 @@ namespace DistCL.RemoteCompilerService {
                 base(binding, remoteAddress) {
         }
         
-        public void RegisterAgent(DistCL.RemoteCompilerService.AgentReqistrationMessage request) {
+        public void RegisterAgent(DistCL.RemoteCompilerService.AgentRegistrationMessage request) {
             base.Channel.RegisterAgent(request);
         }
         
-        public System.Threading.Tasks.Task RegisterAgentAsync(DistCL.RemoteCompilerService.AgentReqistrationMessage request) {
+        public System.Threading.Tasks.Task RegisterAgentAsync(DistCL.RemoteCompilerService.AgentRegistrationMessage request) {
             return base.Channel.RegisterAgentAsync(request);
         }
         
@@ -534,10 +550,10 @@ namespace DistCL.RemoteCompilerService {
         System.Threading.Tasks.Task<DistCL.RemoteCompilerService.CompileOutput> CompileAsync(DistCL.RemoteCompilerService.CompileInput request);
         
         [System.ServiceModel.OperationContractAttribute(IsOneWay=true, Action="urn:distcl/ICompileCoordinator/RegisterAgent")]
-        void RegisterAgent(DistCL.RemoteCompilerService.AgentReqistrationMessage request);
+        void RegisterAgent(DistCL.RemoteCompilerService.AgentRegistrationMessage request);
         
         [System.ServiceModel.OperationContractAttribute(IsOneWay=true, Action="urn:distcl/ICompileCoordinator/RegisterAgent")]
-        System.Threading.Tasks.Task RegisterAgentAsync(DistCL.RemoteCompilerService.AgentReqistrationMessage request);
+        System.Threading.Tasks.Task RegisterAgentAsync(DistCL.RemoteCompilerService.AgentRegistrationMessage request);
         
         [System.ServiceModel.OperationContractAttribute(Action="urn:distcl/IAgentPool/GetAgents", ReplyAction="urn:distcl/IAgentPool/GetAgentsResponse")]
         DistCL.RemoteCompilerService.Agent[] GetAgents();
@@ -611,11 +627,11 @@ namespace DistCL.RemoteCompilerService {
             return ((DistCL.RemoteCompilerService.ICompileManager)(this)).CompileAsync(inValue);
         }
         
-        public void RegisterAgent(DistCL.RemoteCompilerService.AgentReqistrationMessage request) {
+        public void RegisterAgent(DistCL.RemoteCompilerService.AgentRegistrationMessage request) {
             base.Channel.RegisterAgent(request);
         }
         
-        public System.Threading.Tasks.Task RegisterAgentAsync(DistCL.RemoteCompilerService.AgentReqistrationMessage request) {
+        public System.Threading.Tasks.Task RegisterAgentAsync(DistCL.RemoteCompilerService.AgentRegistrationMessage request) {
             return base.Channel.RegisterAgentAsync(request);
         }
         

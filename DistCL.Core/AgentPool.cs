@@ -41,22 +41,22 @@ namespace DistCL
 			try
 			{
 				RegisteredAgent agent;
-				if (!_agents.TryGetValue(request.Agent.Guid, out agent))
+				if (!_agents.TryGetValue(request.Description.Guid, out agent))
 				{
 					agent = new RegisteredAgent(request);
-					_agents.Add(request.Agent.Guid, agent);
+					_agents.Add(request.Description.Guid, agent);
 					_weightsSnapshot = null;
 					_agentsSnapshot = null;
-					Logger.LogAgent("Add agent", request.Agent.Name);
+					Logger.LogAgent("Add agent", request.Description.Name);
 				}
 				else
 				{
-					if (!agent.Agent.Agent.Equals(request.Agent))
+					if (! AgentEqualityComparer.AgentComparer.Equals(agent.Compiler.Description, request.Description))
 					{
-						_agents[request.Agent.Guid] = new RegisteredAgent(request);
+						_agents[request.Description.Guid] = new RegisteredAgent(request);
 						_weightsSnapshot = null;
 						_agentsSnapshot = null;
-						Logger.LogAgent("Update agent", request.Agent.Name);
+						Logger.LogAgent("Update agent", request.Description.Name);
 					}
 					else
 					{
@@ -96,7 +96,7 @@ namespace DistCL
 						if (_agentsSnapshot == null)
 						{
 							Logger.Debug("Take agents list snapshot");
-							_agentsSnapshot = _agents.Values.Select(agent => new Agent(agent.Agent.Agent)).ToArray();
+							_agentsSnapshot = _agents.Values.Select(agent => new Agent(agent.Compiler.Description)).ToArray();
 						}
 					}
 					finally
@@ -132,7 +132,7 @@ namespace DistCL
 
 							foreach (var agent in _agents.Values)
 							{
-								var item = new MeasuredAgent(agent.Agent, weightPosition);
+								var item = new MeasuredAgent(agent.Compiler, weightPosition);
 								weightPosition += item.Weight;
 								weights.Add(item);
 							}
@@ -188,7 +188,7 @@ namespace DistCL
 					{
 						foreach (var item in expired)
 						{
-							Logger.LogAgent("Remove agent", _agents[item].Agent.Agent.Name);
+							Logger.LogAgent("Remove agent", _agents[item].Compiler.Description.Name);
 							_agents.Remove(item);
 						}
 
@@ -227,17 +227,17 @@ namespace DistCL
 
 		private class RegisteredAgent
 		{
-			private readonly ICompilerProvider _agent;
+			private readonly ICompilerProvider _compiler;
 			private DateTime _registrationTime = DateTime.Now;
 
-			public RegisteredAgent(ICompilerProvider agent)
+			public RegisteredAgent(ICompilerProvider compiler)
 			{
-				_agent = agent;
+				_compiler = compiler;
 			}
 
-			public ICompilerProvider Agent
+			public ICompilerProvider Compiler
 			{
-				get { return _agent; }
+				get { return _compiler; }
 			}
 
 			public DateTime RegistrationTime
@@ -272,7 +272,7 @@ namespace DistCL
 			public MeasuredAgent(ICompilerProvider agent, int weightStart)
 			{
 				_agent = agent;
-				_weight = _agent.Agent.Cores;
+				_weight = Math.Max(0, _agent.Description.Cores * (100 - _agent.Description.CPUUsage));
 				_weightStart = weightStart;
 				_weightEnd = weightStart + _weight;
 			}

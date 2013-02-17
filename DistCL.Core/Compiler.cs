@@ -8,7 +8,7 @@ using DistCL.Utils;
 
 namespace DistCL
 {
-	[ServiceBehavior(InstanceContextMode = InstanceContextMode.Single)]
+	[ServiceBehavior(InstanceContextMode = InstanceContextMode.Single, ConcurrencyMode=ConcurrencyMode.Multiple)]
 	[BindingNamespaceBehavior]
 	public class Compiler : ICompileManager, ILocalCompiler
 	{
@@ -58,7 +58,7 @@ namespace DistCL
 			}
 		}
 
-		public void RegisterAgent(AgentReqistrationMessage request)
+		public void RegisterAgent(AgentRegistrationMessage request)
 		{
 			_agentPool.RegisterAgent(new RemoteCompilerProvider(BindingsProvider, request));
 		}

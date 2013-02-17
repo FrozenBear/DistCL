@@ -17,7 +17,7 @@ namespace DistCL
 
 		private readonly ServiceModelSectionGroup _serviceModelSectionGroup;
 		private readonly IBindingsProvider _bindingsProvider;
-		private readonly ICompilerProvider _compilerProvider;
+		private readonly LocalCompilerProvider _compilerProvider;
 		private readonly AgentPool _agentPool;
 
 		private Agent[] _agentsSnapshot;
@@ -29,7 +29,7 @@ namespace DistCL
 		public NetworkBuilder(
 			ServiceModelSectionGroup serviceModelSectionGroup,
 			IBindingsProvider bindingsProvider,
-			ICompilerProvider compilerProvider,
+			LocalCompilerProvider compilerProvider,
 			AgentPool agentPool)
 		{
 			_compilerProvider = compilerProvider;
@@ -53,7 +53,7 @@ namespace DistCL
 			get { return _serviceModelSectionGroup; }
 		}
 
-		private ICompilerProvider CompilerProvider
+		private LocalCompilerProvider CompilerProvider
 		{
 			get { return _compilerProvider; }
 		}
@@ -84,16 +84,7 @@ namespace DistCL
 		{
 			var pools = GetAgentPools(ServiceModelSectionGroup);
 
-			var localAgent = new RemoteCompilerService.AgentReqistrationMessage
-			{
-				Guid = CompilerProvider.Agent.Guid,
-				Name = CompilerProvider.Agent.Name,
-				Cores = CompilerProvider.Agent.Cores,
-				AgentPoolUrls = CompilerProvider.Agent.AgentPoolUrls,
-				CompilerUrls = CompilerProvider.Agent.CompilerUrls
-			};
-
-			Logger.LogAgent("Init", localAgent.Name);
+			Logger.LogAgent("Init", CompilerProvider.RegistrationMessage.Name);
 
 			lock (_syncRoot)
 			{
@@ -104,6 +95,7 @@ namespace DistCL
 					var iterationStarted = DateTime.Now;
 
 					var ts = new CancellationTokenSource();
+					var localAgent = CompilerProvider.RegistrationMessage;
 
 					foreach (var item in pools.Values)
 					{
@@ -133,7 +125,7 @@ namespace DistCL
 								}); // without CancellationToken - final result check shouldn't be cancelled
 					}
 
-					AgentPool.RegisterAgent(CompilerProvider);
+					AgentPool.RegisterAgent(CompilerProvider.Snapshot);
 
 					AgentPool.Clean(DateTime.Now.Subtract(CompilerSettings.Default.AgentsSilenceLimit));
 
@@ -175,7 +167,7 @@ namespace DistCL
 
 		private void ConvertAgents2Pools(
 			IEnumerable<IAgentPoolInternal> knownAgentPools,
-			RemoteCompilerService.AgentReqistrationMessage localAgent,
+			RemoteCompilerService.AgentRegistrationMessage localAgent,
 			ConcurrentDictionary<Uri, AgentPoolClient> pools,
 			CancellationTokenSource ts,
 			bool tryKnownAgents)
@@ -318,13 +310,13 @@ namespace DistCL
 
 		private class ConvertRegisteredAgents2AgentPoolsToken
 		{
-			private readonly RemoteCompilerService.AgentReqistrationMessage _localAgent;
+			private readonly RemoteCompilerService.AgentRegistrationMessage _localAgent;
 			private readonly ConcurrentDictionary<Uri, AgentPoolClient> _pools;
 			private readonly CancellationTokenSource _cancellationTokenSource;
 			private readonly bool _tryKnownAgents;
 
 			public ConvertRegisteredAgents2AgentPoolsToken(
-				RemoteCompilerService.AgentReqistrationMessage localAgent,
+				RemoteCompilerService.AgentRegistrationMessage localAgent,
 				ConcurrentDictionary<Uri, AgentPoolClient> pools,
 				CancellationTokenSource cancellationTokenSource,
 				bool tryKnownAgents)
@@ -335,7 +327,7 @@ namespace DistCL
 				_tryKnownAgents = tryKnownAgents;
 			}
 
-			public RemoteCompilerService.AgentReqistrationMessage LocalAgent
+			public RemoteCompilerService.AgentRegistrationMessage LocalAgent
 			{
 				get { return _localAgent; }
 			}

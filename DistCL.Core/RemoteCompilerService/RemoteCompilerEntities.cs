@@ -35,11 +35,38 @@ namespace DistCL.RemoteCompilerService
 
 	partial class Agent : IAgent
 	{
-		
 	}
 
-	partial class AgentReqistrationMessage : IAgent
+	partial class AgentRegistrationMessage : IAgent
 	{
+		public AgentRegistrationMessage(){}
+
+		public AgentRegistrationMessage(
+			Guid guid,
+			string name,
+			int cores,
+			int cpuUsage,
+			Uri[] agentPoolUrls,
+			Uri[] compilerUrls)
+		{
+			Guid = guid;
+			Name = name;
+			Cores = cores;
+			CPUUsage = cpuUsage;
+			AgentPoolUrls = agentPoolUrls;
+			CompilerUrls = compilerUrls;
+		}
+
+		public AgentRegistrationMessage(IAgent agent)
+		{
+			Guid = agent.Guid;
+			Name = agent.Name;
+			Cores = agent.Cores;
+			CPUUsage = agent.CPUUsage;
+			AgentPoolUrls = agent.AgentPoolUrls;
+			CompilerUrls = agent.CompilerUrls;
+		}
+
 		Guid IAgent.Guid
 		{
 			get { return Guid; }
