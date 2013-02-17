@@ -89,7 +89,7 @@ namespace DistCL
 
 				var streams = RunCompiler(input.Arguments, srcName, tmpPath);
 
-				Logger.InfoFormat("{0} compiled successfully");
+				Logger.InfoFormat("'{0} Compiled successfully", srcName);
 
 				return new CompileOutput(true, 0, streams);
 			}
