@@ -111,7 +111,10 @@ namespace DistCL
 
 		public bool IsReady()
 		{
-			return true;
+			lock (_syncRoot)
+			{
+				return _workersCount < _maxWorkersCount;
+			}
 		}
 
 		public LocalCompileOutput LocalCompile(LocalCompileInput input)
