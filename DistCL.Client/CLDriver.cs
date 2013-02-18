@@ -161,7 +161,8 @@ namespace DistCL.Client
 					}
 					else if (arg.StartsWith("FI", 1) || arg.StartsWith("Yu", 1) || arg.StartsWith("Fp", 1) || arg.StartsWith("Fd", 1))
 					{
-						// skip it
+						// To opimize disributed compilation we will exclude whole PCH handling and forced include (for POA it is pch-server.h file)
+						// TODO: We need to make this customizible in future
 					}
 					else if (arg.StartsWith("Yc", 1))
 					{
