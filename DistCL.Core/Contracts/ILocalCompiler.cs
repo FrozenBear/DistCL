@@ -39,7 +39,12 @@ namespace DistCL
 		{
 		}
 
-		public LocalCompileOutput(bool success, int exitCode, IDictionary<CompileArtifactDescription, Stream> streams) : base(success, exitCode, streams)
+		public LocalCompileOutput(
+			bool success,
+			int exitCode,
+			IDictionary<CompileArtifactDescription, Stream> streams,
+			IEnumerable<CompileArtifactDescription> artifacts)
+			: base(success, exitCode, streams, artifacts)
 		{
 		}
 	}

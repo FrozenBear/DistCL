@@ -99,6 +99,9 @@ namespace DistCL.Utils
 
 			foreach (var cookie in cookies)
 			{
+				if (cookie.Size < 0)
+					continue;
+
 				using (var stream = splitter.GetStream(cookie.Size))
 				{
 					stream.CopyTo(streams[cookie.Type]);

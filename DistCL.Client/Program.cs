@@ -67,34 +67,31 @@ namespace DistCL.Client
 
 				var streams = new Dictionary<CompileArtifactType, Stream>();
 
-				using (var objFile = new FileStream(driver.OutputFiles[0].Path, FileMode.Create, FileAccess.Write))
+				foreach (var artifact in output.Status.Cookies)
 				{
-					foreach (var artifact in output.Status.Cookies)
+					switch (artifact.Type)
 					{
-						switch (artifact.Type)
-						{
-							case CompileArtifactType.Out:
-								streams.Add(((ICompileArtifactCookie) artifact).Type, Console.OpenStandardOutput());
-								break;
+						case CompileArtifactType.Out:
+							streams.Add(((ICompileArtifactCookie) artifact).Type, Console.OpenStandardOutput());
+							break;
 
-							case CompileArtifactType.Err:
-								streams.Add(((ICompileArtifactCookie) artifact).Type, Console.OpenStandardError());
-								break;
-							case CompileArtifactType.Obj:
-								streams.Add(((ICompileArtifactCookie) artifact).Type, objFile);
-								break;
-							default:
-								throw new NotSupportedException("Not supported stream type");
-						}
+						case CompileArtifactType.Err:
+							streams.Add(((ICompileArtifactCookie) artifact).Type, Console.OpenStandardError());
+							break;
+						case CompileArtifactType.Obj:
+							File.Move(Path.Combine(Path.GetDirectoryName(ppFilename), artifact.Name), driver.OutputFiles[0].Path);
+							break;
+						default:
+							throw new NotSupportedException("Not supported stream type");
 					}
+				}
 
-					CompileResultHelper.Unpack(output.ResultData, output.Status.Cookies, streams);
-					output.ResultData.Close();
+				CompileResultHelper.Unpack(output.ResultData, output.Status.Cookies, streams);
+				output.ResultData.Close();
 
-					foreach (var stream in streams.Values)
-					{
-						stream.Close();
-					}
+				foreach (var stream in streams.Values)
+				{
+					stream.Close();
 				}
 
 				return output.Status.ExitCode;

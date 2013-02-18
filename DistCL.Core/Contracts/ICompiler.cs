@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Runtime.Serialization;
 using System.ServiceModel;
 using DistCL.Utils;
@@ -90,10 +91,23 @@ namespace DistCL
 			_resultData = resultData;
 		}
 
-		public CompileOutput(bool success, int exitCode, IDictionary<CompileArtifactDescription, Stream> streams)
+		public CompileOutput(
+			bool success,
+			int exitCode,
+			IDictionary<CompileArtifactDescription, Stream> streams,
+			IEnumerable<CompileArtifactDescription> artifacts)
 		{
 			CompileArtifactCookie[] cookies;
 			_resultData = CompileResultHelper.Pack(streams, out cookies);
+			
+			// TODO remove redundant collections copy
+			if (artifacts != null)
+			{
+				var list = new List<CompileArtifactCookie>(cookies);
+				list.AddRange(artifacts.Select(artifact => new CompileArtifactCookie(artifact, -1)));
+				cookies = list.ToArray();
+			}
+
 			_status = new CompileStatus(success, exitCode, cookies);
 		}
 

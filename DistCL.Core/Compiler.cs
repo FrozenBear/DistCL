@@ -93,7 +93,7 @@ namespace DistCL
 
 				Logger.InfoFormat("'{0}' compiled successfully", srcName);
 
-				return new CompileOutput(true, 0, streams);
+				return new CompileOutput(true, 0, streams, null);
 			}
 			finally
 			{
@@ -198,8 +198,11 @@ namespace DistCL
 								break;
 
 							default:
-								var fileStream =
-									File.OpenWrite(Path.Combine(Path.GetDirectoryName(input.Src), artifact.Name));
+								var fileStream = File.Open(
+									Path.Combine(Path.GetDirectoryName(input.Src), artifact.Name),
+									FileMode.Create,
+									FileAccess.Write,
+									FileShare.None);
 								remoteStreams.Add(artifact.Type, fileStream);
 								break;
 						}
@@ -207,6 +210,7 @@ namespace DistCL
 					CompileResultHelper.Unpack(remoteOutput.ResultData, remoteOutput.Status.Cookies, remoteStreams);
 
 					var localStreams = new Dictionary<CompileArtifactDescription, Stream>();
+					var localFiles = new List<CompileArtifactDescription>();
 					foreach (var artifact in remoteOutput.Status.Cookies)
 					{
 						var stream = remoteStreams[artifact.Type];
@@ -220,12 +224,13 @@ namespace DistCL
 
 							default:
 								stream.Close();
+								localFiles.Add(artifact);
 								break;
 						}
 					}
 
 					Logger.InfoFormat("Completed local compile '{0}'", input.SrcName);
-					return new LocalCompileOutput(true, remoteOutput.Status.ExitCode, localStreams);
+					return new LocalCompileOutput(true, remoteOutput.Status.ExitCode, localStreams, localFiles);
 				}
 			}
 		}
@@ -239,7 +244,7 @@ namespace DistCL
 			int stdOutStreamLen = 0;
 			int stdErrStreamLen = 0;
 
-			var fileName = Guid.NewGuid() + "myFile.obj";
+			var fileName = Guid.NewGuid() + ".obj";
 
 			using (MemoryStream stdOutStream = new MemoryStream())
 			using (MemoryStream stdErrStream = new MemoryStream())
@@ -272,7 +277,8 @@ namespace DistCL
 			Logger.DebugFormat("stdout: {0}, stderr: {1}", System.Text.UTF8Encoding.UTF8.GetString(stdOutBuf, 0, stdOutStreamLen),
 				System.Text.UTF8Encoding.UTF8.GetString(stdErrBuf, 0, stdErrStreamLen));
 
-			streams.Add(new CompileArtifactDescription(CompileArtifactType.Obj, "myFile.obj"),
+			streams.Add(
+				new CompileArtifactDescription(CompileArtifactType.Obj, fileName),
 				new TempFileStreamWrapper(Path.Combine(outputPath, fileName)));
 
 			return streams;
