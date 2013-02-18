@@ -156,7 +156,20 @@ namespace DistCL
 			}
 		}
 
-		public ICompilerProvider GetRandomCompiler()
+		public ICompiler GetRandomCompiler()
+		{
+			ICompiler compiler = null;
+
+			SpinWait.SpinUntil(delegate
+				{
+					compiler = GetRandomCompilerInternal();
+					return compiler != null;
+				});
+
+			return compiler;
+		}
+
+		private ICompiler GetRandomCompilerInternal()
 		{
 			var weights = GetWeights();
 
@@ -167,11 +180,19 @@ namespace DistCL
 
 			var result = weights.BinarySearch(target);
 
-			int index = result < 0
+			var index = result < 0
 							? ~result - 1
 							: result;
 
-			return weights[index].Agent;
+			var compilerProvider = weights[index].Agent;
+			var compiler = compilerProvider.GetCompiler();
+
+			if (compiler != null)
+			{
+				Logger.DebugFormat("Found ready compiler '{0}'", compilerProvider.Description.Name);
+			}
+
+			return compiler;
 		}
 
 		public void Clean(DateTime limit)
@@ -257,7 +278,7 @@ namespace DistCL
 
 		private class MeasuredAgent : IComparable<MeasuredAgent>
 		{
-			private readonly ICompilerProvider _agent;
+			private readonly ICompilerProvider _compilerProvider;
 			private readonly int _weight;
 			private readonly int _weightStart;
 			private readonly int _weightEnd;
@@ -271,15 +292,15 @@ namespace DistCL
 
 			public MeasuredAgent(ICompilerProvider agent, int weightStart)
 			{
-				_agent = agent;
-				_weight = Math.Max(0, _agent.Description.Cores * (100 - _agent.Description.CPUUsage));
+				_compilerProvider = agent;
+				_weight = Math.Max(0, _compilerProvider.Description.Cores * (100 - _compilerProvider.Description.CPUUsage));
 				_weightStart = weightStart;
 				_weightEnd = weightStart + _weight;
 			}
 
 			public ICompilerProvider Agent
 			{
-				get { return _agent; }
+				get { return _compilerProvider; }
 			}
 
 			public int Weight

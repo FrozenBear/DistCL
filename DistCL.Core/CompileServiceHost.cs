@@ -48,7 +48,7 @@ namespace DistCL
 			_networkBuilder = new NetworkBuilder(
 				ServiceModelSectionGroup,
 				this,
-				new LocalCompilerProvider(CompilerInstance, agentPoolUrls.ToArray(), compilerUrls.ToArray()),
+				new LocalCompilerManager(CompilerInstance, agentPoolUrls.ToArray(), compilerUrls.ToArray()),
 				CompilerInstance.AgentPool);
 		}
 

@@ -12,19 +12,19 @@ namespace DistCL
 		ICompiler GetCompiler();
 	}
 
-	internal class LocalCompilerProvider : ICompilerProvider
+	internal class LocalCompilerManager
 	{
 		private readonly Logger _logger = new Logger("AGENT");
 		private readonly ICompiler _compiler;
 		private readonly Agent _stub;
 		private RemoteCompilerService.AgentRegistrationMessage _registrationMessage;
-		private ICompilerProvider _snapshot;
+		private ICompilerProvider _compilerProvider;
 
 		private readonly PerformanceCounter _cpuCounter;
 		DateTime _nextSample = DateTime.MinValue;
 		private int _cpuUsage;
 
-		public LocalCompilerProvider(Compiler compiler, Uri[] agentPoolUrls, Uri[] compilerUrls)
+		public LocalCompilerManager(Compiler compiler, Uri[] agentPoolUrls, Uri[] compilerUrls)
 		{
 			_compiler = compiler;
 			_stub = new Agent(
@@ -60,26 +60,16 @@ namespace DistCL
 			}
 		}
 
-		public ICompilerProvider Snapshot
+		public ICompilerProvider CompilerProvider
 		{
 			get
 			{
-				if (_snapshot == null || _snapshot.Description.CPUUsage != CPUUsage)
+				if (_compilerProvider == null || _compilerProvider.Description.CPUUsage != CPUUsage)
 				{
-					_snapshot = new LocalCompilerProviderSnapshot(_compiler, RegistrationMessage);
+					_compilerProvider = new LocalCompilerProvider(_compiler, RegistrationMessage);
 				}
-				return _snapshot;
+				return _compilerProvider;
 			}
-		}
-
-		IAgent ICompilerProvider.Description
-		{
-			get { return RegistrationMessage; }
-		}
-
-		public ICompiler GetCompiler()
-		{
-			return _compiler;
 		}
 
 		private int CPUUsage
@@ -100,12 +90,12 @@ namespace DistCL
 			return 20 * ((int)(usage / 20));
 		}
 
-		private class LocalCompilerProviderSnapshot : ICompilerProvider
+		private class LocalCompilerProvider : ICompilerProvider
 		{
 			private readonly ICompiler _compiler;
 			private readonly IAgent _description;
 
-			public LocalCompilerProviderSnapshot(ICompiler compiler, IAgent description)
+			public LocalCompilerProvider(ICompiler compiler, IAgent description)
 			{
 				_compiler = compiler;
 				_description = description;
@@ -113,7 +103,7 @@ namespace DistCL
 
 			public ICompiler GetCompiler()
 			{
-				return _compiler;
+				return _compiler.IsReady() ? _compiler : null;
 			}
 
 			public IAgent Description
@@ -143,12 +133,20 @@ namespace DistCL
 		{
 			foreach (var url in _description.CompilerUrls)
 			{
-				RemoteCompilerService.ICompiler compiler = new CompilerClient(_bindingsProvider.GetBinding(url), new EndpointAddress(url));
-
-				return compiler.IsReady() ? new CompilerProxy(compiler) : null;
+				try
+				{
+					RemoteCompilerService.ICompiler compiler = new CompilerClient(
+						_bindingsProvider.GetBinding(url),
+						new EndpointAddress(url));
+					return compiler.IsReady() ? new CompilerProxy(compiler) : null;
+				}
+				catch (Exception e)
+				{
+					// TODO logger?
+				}
 			}
 
-			throw new InvalidOperationException();
+			return null;
 		}
 
 		private class CompilerProxy : ICompiler

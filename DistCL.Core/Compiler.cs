@@ -19,7 +19,7 @@ namespace DistCL
 		private readonly int _maxWorkersCount;
 		private int _workersCount;
 		private readonly object _syncRoot = new object();
-		ConcurrentDictionary<Guid, string> _preprocessTokens = new ConcurrentDictionary<Guid, string>();
+		readonly ConcurrentDictionary<Guid, string> _preprocessTokens = new ConcurrentDictionary<Guid, string>();
 
 		public Compiler()
 		{
@@ -69,7 +69,7 @@ namespace DistCL
 			}
 		}
 
-		public CompileOutput CompileInternal(CompileInput input)
+		private CompileOutput CompileInternal(CompileInput input)
 		{
 			Logger.InfoFormat("Compiling '{0}'...", input.SrcName);
 
@@ -188,8 +188,7 @@ namespace DistCL
 						SrcName = input.SrcName
 					};
 
-				// TODO move IsReady check into GetRandomCompiler, result should be ICompiler instead of ICompilerProvider
-				using (var remoteOutput = AgentPool.GetRandomCompiler().GetCompiler().Compile(remoteInput))
+				using (var remoteOutput = AgentPool.GetRandomCompiler().Compile(remoteInput))
 				{
 					var remoteStreams = new Dictionary<CompileArtifactType, Stream>();
 					var cookies = new List<CompileArtifactCookie>();

@@ -17,7 +17,7 @@ namespace DistCL
 
 		private readonly ServiceModelSectionGroup _serviceModelSectionGroup;
 		private readonly IBindingsProvider _bindingsProvider;
-		private readonly LocalCompilerProvider _compilerProvider;
+		private readonly LocalCompilerManager _compilerManager;
 		private readonly AgentPool _agentPool;
 
 		private Agent[] _agentsSnapshot;
@@ -29,10 +29,10 @@ namespace DistCL
 		public NetworkBuilder(
 			ServiceModelSectionGroup serviceModelSectionGroup,
 			IBindingsProvider bindingsProvider,
-			LocalCompilerProvider compilerProvider,
+			LocalCompilerManager compilerManager,
 			AgentPool agentPool)
 		{
-			_compilerProvider = compilerProvider;
+			_compilerManager = compilerManager;
 			_agentPool = agentPool;
 			_serviceModelSectionGroup = serviceModelSectionGroup;
 			_bindingsProvider = bindingsProvider;
@@ -53,9 +53,9 @@ namespace DistCL
 			get { return _serviceModelSectionGroup; }
 		}
 
-		private LocalCompilerProvider CompilerProvider
+		private LocalCompilerManager CompilerManager
 		{
-			get { return _compilerProvider; }
+			get { return _compilerManager; }
 		}
 
 		public IBindingsProvider BindingsProvider
@@ -84,7 +84,7 @@ namespace DistCL
 		{
 			var pools = GetAgentPools(ServiceModelSectionGroup);
 
-			Logger.LogAgent("Init", CompilerProvider.RegistrationMessage.Name);
+			Logger.LogAgent("Init", CompilerManager.RegistrationMessage.Name);
 
 			lock (_syncRoot)
 			{
@@ -95,7 +95,7 @@ namespace DistCL
 					var iterationStarted = DateTime.Now;
 
 					var ts = new CancellationTokenSource();
-					var localAgent = CompilerProvider.RegistrationMessage;
+					var localAgent = CompilerManager.RegistrationMessage;
 
 					foreach (var item in pools.Values)
 					{
@@ -125,7 +125,7 @@ namespace DistCL
 								}); // without CancellationToken - final result check shouldn't be cancelled
 					}
 
-					AgentPool.RegisterAgent(CompilerProvider.Snapshot);
+					AgentPool.RegisterAgent(CompilerManager.CompilerProvider);
 
 					AgentPool.Clean(DateTime.Now.Subtract(CompilerSettings.Default.AgentsSilenceLimit));
 
