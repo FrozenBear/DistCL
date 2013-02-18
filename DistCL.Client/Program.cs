@@ -79,7 +79,15 @@ namespace DistCL.Client
 							streams.Add(((ICompileArtifactCookie) artifact).Type, Console.OpenStandardError());
 							break;
 						case CompileArtifactType.Obj:
-							File.Move(Path.Combine(Path.GetDirectoryName(ppFilename), artifact.Name), driver.OutputFiles[0].Path);
+							var tmpFile = Path.Combine(Path.GetDirectoryName(ppFilename), artifact.Name);
+							var resultFile = driver.OutputFiles[0].Path;
+							if (File.Exists(resultFile))
+							{
+								Logger.DebugFormat("Delete old '{0}'", resultFile);
+								File.Delete(resultFile);
+							}
+							Logger.DebugFormat("Move '{0}' to {1}", tmpFile, resultFile);
+							File.Move(tmpFile, resultFile);
 							break;
 						default:
 							throw new NotSupportedException("Not supported stream type");

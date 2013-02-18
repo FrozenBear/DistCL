@@ -1,10 +1,9 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.IO;
 using System.ServiceModel;
-using System.ServiceModel.Channels;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using DistCL.Utils;
@@ -89,11 +88,19 @@ namespace DistCL
 					Logger.Debug("Source copied to local file");
 				}
 
-				var streams = RunCompiler(input.Arguments, srcName, tmpPath);
+				Dictionary<CompileArtifactDescription, Stream> streams;
+				var errorCode = RunCompiler(input.Arguments, srcName, tmpPath, out streams);
 
-				Logger.InfoFormat("'{0}' compiled successfully", srcName);
-
-				return new CompileOutput(true, 0, streams, null);
+				if (errorCode == 0)
+				{
+					Logger.InfoFormat("'{0}' compiled successfully", srcName);
+				}
+				else
+				{
+					Logger.WarnFormat("'{0}' compiled with errors", srcName);
+				}
+				
+				return new CompileOutput(errorCode == 0, errorCode, streams, null);
 			}
 			finally
 			{
@@ -235,53 +242,53 @@ namespace DistCL
 			}
 		}
 
-		private Dictionary<CompileArtifactDescription, Stream> RunCompiler(string commmandLine, string inputPath, string outputPath)
+		private int RunCompiler(string commmandLine, string inputPath, string outputPath, out Dictionary<CompileArtifactDescription, Stream> streams)
 		{
-			var streams = new Dictionary<CompileArtifactDescription, Stream>();
-
-			byte[] stdOutBuf = null;
-			byte[] stdErrBuf = null;
-			int stdOutStreamLen = 0;
-			int stdErrStreamLen = 0;
+			streams = new Dictionary<CompileArtifactDescription, Stream>();
 
 			var fileName = Guid.NewGuid() + ".obj";
 
-			using (MemoryStream stdOutStream = new MemoryStream())
-			using (MemoryStream stdErrStream = new MemoryStream())
-			using (StreamWriter stdWriter = new StreamWriter(stdOutStream))
-			using (StreamWriter errWriter = new StreamWriter(stdErrStream))
+			var stdOutStream = new MemoryStream();
+			var stdErrStream = new MemoryStream();
+
+			const int bufferSize = 4086;
+			var encoding = Encoding.UTF8;
+
+			int errCode;
+
+			using (var outWriter = new StreamWriter(stdOutStream, encoding, bufferSize, true))
+			using (var errWriter = new StreamWriter(stdErrStream, encoding, bufferSize, true))
 			{
 				// TODO dirty code.
 				commmandLine += " /Fo" + StringUtils.QuoteString(Path.Combine(outputPath, fileName));
 				commmandLine += " " + StringUtils.QuoteString(inputPath);
 				Logger.DebugFormat("Call compiler '{0}' with cmdline '{1}'", Utils.CompilerSettings.CLExeFilename, commmandLine);
 
-				int errCode = ProcessRunner.Run(Utils.CompilerSettings.CLExeFilename, commmandLine, stdWriter, errWriter);
+				errCode = ProcessRunner.Run(Utils.CompilerSettings.CLExeFilename, commmandLine, outWriter, errWriter);
 				Logger.DebugFormat("Compilation is completed.");
-
-				if (errCode != 0)
-					throw new ApplicationException(String.Format("{0}: {1}", Utils.CompilerSettings.CLExeFilename, errCode));
-
-				stdErrStreamLen = (int)stdErrStream.Length;
-				stdErrBuf = stdErrStream.GetBuffer();
-
-				stdOutStreamLen = (int)stdOutStream.Length;
-				stdOutBuf = stdOutStream.GetBuffer();
 			}
 
-			streams.Add(new CompileArtifactDescription(CompileArtifactType.Out, "stdout"),
-				new MemoryStream(stdOutBuf, 0, stdOutStreamLen));
-			streams.Add(new CompileArtifactDescription(CompileArtifactType.Err, "stderr"),
-				new MemoryStream(stdErrBuf, 0, stdErrStreamLen));
+			stdOutStream.Position = 0;
+			stdErrStream.Position = 0;
 
-			Logger.DebugFormat("stdout: {0}, stderr: {1}", System.Text.UTF8Encoding.UTF8.GetString(stdOutBuf, 0, stdOutStreamLen),
-				System.Text.UTF8Encoding.UTF8.GetString(stdErrBuf, 0, stdErrStreamLen));
+			using (var outReader = new StreamReader(stdOutStream, encoding, true, bufferSize, true))
+			using (var errReader = new StreamReader(stdErrStream, encoding, true, bufferSize, true))
+			{
+
+				Logger.DebugFormat("errorCode: {0}, stdout: {1}, stderr: {2}", errCode, outReader.ReadToEnd(), errReader.ReadToEnd());
+			}
+
+			stdOutStream.Position = 0;
+			stdErrStream.Position = 0;
+
+			streams.Add(new CompileArtifactDescription(CompileArtifactType.Out, "stdout"), stdOutStream);
+			streams.Add(new CompileArtifactDescription(CompileArtifactType.Err, "stderr"), stdErrStream);
 
 			streams.Add(
 				new CompileArtifactDescription(CompileArtifactType.Obj, fileName),
 				new TempFileStreamWrapper(Path.Combine(outputPath, fileName)));
 
-			return streams;
+			return errCode;
 		}
 	}
 }
