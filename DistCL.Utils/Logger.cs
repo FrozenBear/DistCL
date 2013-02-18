@@ -51,5 +51,10 @@ namespace DistCL.Utils
 		{
 			_logger.Fatal(message, e);
 		}
+
+		public bool DebugEnabled
+		{
+			get { return _logger.IsDebugEnabled; }
+		}
 	}
 }

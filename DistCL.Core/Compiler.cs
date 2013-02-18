@@ -262,6 +262,7 @@ namespace DistCL
 				// TODO dirty code.
 				commmandLine += " /Fo" + StringUtils.QuoteString(Path.Combine(outputPath, fileName));
 				commmandLine += " " + StringUtils.QuoteString(inputPath);
+				
 				Logger.DebugFormat("Call compiler '{0}' with cmdline '{1}'", Utils.CompilerSettings.CLExeFilename, commmandLine);
 
 				errCode = ProcessRunner.Run(Utils.CompilerSettings.CLExeFilename, commmandLine, outWriter, errWriter);
@@ -271,11 +272,14 @@ namespace DistCL
 			stdOutStream.Position = 0;
 			stdErrStream.Position = 0;
 
-			using (var outReader = new StreamReader(stdOutStream, encoding, true, bufferSize, true))
-			using (var errReader = new StreamReader(stdErrStream, encoding, true, bufferSize, true))
+			if (Logger.DebugEnabled)
 			{
+				using (var outReader = new StreamReader(stdOutStream, encoding, true, bufferSize, true))
+				using (var errReader = new StreamReader(stdErrStream, encoding, true, bufferSize, true))
+				{
 
-				Logger.DebugFormat("errorCode: {0}, stdout: {1}, stderr: {2}", errCode, outReader.ReadToEnd(), errReader.ReadToEnd());
+					Logger.DebugFormat("errorCode: {0}, stdout: {1}, stderr: {2}", errCode, outReader.ReadToEnd(), errReader.ReadToEnd());
+				}
 			}
 
 			stdOutStream.Position = 0;
