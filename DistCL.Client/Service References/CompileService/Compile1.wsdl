@@ -21,6 +21,12 @@
   <wsdl:message name="LocalCompileOutput_Headers">
     <wsdl:part name="Status" element="tns:Status" />
   </wsdl:message>
+  <wsdl:message name="ILocalCompiler_GetPreprocessToken_InputMessage">
+    <wsdl:part name="parameters" element="tns:GetPreprocessToken" />
+  </wsdl:message>
+  <wsdl:message name="ILocalCompiler_GetPreprocessToken_OutputMessage">
+    <wsdl:part name="parameters" element="tns:GetPreprocessTokenResponse" />
+  </wsdl:message>
   <wsdl:message name="ICompiler_IsReady_InputMessage">
     <wsdl:part name="parameters" element="tns:IsReady" />
   </wsdl:message>
@@ -54,6 +60,10 @@
     <wsdl:operation name="LocalCompile">
       <wsdl:input wsaw:Action="urn:distcl/ILocalCompiler/LocalCompile" name="LocalCompileInput" message="tns:LocalCompileInput" />
       <wsdl:output wsaw:Action="urn:distcl/ILocalCompiler/LocalCompileResponse" name="LocalCompileOutput" message="tns:LocalCompileOutput" />
+    </wsdl:operation>
+    <wsdl:operation name="GetPreprocessToken">
+      <wsdl:input wsaw:Action="urn:distcl/ILocalCompiler/GetPreprocessToken" message="tns:ILocalCompiler_GetPreprocessToken_InputMessage" />
+      <wsdl:output wsaw:Action="urn:distcl/ILocalCompiler/GetPreprocessTokenResponse" message="tns:ILocalCompiler_GetPreprocessToken_OutputMessage" />
     </wsdl:operation>
   </wsdl:portType>
   <wsdl:portType name="ICompiler">

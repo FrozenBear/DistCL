@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
@@ -19,6 +20,7 @@ namespace DistCL
 		private readonly int _maxWorkersCount;
 		private int _workersCount;
 		private readonly object _syncRoot = new object();
+		ConcurrentDictionary<Guid, string> _preprocessTokens = new ConcurrentDictionary<Guid, string>();
 
 		public Compiler()
 		{
@@ -89,7 +91,7 @@ namespace DistCL
 
 				var streams = RunCompiler(input.Arguments, srcName, tmpPath);
 
-				Logger.InfoFormat("'{0} Compiled successfully", srcName);
+				Logger.InfoFormat("'{0}' compiled successfully", srcName);
 
 				return new CompileOutput(true, 0, streams);
 			}
@@ -117,8 +119,58 @@ namespace DistCL
 			}
 		}
 
+		public Guid GetPreprocessToken(string name)
+		{
+			lock (_syncRoot)
+			{
+				while (_workersCount >= _maxWorkersCount)
+				{
+					Monitor.Wait(_syncRoot);
+				}
+
+				_workersCount++;
+			}
+
+			var token = Guid.NewGuid();
+			Task.Delay(TimeSpan.FromMinutes(1)).ContinueWith(PreprocessTokenRemove, token);
+			_preprocessTokens[token] = name;
+			return token;
+		}
+
+		private void PreprocessTokenRemove(Task task, object state)
+		{
+			var token = (Guid) state;
+			string name;
+
+			if (_preprocessTokens.TryRemove(token, out name))
+			{
+				Logger.WarnFormat("Preprocess token expired: {0}", name);
+				lock (_syncRoot)
+				{
+					_workersCount--;
+					Monitor.Pulse(_syncRoot);
+				}
+			}
+		}
+
 		public LocalCompileOutput LocalCompile(LocalCompileInput input)
 		{
+			Logger.InfoFormat("Processing local compile request '{0}'...", input.SrcName);
+
+			string preprocessName;
+			if (_preprocessTokens.TryRemove(input.PreprocessToken, out preprocessName))
+			{
+				lock (_syncRoot)
+				{
+					_workersCount--;
+					Monitor.Pulse(_syncRoot);
+				}
+			}
+			else
+			{
+				Logger.WarnFormat("Preprocess token already expired: {0}", input.SrcName);
+			}
+
 			using (var inputStream = File.OpenRead(input.Src))
 			{
 				var remoteInput = new CompileInput
@@ -129,6 +181,7 @@ namespace DistCL
 						SrcName = input.SrcName
 					};
 
+				// TODO move IsReady check into GetRandomCompiler, result should be ICompiler instead of ICompilerProvider
 				using (var remoteOutput = AgentPool.GetRandomCompiler().GetCompiler().Compile(remoteInput))
 				{
 					var remoteStreams = new Dictionary<CompileArtifactType, Stream>();
@@ -171,6 +224,7 @@ namespace DistCL
 						}
 					}
 
+					Logger.InfoFormat("Completed local compile '{0}'", input.SrcName);
 					return new LocalCompileOutput(true, remoteOutput.Status.ExitCode, localStreams);
 				}
 			}
@@ -185,13 +239,15 @@ namespace DistCL
 			int stdOutStreamLen = 0;
 			int stdErrStreamLen = 0;
 
+			var fileName = Guid.NewGuid() + "myFile.obj";
+
 			using (MemoryStream stdOutStream = new MemoryStream())
 			using (MemoryStream stdErrStream = new MemoryStream())
 			using (StreamWriter stdWriter = new StreamWriter(stdOutStream))
 			using (StreamWriter errWriter = new StreamWriter(stdErrStream))
 			{
 				// TODO dirty code.
-				commmandLine += " /Fo" + StringUtils.QuoteString(Path.Combine(outputPath, "myFile.obj"));
+				commmandLine += " /Fo" + StringUtils.QuoteString(Path.Combine(outputPath, fileName));
 				commmandLine += " " + StringUtils.QuoteString(inputPath);
 				Logger.DebugFormat("Call compiler '{0}' with cmdline '{1}'", Utils.CompilerSettings.CLExeFilename, commmandLine);
 
@@ -217,7 +273,7 @@ namespace DistCL
 				System.Text.UTF8Encoding.UTF8.GetString(stdErrBuf, 0, stdErrStreamLen));
 
 			streams.Add(new CompileArtifactDescription(CompileArtifactType.Obj, "myFile.obj"),
-				new TempFileStreamWrapper(Path.Combine(outputPath, "myFile.obj")));
+				new TempFileStreamWrapper(Path.Combine(outputPath, fileName)));
 
 			return streams;
 		}

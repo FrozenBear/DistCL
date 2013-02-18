@@ -233,6 +233,12 @@ namespace DistCL.RemoteCompilerService {
         
         [System.ServiceModel.OperationContractAttribute(Action="urn:distcl/ILocalCompiler/LocalCompile", ReplyAction="urn:distcl/ILocalCompiler/LocalCompileResponse")]
         System.Threading.Tasks.Task<DistCL.RemoteCompilerService.LocalCompileOutput> LocalCompileAsync(DistCL.RemoteCompilerService.LocalCompileInput request);
+        
+        [System.ServiceModel.OperationContractAttribute(Action="urn:distcl/ILocalCompiler/GetPreprocessToken", ReplyAction="urn:distcl/ILocalCompiler/GetPreprocessTokenResponse")]
+        System.Guid GetPreprocessToken(string name);
+        
+        [System.ServiceModel.OperationContractAttribute(Action="urn:distcl/ILocalCompiler/GetPreprocessToken", ReplyAction="urn:distcl/ILocalCompiler/GetPreprocessTokenResponse")]
+        System.Threading.Tasks.Task<System.Guid> GetPreprocessTokenAsync(string name);
     }
     
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -245,16 +251,20 @@ namespace DistCL.RemoteCompilerService {
         public string Arguments;
         
         [System.ServiceModel.MessageBodyMemberAttribute(Namespace="urn:distcl:compiler:local:messages", Order=1)]
-        public string Src;
+        public System.Guid PreprocessToken;
         
         [System.ServiceModel.MessageBodyMemberAttribute(Namespace="urn:distcl:compiler:local:messages", Order=2)]
+        public string Src;
+        
+        [System.ServiceModel.MessageBodyMemberAttribute(Namespace="urn:distcl:compiler:local:messages", Order=3)]
         public string SrcName;
         
         public LocalCompileInput() {
         }
         
-        public LocalCompileInput(string Arguments, string Src, string SrcName) {
+        public LocalCompileInput(string Arguments, System.Guid PreprocessToken, string Src, string SrcName) {
             this.Arguments = Arguments;
+            this.PreprocessToken = PreprocessToken;
             this.Src = Src;
             this.SrcName = SrcName;
         }
@@ -313,9 +323,10 @@ namespace DistCL.RemoteCompilerService {
             return base.Channel.LocalCompile(request);
         }
         
-        public DistCL.RemoteCompilerService.CompileStatus LocalCompile(string Arguments, string Src, string SrcName, out System.IO.Stream ResultData) {
+        public DistCL.RemoteCompilerService.CompileStatus LocalCompile(string Arguments, System.Guid PreprocessToken, string Src, string SrcName, out System.IO.Stream ResultData) {
             DistCL.RemoteCompilerService.LocalCompileInput inValue = new DistCL.RemoteCompilerService.LocalCompileInput();
             inValue.Arguments = Arguments;
+            inValue.PreprocessToken = PreprocessToken;
             inValue.Src = Src;
             inValue.SrcName = SrcName;
             DistCL.RemoteCompilerService.LocalCompileOutput retVal = ((DistCL.RemoteCompilerService.ILocalCompiler)(this)).LocalCompile(inValue);
@@ -328,12 +339,21 @@ namespace DistCL.RemoteCompilerService {
             return base.Channel.LocalCompileAsync(request);
         }
         
-        public System.Threading.Tasks.Task<DistCL.RemoteCompilerService.LocalCompileOutput> LocalCompileAsync(string Arguments, string Src, string SrcName) {
+        public System.Threading.Tasks.Task<DistCL.RemoteCompilerService.LocalCompileOutput> LocalCompileAsync(string Arguments, System.Guid PreprocessToken, string Src, string SrcName) {
             DistCL.RemoteCompilerService.LocalCompileInput inValue = new DistCL.RemoteCompilerService.LocalCompileInput();
             inValue.Arguments = Arguments;
+            inValue.PreprocessToken = PreprocessToken;
             inValue.Src = Src;
             inValue.SrcName = SrcName;
             return ((DistCL.RemoteCompilerService.ILocalCompiler)(this)).LocalCompileAsync(inValue);
+        }
+        
+        public System.Guid GetPreprocessToken(string name) {
+            return base.Channel.GetPreprocessToken(name);
+        }
+        
+        public System.Threading.Tasks.Task<System.Guid> GetPreprocessTokenAsync(string name) {
+            return base.Channel.GetPreprocessTokenAsync(name);
         }
     }
     

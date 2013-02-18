@@ -12,7 +12,7 @@
 			if (idx >= text.Length)
 				return false;
 
-			return text.IndexOf(value, idx) != -1;
+			return text.IndexOf(value, idx) == idx;
 		}
 	}
 }

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.ServiceModel;
 using DistCL.Utils;
@@ -10,6 +11,9 @@ namespace DistCL
 	{
 		[OperationContract]
 		LocalCompileOutput LocalCompile(LocalCompileInput input);
+
+		[OperationContract]
+		Guid GetPreprocessToken(string name);
 	}
 
 	[MessageContract(WrapperNamespace = GeneralSettings.LocalCompilerMessageNamespace)]
@@ -23,6 +27,9 @@ namespace DistCL
 
 		[MessageBodyMember(Namespace = GeneralSettings.LocalCompilerMessageNamespace)]
 		public string SrcName { get; set; }
+
+		[MessageBodyMember(Namespace = GeneralSettings.LocalCompilerMessageNamespace)]
+		public Guid PreprocessToken { get; set; }
 	}
 
 	[MessageContract(WrapperNamespace = GeneralSettings.LocalCompilerMessageNamespace)]

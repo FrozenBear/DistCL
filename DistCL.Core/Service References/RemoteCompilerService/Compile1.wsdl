@@ -44,6 +44,15 @@
         <soap:body use="literal" />
       </wsdl:output>
     </wsdl:operation>
+    <wsdl:operation name="GetPreprocessToken">
+      <soap:operation soapAction="urn:distcl/ILocalCompiler/GetPreprocessToken" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
   </wsdl:binding>
   <wsdl:binding name="basicHttpEndpoint_Compiler" type="i0:ICompiler">
     <soap:binding transport="http://schemas.xmlsoap.org/soap/http" />
