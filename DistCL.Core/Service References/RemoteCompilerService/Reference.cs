@@ -495,6 +495,12 @@ namespace DistCL.RemoteCompilerService {
     [System.ServiceModel.ServiceContractAttribute(Namespace="urn:distcl", ConfigurationName="RemoteCompilerService.IAgentPool")]
     public interface IAgentPool {
         
+        [System.ServiceModel.OperationContractAttribute(Action="urn:distcl/ICompileCoordinator/GetDescription", ReplyAction="urn:distcl/ICompileCoordinator/GetDescriptionResponse")]
+        DistCL.RemoteCompilerService.Agent GetDescription();
+        
+        [System.ServiceModel.OperationContractAttribute(Action="urn:distcl/ICompileCoordinator/GetDescription", ReplyAction="urn:distcl/ICompileCoordinator/GetDescriptionResponse")]
+        System.Threading.Tasks.Task<DistCL.RemoteCompilerService.Agent> GetDescriptionAsync();
+        
         [System.ServiceModel.OperationContractAttribute(IsOneWay=true, Action="urn:distcl/ICompileCoordinator/RegisterAgent")]
         void RegisterAgent(DistCL.RemoteCompilerService.AgentRegistrationMessage request);
         
@@ -535,6 +541,14 @@ namespace DistCL.RemoteCompilerService {
                 base(binding, remoteAddress) {
         }
         
+        public DistCL.RemoteCompilerService.Agent GetDescription() {
+            return base.Channel.GetDescription();
+        }
+        
+        public System.Threading.Tasks.Task<DistCL.RemoteCompilerService.Agent> GetDescriptionAsync() {
+            return base.Channel.GetDescriptionAsync();
+        }
+        
         public void RegisterAgent(DistCL.RemoteCompilerService.AgentRegistrationMessage request) {
             base.Channel.RegisterAgent(request);
         }
@@ -549,6 +563,67 @@ namespace DistCL.RemoteCompilerService {
         
         public System.Threading.Tasks.Task<DistCL.RemoteCompilerService.Agent[]> GetAgentsAsync() {
             return base.Channel.GetAgentsAsync();
+        }
+    }
+    
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
+    [System.ServiceModel.ServiceContractAttribute(Namespace="urn:distcl", ConfigurationName="RemoteCompilerService.ICompileCoordinator")]
+    public interface ICompileCoordinator {
+        
+        [System.ServiceModel.OperationContractAttribute(Action="urn:distcl/ICompileCoordinator/GetDescription", ReplyAction="urn:distcl/ICompileCoordinator/GetDescriptionResponse")]
+        DistCL.RemoteCompilerService.Agent GetDescription();
+        
+        [System.ServiceModel.OperationContractAttribute(Action="urn:distcl/ICompileCoordinator/GetDescription", ReplyAction="urn:distcl/ICompileCoordinator/GetDescriptionResponse")]
+        System.Threading.Tasks.Task<DistCL.RemoteCompilerService.Agent> GetDescriptionAsync();
+        
+        [System.ServiceModel.OperationContractAttribute(IsOneWay=true, Action="urn:distcl/ICompileCoordinator/RegisterAgent")]
+        void RegisterAgent(DistCL.RemoteCompilerService.AgentRegistrationMessage request);
+        
+        [System.ServiceModel.OperationContractAttribute(IsOneWay=true, Action="urn:distcl/ICompileCoordinator/RegisterAgent")]
+        System.Threading.Tasks.Task RegisterAgentAsync(DistCL.RemoteCompilerService.AgentRegistrationMessage request);
+    }
+    
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
+    public interface ICompileCoordinatorChannel : DistCL.RemoteCompilerService.ICompileCoordinator, System.ServiceModel.IClientChannel {
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
+    public partial class CompileCoordinatorClient : System.ServiceModel.ClientBase<DistCL.RemoteCompilerService.ICompileCoordinator>, DistCL.RemoteCompilerService.ICompileCoordinator {
+        
+        public CompileCoordinatorClient() {
+        }
+        
+        public CompileCoordinatorClient(string endpointConfigurationName) : 
+                base(endpointConfigurationName) {
+        }
+        
+        public CompileCoordinatorClient(string endpointConfigurationName, string remoteAddress) : 
+                base(endpointConfigurationName, remoteAddress) {
+        }
+        
+        public CompileCoordinatorClient(string endpointConfigurationName, System.ServiceModel.EndpointAddress remoteAddress) : 
+                base(endpointConfigurationName, remoteAddress) {
+        }
+        
+        public CompileCoordinatorClient(System.ServiceModel.Channels.Binding binding, System.ServiceModel.EndpointAddress remoteAddress) : 
+                base(binding, remoteAddress) {
+        }
+        
+        public DistCL.RemoteCompilerService.Agent GetDescription() {
+            return base.Channel.GetDescription();
+        }
+        
+        public System.Threading.Tasks.Task<DistCL.RemoteCompilerService.Agent> GetDescriptionAsync() {
+            return base.Channel.GetDescriptionAsync();
+        }
+        
+        public void RegisterAgent(DistCL.RemoteCompilerService.AgentRegistrationMessage request) {
+            base.Channel.RegisterAgent(request);
+        }
+        
+        public System.Threading.Tasks.Task RegisterAgentAsync(DistCL.RemoteCompilerService.AgentRegistrationMessage request) {
+            return base.Channel.RegisterAgentAsync(request);
         }
     }
     
@@ -568,6 +643,12 @@ namespace DistCL.RemoteCompilerService {
         
         [System.ServiceModel.OperationContractAttribute(Action="urn:distcl/ICompiler/Compile", ReplyAction="urn:distcl/ICompiler/CompileResponse")]
         System.Threading.Tasks.Task<DistCL.RemoteCompilerService.CompileOutput> CompileAsync(DistCL.RemoteCompilerService.CompileInput request);
+        
+        [System.ServiceModel.OperationContractAttribute(Action="urn:distcl/ICompileCoordinator/GetDescription", ReplyAction="urn:distcl/ICompileCoordinator/GetDescriptionResponse")]
+        DistCL.RemoteCompilerService.Agent GetDescription();
+        
+        [System.ServiceModel.OperationContractAttribute(Action="urn:distcl/ICompileCoordinator/GetDescription", ReplyAction="urn:distcl/ICompileCoordinator/GetDescriptionResponse")]
+        System.Threading.Tasks.Task<DistCL.RemoteCompilerService.Agent> GetDescriptionAsync();
         
         [System.ServiceModel.OperationContractAttribute(IsOneWay=true, Action="urn:distcl/ICompileCoordinator/RegisterAgent")]
         void RegisterAgent(DistCL.RemoteCompilerService.AgentRegistrationMessage request);
@@ -645,6 +726,14 @@ namespace DistCL.RemoteCompilerService {
             inValue.SrcName = SrcName;
             inValue.Src = Src;
             return ((DistCL.RemoteCompilerService.ICompileManager)(this)).CompileAsync(inValue);
+        }
+        
+        public DistCL.RemoteCompilerService.Agent GetDescription() {
+            return base.Channel.GetDescription();
+        }
+        
+        public System.Threading.Tasks.Task<DistCL.RemoteCompilerService.Agent> GetDescriptionAsync() {
+            return base.Channel.GetDescriptionAsync();
         }
         
         public void RegisterAgent(DistCL.RemoteCompilerService.AgentRegistrationMessage request) {

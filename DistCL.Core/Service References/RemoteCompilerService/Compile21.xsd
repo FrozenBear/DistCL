@@ -2,14 +2,6 @@
 <xs:schema xmlns:ser="http://schemas.microsoft.com/2003/10/Serialization/" xmlns:tns="urn:distcl:agents:messages" elementFormDefault="qualified" targetNamespace="urn:distcl:agents:messages" xmlns:xs="http://www.w3.org/2001/XMLSchema">
   <xs:import schemaLocation="http://localhost:8733/Compile?xsd=xsd7" namespace="http://schemas.microsoft.com/2003/10/Serialization/Arrays" />
   <xs:import schemaLocation="http://localhost:8733/Compile?xsd=xsd1" namespace="http://schemas.microsoft.com/2003/10/Serialization/" />
-  <xs:complexType name="AgentRegistrationMessage">
-    <xs:complexContent mixed="false">
-      <xs:extension base="tns:Agent">
-        <xs:sequence />
-      </xs:extension>
-    </xs:complexContent>
-  </xs:complexType>
-  <xs:element name="AgentRegistrationMessage" nillable="true" type="tns:AgentRegistrationMessage" />
   <xs:complexType name="Agent">
     <xs:sequence>
       <xs:element xmlns:q1="http://schemas.microsoft.com/2003/10/Serialization/Arrays" minOccurs="0" name="AgentPoolUrls" nillable="true" type="q1:ArrayOfanyURI" />
@@ -21,6 +13,14 @@
     </xs:sequence>
   </xs:complexType>
   <xs:element name="Agent" nillable="true" type="tns:Agent" />
+  <xs:complexType name="AgentRegistrationMessage">
+    <xs:complexContent mixed="false">
+      <xs:extension base="tns:Agent">
+        <xs:sequence />
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:element name="AgentRegistrationMessage" nillable="true" type="tns:AgentRegistrationMessage" />
   <xs:complexType name="ArrayOfAgent">
     <xs:sequence>
       <xs:element minOccurs="0" maxOccurs="unbounded" name="Agent" nillable="true" type="tns:Agent" />

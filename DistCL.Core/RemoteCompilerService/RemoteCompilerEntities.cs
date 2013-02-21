@@ -1,37 +1,59 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace DistCL.RemoteCompilerService
 {
-	partial class AgentPoolClient : IAgentPoolInternal
+
+	internal interface IRemoteCompileCoordinator
 	{
-		private const int MaxErrorCount = 3;
-		private int _errorCount;
+		IAgent GetDescription();
+		Task<IAgent> GetDescriptionAsync();
+	}
 
-		public string Name { get { return Endpoint.ListenUri.ToString(); } }
-
-		IEnumerable<IAgent> IAgentPoolInternal.GetAgents()
+	partial class CompileCoordinatorClient : IRemoteCompileCoordinator
+	{
+		IAgent IRemoteCompileCoordinator.GetDescription()
 		{
-			return GetAgents();
+			return GetDescription();
 		}
 
-		Task<IEnumerable<IAgent>> IAgentPoolInternal.GetAgentsAsync()
+		Task<IAgent> IRemoteCompileCoordinator.GetDescriptionAsync()
 		{
-			return GetAgentsAsync().ContinueWith(task => (IEnumerable<IAgent>) task.Result);
-		}
-
-		public bool IncreaseErrorCount()
-		{
-			return Interlocked.Increment(ref _errorCount) >= MaxErrorCount;
-		}
-
-		public void ResetErrorCount()
-		{
-			_errorCount = 0;
+			return GetDescriptionAsync().ContinueWith(task => (IAgent)task.Result);
 		}
 	}
+
+	partial class AgentPoolClient : IRemoteCompileCoordinator
+	{
+		IAgent IRemoteCompileCoordinator.GetDescription()
+		{
+			return GetDescription();
+		}
+
+		Task<IAgent> IRemoteCompileCoordinator.GetDescriptionAsync()
+		{
+			return GetDescriptionAsync().ContinueWith(task => (IAgent)task.Result);
+		}
+	}
+
+/*
+	partial class AgentPoolClient //: IAgentPoolInternal
+	{
+		public string Name { get { return Endpoint.ListenUri.ToString(); } }
+
+//		IEnumerable<IAgent> IAgentPoolInternal.GetAgents()
+//		{
+//			return GetAgents();
+//		}
+//
+//		Task<IEnumerable<IAgent>> IAgentPoolInternal.GetAgentsAsync()
+//		{
+//			return GetAgentsAsync().ContinueWith(task => (IEnumerable<IAgent>) task.Result);
+//		}
+
+	}
+*/
 
 	partial class Agent : IAgent
 	{

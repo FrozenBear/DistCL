@@ -1,13 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Diagnostics;
 using System.IO;
-using System.Threading;
 using DistCL.Client.CompileService;
 using DistCL.Utils;
-using LocalCompileService = DistCL.Client.CompileService;
-using System.Linq;
 
 namespace DistCL.Client
 {

@@ -49,7 +49,7 @@ namespace DistCL {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("DefaultInstance")]
+        [global::System.Configuration.DefaultSettingValueAttribute("Default")]
         public string InstanceName {
             get {
                 return ((string)(this["InstanceName"]));
@@ -68,6 +68,18 @@ namespace DistCL {
             }
             set {
                 this["NetworkBuildPeriod"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("00:10:00")]
+        public global::System.TimeSpan AgentsFromConfigCheckPeriod {
+            get {
+                return ((global::System.TimeSpan)(this["AgentsFromConfigCheckPeriod"]));
+            }
+            set {
+                this["AgentsFromConfigCheckPeriod"] = value;
             }
         }
     }

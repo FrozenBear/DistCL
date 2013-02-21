@@ -47,6 +47,12 @@
   <wsdl:message name="CompileOutput_Headers">
     <wsdl:part name="Status" element="tns:Status" />
   </wsdl:message>
+  <wsdl:message name="IAgentPool_GetDescription_InputMessage">
+    <wsdl:part name="parameters" element="tns:GetDescription" />
+  </wsdl:message>
+  <wsdl:message name="IAgentPool_GetDescription_OutputMessage">
+    <wsdl:part name="parameters" element="tns:GetDescriptionResponse" />
+  </wsdl:message>
   <wsdl:message name="IAgentPool_RegisterAgent_InputMessage">
     <wsdl:part name="parameters" element="tns:RegisterAgent" />
   </wsdl:message>
@@ -77,12 +83,25 @@
     </wsdl:operation>
   </wsdl:portType>
   <wsdl:portType name="IAgentPool">
+    <wsdl:operation name="GetDescription">
+      <wsdl:input wsaw:Action="urn:distcl/ICompileCoordinator/GetDescription" message="tns:IAgentPool_GetDescription_InputMessage" />
+      <wsdl:output wsaw:Action="urn:distcl/ICompileCoordinator/GetDescriptionResponse" message="tns:IAgentPool_GetDescription_OutputMessage" />
+    </wsdl:operation>
     <wsdl:operation name="RegisterAgent">
       <wsdl:input wsaw:Action="urn:distcl/ICompileCoordinator/RegisterAgent" message="tns:IAgentPool_RegisterAgent_InputMessage" />
     </wsdl:operation>
     <wsdl:operation name="GetAgents">
       <wsdl:input wsaw:Action="urn:distcl/IAgentPool/GetAgents" message="tns:IAgentPool_GetAgents_InputMessage" />
       <wsdl:output wsaw:Action="urn:distcl/IAgentPool/GetAgentsResponse" message="tns:IAgentPool_GetAgents_OutputMessage" />
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:portType name="ICompileCoordinator">
+    <wsdl:operation name="GetDescription">
+      <wsdl:input wsaw:Action="urn:distcl/ICompileCoordinator/GetDescription" message="tns:IAgentPool_GetDescription_InputMessage" />
+      <wsdl:output wsaw:Action="urn:distcl/ICompileCoordinator/GetDescriptionResponse" message="tns:IAgentPool_GetDescription_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="RegisterAgent">
+      <wsdl:input wsaw:Action="urn:distcl/ICompileCoordinator/RegisterAgent" message="tns:IAgentPool_RegisterAgent_InputMessage" />
     </wsdl:operation>
   </wsdl:portType>
   <wsdl:portType name="ICompileManager">
@@ -93,6 +112,10 @@
     <wsdl:operation name="Compile">
       <wsdl:input wsaw:Action="urn:distcl/ICompiler/Compile" name="CompileInput" message="tns:CompileInput" />
       <wsdl:output wsaw:Action="urn:distcl/ICompiler/CompileResponse" name="CompileOutput" message="tns:CompileOutput" />
+    </wsdl:operation>
+    <wsdl:operation name="GetDescription">
+      <wsdl:input wsaw:Action="urn:distcl/ICompileCoordinator/GetDescription" message="tns:IAgentPool_GetDescription_InputMessage" />
+      <wsdl:output wsaw:Action="urn:distcl/ICompileCoordinator/GetDescriptionResponse" message="tns:IAgentPool_GetDescription_OutputMessage" />
     </wsdl:operation>
     <wsdl:operation name="RegisterAgent">
       <wsdl:input wsaw:Action="urn:distcl/ICompileCoordinator/RegisterAgent" message="tns:IAgentPool_RegisterAgent_InputMessage" />

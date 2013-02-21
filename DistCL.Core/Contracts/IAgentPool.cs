@@ -9,6 +9,9 @@ namespace DistCL
 	[ServiceContract(Namespace = GeneralSettings.Namespace)]
 	public interface ICompileCoordinator
 	{
+		[OperationContract]
+		Agent GetDescription();
+
 		[OperationContract(IsOneWay = true)]
 		void RegisterAgent(AgentRegistrationMessage request);
 	}

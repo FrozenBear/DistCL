@@ -47,8 +47,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AgentPool.cs" />
+    <Compile Include="AgentProxy.cs" />
+    <Compile Include="AsyncHelpers.cs" />
     <Compile Include="Compiler.cs" />
-    <Compile Include="CompilerProvider.cs" />
     <Compile Include="CompilerSettings.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
@@ -59,6 +60,7 @@
     <Compile Include="Contracts\ICompileManager.cs" />
     <Compile Include="Contracts\ICompiler.cs" />
     <Compile Include="Contracts\ILocalCompiler.cs" />
+    <Compile Include="LocalAgentManager.cs" />
     <Compile Include="NetworkBuilder.cs" />
     <Compile Include="RemoteCompilerService\RemoteCompilerEntities.cs" />
     <Compile Include="GeneralSettings.cs" />

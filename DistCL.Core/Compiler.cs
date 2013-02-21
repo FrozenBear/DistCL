@@ -110,12 +110,18 @@ namespace DistCL
 
 		public void RegisterAgent(AgentRegistrationMessage request)
 		{
-			_agentPool.RegisterAgent(new RemoteCompilerProvider(BindingsProvider, request));
+			_agentPool.RegisterAgent(new RemoteAgentProxy(BindingsProvider, request));
 		}
 
 		Agent[] IAgentPool.GetAgents()
 		{
 			return _agentPool.GetAgents();
+		}
+
+		public Agent GetDescription()
+		{
+			//  TODO get off new object creation
+			return new Agent(AgentPool.Manager.AgentProxy.Description);
 		}
 
 		public bool IsReady()
@@ -255,11 +261,13 @@ namespace DistCL
 
 			int errCode;
 
+			var objFilename = Path.Combine(outputPath, fileName);
+
 			using (var outWriter = new StreamWriter(stdOutStream, encoding, bufferSize, true))
 			using (var errWriter = new StreamWriter(stdErrStream, encoding, bufferSize, true))
 			{
 				// TODO dirty code.
-				commmandLine += " /Fo" + StringUtils.QuoteString(Path.Combine(outputPath, fileName));
+				commmandLine += " /Fo" + StringUtils.QuoteString(objFilename);
 				commmandLine += " " + StringUtils.QuoteString(inputPath);
 				
 				Logger.DebugFormat("Call compiler '{0}' with cmdline '{1}'", Utils.CompilerSettings.CLExeFilename, commmandLine);
@@ -287,9 +295,12 @@ namespace DistCL
 			streams.Add(new CompileArtifactDescription(CompileArtifactType.Out, "stdout"), stdOutStream);
 			streams.Add(new CompileArtifactDescription(CompileArtifactType.Err, "stderr"), stdErrStream);
 
-			streams.Add(
-				new CompileArtifactDescription(CompileArtifactType.Obj, fileName),
-				new TempFileStreamWrapper(Path.Combine(outputPath, fileName)));
+			if (File.Exists(objFilename))
+			{
+				streams.Add(
+					new CompileArtifactDescription(CompileArtifactType.Obj, fileName),
+					new TempFileStreamWrapper(objFilename));
+			}
 
 			return errCode;
 		}

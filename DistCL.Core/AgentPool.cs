@@ -7,11 +7,36 @@ using DistCL.Utils;
 
 namespace DistCL
 {
-	internal interface IAgentPoolInternal
+	internal interface ICompileCoordinatorInternal
 	{
 		string Name { get; }
+
+		void RegisterAgent(IAgentProxy request);
+		Task RegisterAgentAsync(IAgentProxy request);
+
+		bool IncreaseErrorCount();
+		void ResetErrorCount();
+
+		IAgentProxy Proxy { get; }
+		
+		IAgent GetDescription();
+		Task<IAgent> GetDescriptionAsync();
+	}
+
+	internal interface IAgentPoolInternal : ICompileCoordinatorInternal
+	{
 		IEnumerable<IAgent> GetAgents();
 		Task<IEnumerable<IAgent>> GetAgentsAsync();
+	}
+
+	internal class AgentAddEventArgs : EventArgs
+	{
+		public AgentAddEventArgs(IAgentProxy agent)
+		{
+			Agent = agent;
+		}
+
+		public IAgentProxy Agent { get; private set; }
 	}
 
 	internal class AgentPool : IAgentPoolInternal
@@ -35,7 +60,9 @@ namespace DistCL
 
 		// TODO total optimization
 
-		public void RegisterAgent(ICompilerProvider request)
+		public event EventHandler<AgentAddEventArgs> AgentRegistered;
+
+		public void RegisterAgent(IAgentProxy request)
 		{
 			_agentsLock.AcquireWriterLock(_lockTimeout);
 			try
@@ -48,10 +75,16 @@ namespace DistCL
 					_weightsSnapshot = null;
 					_agentsSnapshot = null;
 					Logger.LogAgent("Add agent", request.Description.Name);
+					
+					var handler = AgentRegistered;
+					if (handler != null)
+					{
+						handler(this, new AgentAddEventArgs(request));
+					}
 				}
 				else
 				{
-					if (! AgentEqualityComparer.AgentComparer.Equals(agent.Compiler.Description, request.Description))
+					if (! AgentEqualityComparer.AgentComparer.Equals(agent.Proxy.Description, request.Description))
 					{
 						_agents[request.Description.Guid] = new RegisteredAgent(request);
 						_weightsSnapshot = null;
@@ -96,7 +129,7 @@ namespace DistCL
 						if (_agentsSnapshot == null)
 						{
 							Logger.Debug("Take agents list snapshot");
-							_agentsSnapshot = _agents.Values.Select(agent => new Agent(agent.Compiler.Description)).ToArray();
+							_agentsSnapshot = _agents.Values.Select(agent => new Agent(agent.Proxy.Description)).ToArray();
 						}
 					}
 					finally
@@ -132,7 +165,7 @@ namespace DistCL
 
 							foreach (var agent in _agents.Values)
 							{
-								var item = new MeasuredAgent(agent.Compiler, weightPosition);
+								var item = new MeasuredAgent(agent.Proxy, weightPosition);
 								weightPosition += item.Weight;
 								weights.Add(item);
 							}
@@ -209,7 +242,7 @@ namespace DistCL
 					{
 						foreach (var item in expired)
 						{
-							Logger.LogAgent("Remove agent", _agents[item].Compiler.Description.Name);
+							Logger.LogAgent("Remove agent", _agents[item].Proxy.Description.Name);
 							_agents.Remove(item);
 						}
 
@@ -230,7 +263,7 @@ namespace DistCL
 
 		#region IAgentPoolInternal
 
-		string IAgentPoolInternal.Name { get { return "<local pool>"; } }
+		string ICompileCoordinatorInternal.Name { get { return "<local agent pool>"; } }
 
 		IEnumerable<IAgent> IAgentPoolInternal.GetAgents()
 		{
@@ -242,23 +275,54 @@ namespace DistCL
 			return Task.FromResult((IEnumerable<IAgent>)GetAgents());
 		}
 
+		Task ICompileCoordinatorInternal.RegisterAgentAsync(IAgentProxy request)
+		{
+			return Task.Run(() => RegisterAgent(request));
+		}
+
+		bool ICompileCoordinatorInternal.IncreaseErrorCount()
+		{
+			return false;
+		}
+
+		void ICompileCoordinatorInternal.ResetErrorCount()
+		{
+		}
+
+		public IAgent GetDescription()
+		{
+			return Manager.RegistrationMessage;
+		}
+
+		public Task<IAgent> GetDescriptionAsync()
+		{
+			return Task.FromResult(GetDescription());
+		}
+
+		// TODO rework
+		internal LocalAgentManager Manager { get; set; }
+		public IAgentProxy Proxy
+		{
+			get { return Manager.AgentProxy; }
+		}
+
 		#endregion
 
 		#region RegisteredAgent
 
 		private class RegisteredAgent
 		{
-			private readonly ICompilerProvider _compiler;
+			private readonly IAgentProxy _proxy;
 			private DateTime _registrationTime = DateTime.Now;
 
-			public RegisteredAgent(ICompilerProvider compiler)
+			public RegisteredAgent(IAgentProxy proxy)
 			{
-				_compiler = compiler;
+				_proxy = proxy;
 			}
 
-			public ICompilerProvider Compiler
+			public IAgentProxy Proxy
 			{
-				get { return _compiler; }
+				get { return _proxy; }
 			}
 
 			public DateTime RegistrationTime
@@ -278,7 +342,7 @@ namespace DistCL
 
 		private class MeasuredAgent : IComparable<MeasuredAgent>
 		{
-			private readonly ICompilerProvider _compilerProvider;
+			private readonly IAgentProxy _agentProxy;
 			private readonly int _weight;
 			private readonly int _weightStart;
 			private readonly int _weightEnd;
@@ -290,17 +354,17 @@ namespace DistCL
 				_weightEnd = target;
 			}
 
-			public MeasuredAgent(ICompilerProvider agent, int weightStart)
+			public MeasuredAgent(IAgentProxy agent, int weightStart)
 			{
-				_compilerProvider = agent;
-				_weight = Math.Max(0, _compilerProvider.Description.Cores * (100 - _compilerProvider.Description.CPUUsage));
+				_agentProxy = agent;
+				_weight = Math.Max(0, _agentProxy.Description.Cores * (100 - _agentProxy.Description.CPUUsage));
 				_weightStart = weightStart;
 				_weightEnd = weightStart + _weight;
 			}
 
-			public ICompilerProvider Agent
+			public IAgentProxy Agent
 			{
-				get { return _compilerProvider; }
+				get { return _agentProxy; }
 			}
 
 			public int Weight

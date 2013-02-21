@@ -3,9 +3,11 @@ using System.Collections.Generic;
 using System.Configuration;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.ServiceModel;
 using System.ServiceModel.Channels;
 using System.ServiceModel.Configuration;
+using DistCL.Utils;
 
 namespace DistCL
 {
@@ -16,6 +18,8 @@ namespace DistCL
 
 	public class CompileServiceHost : ServiceHost, IBindingsProvider
 	{
+		private readonly Logger _logger = new Logger("SERVICE");
+
 		private static ServiceModelSectionGroup _serviceModelSectionGroup;
 		private static Dictionary<string, Binding> _bindings;
 		private string _physicalPath;
@@ -25,31 +29,77 @@ namespace DistCL
 		{
 			CompilerInstance.BindingsProvider = this;
 
+			var hostName = Dns.GetHostName();
+			var ipHostEntry = Dns.GetHostEntry(hostName);
+
 			var agentPoolUrls = new List<Uri>();
 			var compilerUrls = new List<Uri>();
 
+			var agentPoolType = typeof(IAgentPool);
+			var compilerType = typeof(ICompiler);
+			var compileManagerType = typeof(ICompileManager);
+
 			foreach (var endpoint in Description.Endpoints)
 			{
-				if (typeof (IAgentPool).IsAssignableFrom(endpoint.Contract.ContractType))
+				if (compileManagerType.IsAssignableFrom(endpoint.Contract.ContractType))
 				{
-					agentPoolUrls.Add(endpoint.Address.Uri.IsLoopback
-										? new UriBuilder(endpoint.Address.Uri) {Host = Environment.MachineName}.Uri
-										: endpoint.Address.Uri);
+					agentPoolType = compileManagerType;
+					compilerType = compileManagerType;
+					break;
+				}
+			}
+
+			foreach (var endpoint in Description.Endpoints)
+			{
+				if (agentPoolType.IsAssignableFrom(endpoint.Contract.ContractType))
+				{
+					if (endpoint.Address.Uri.IsLoopback)
+					{
+						var ub = new UriBuilder(endpoint.Address.Uri);
+
+						foreach (var ip in ipHostEntry.AddressList)
+						{
+							ub.Host = ip.ToString();
+							agentPoolUrls.Add(ub.Uri);
+							Logger.DebugFormat("Found agent endpoint '{0}' ({1})", ub.Uri, endpoint.Contract.ContractType);
+						}
+					}
+					else
+					{
+						agentPoolUrls.Add(endpoint.Address.Uri);
+					}
 				}
 
-				if (typeof (ICompiler).IsAssignableFrom(endpoint.Contract.ContractType))
+				if (compilerType.IsAssignableFrom(endpoint.Contract.ContractType))
 				{
-					compilerUrls.Add(endpoint.Address.Uri.IsLoopback
-										? new UriBuilder(endpoint.Address.Uri) {Host = Environment.MachineName}.Uri
-										: endpoint.Address.Uri);
+					if (endpoint.Address.Uri.IsLoopback)
+					{
+						var ub = new UriBuilder(endpoint.Address.Uri);
+
+						foreach (var ip in ipHostEntry.AddressList)
+						{
+							ub.Host = ip.ToString();
+							compilerUrls.Add(ub.Uri);
+							Logger.DebugFormat("Found compiler endpoint '{0}' ({1})", ub.Uri, endpoint.Contract.ContractType);
+						}
+					}
+					else
+					{
+						compilerUrls.Add(endpoint.Address.Uri);
+					}
 				}
 			}
 
 			_networkBuilder = new NetworkBuilder(
 				ServiceModelSectionGroup,
 				this,
-				new LocalCompilerManager(CompilerInstance, agentPoolUrls.ToArray(), compilerUrls.ToArray()),
+				new LocalAgentManager(CompilerInstance.AgentPool, CompilerInstance, agentPoolUrls.ToArray(), compilerUrls.ToArray()),
 				CompilerInstance.AgentPool);
+		}
+
+		public Logger Logger
+		{
+			get { return _logger; }
 		}
 
 		private static ServiceModelSectionGroup ServiceModelSectionGroup
