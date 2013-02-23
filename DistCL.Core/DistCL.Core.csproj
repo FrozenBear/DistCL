@@ -48,7 +48,6 @@
   <ItemGroup>
     <Compile Include="AgentPool.cs" />
     <Compile Include="AgentProxy.cs" />
-    <Compile Include="AsyncHelpers.cs" />
     <Compile Include="Compiler.cs" />
     <Compile Include="CompilerSettings.Designer.cs">
       <AutoGen>True</AutoGen>

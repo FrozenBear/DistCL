@@ -93,9 +93,12 @@ namespace DistCL.Client
 				CompileResultHelper.Unpack(output.ResultData, output.Status.Cookies, streams);
 				output.ResultData.Close();
 
-				foreach (var stream in streams.Values)
+				foreach (var stream in streams)
 				{
-					stream.Close();
+					if (stream.Key != CompileArtifactType.Out && stream.Key != CompileArtifactType.Err)
+					{
+						stream.Value.Close();
+					}
 				}
 
 				return output.Status.ExitCode;

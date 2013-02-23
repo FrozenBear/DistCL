@@ -19,6 +19,9 @@ namespace DistCL.Utils.Streams
 
         public override int Read(byte[] buffer, int offset, int count)
         {
+	        if (count == 0)
+		        return 0;
+
             var localPosition = 0L;
             var result = 0;
             var bufPos = offset;
@@ -29,10 +32,11 @@ namespace DistCL.Utils.Streams
                 {
                     var streamRead = 0L;
 
-                    while (count > 0 && Position < localPosition + stream.Length)
-                    {
-                        stream.Position = Position - localPosition;
+					stream.Position = Position - localPosition;
+	                localPosition += stream.Position;
 
+                    while (count > 0 && stream.Position < stream.Length)
+                    {
                         int bytesRead = stream.Read(buffer, bufPos, count);
                         
                         result += bytesRead;
@@ -50,6 +54,9 @@ namespace DistCL.Utils.Streams
                 {
                     localPosition += stream.Length;
                 }
+
+	            if (count == 0)
+		            break;
             }
 
             return result;

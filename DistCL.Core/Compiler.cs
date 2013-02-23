@@ -134,6 +134,7 @@ namespace DistCL
 
 		public Guid GetPreprocessToken(string name)
 		{
+			Logger.DebugFormat("Preprocess token requested ({0})", name);
 			lock (_syncRoot)
 			{
 				while (_workersCount >= _maxWorkersCount)
@@ -147,6 +148,7 @@ namespace DistCL
 			var token = Guid.NewGuid();
 			Task.Delay(TimeSpan.FromMinutes(1)).ContinueWith(PreprocessTokenRemove, token);
 			_preprocessTokens[token] = name;
+			Logger.DebugFormat("Preprocess token created ({0})", name);
 			return token;
 		}
 
