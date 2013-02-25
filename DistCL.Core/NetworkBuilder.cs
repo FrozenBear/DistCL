@@ -205,7 +205,7 @@ namespace DistCL
 			Logger.Debug("Converting agents to pools" + (tryKnownAgents ? "..." : " again..."));
 
 			var poolsCount = pools.Count;
-			var cookie = new ConvertRegisteredAgents2AgentPoolsToken(localAgent, pools, ts, tryKnownAgents);
+			var cookie = new ConvertAgents2PoolsToken(localAgent, pools, ts, tryKnownAgents);
 
 			var tasks = knownAgentPools
 				.Select(
@@ -247,7 +247,7 @@ namespace DistCL
 				return;
 			}
 
-			var cookie = (ConvertRegisteredAgents2AgentPoolsToken) statePair.Value;
+			var cookie = (ConvertAgents2PoolsToken) statePair.Value;
 
 			var tasks = new List<Task>();
 
@@ -295,14 +295,14 @@ namespace DistCL
 			return null;
 		}
 
-		private class ConvertRegisteredAgents2AgentPoolsToken
+		private class ConvertAgents2PoolsToken
 		{
 			private readonly LocalAgentManager _localAgent;
 			private readonly ConcurrentDictionary<Guid, ICompileCoordinatorInternal> _pools;
 			private readonly CancellationTokenSource _cancellationTokenSource;
 			private readonly bool _tryKnownAgents;
 
-			public ConvertRegisteredAgents2AgentPoolsToken(
+			public ConvertAgents2PoolsToken(
 				LocalAgentManager localAgent,
 				ConcurrentDictionary<Guid, ICompileCoordinatorInternal> pools,
 				CancellationTokenSource cancellationTokenSource,

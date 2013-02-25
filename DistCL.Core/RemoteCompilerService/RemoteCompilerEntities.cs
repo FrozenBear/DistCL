@@ -9,6 +9,9 @@ namespace DistCL.RemoteCompilerService
 	{
 		IAgent GetDescription();
 		Task<IAgent> GetDescriptionAsync();
+
+		void RegisterAgent(Agent agent);
+		Task RegisterAgentAsync(Agent agent);
 	}
 
 	partial class CompileCoordinatorClient : IRemoteCompileCoordinator
@@ -59,11 +62,11 @@ namespace DistCL.RemoteCompilerService
 	{
 	}
 
-	partial class AgentRegistrationMessage : IAgent
+	partial class Agent : IAgent
 	{
-		public AgentRegistrationMessage(){}
+		public Agent(){}
 
-		public AgentRegistrationMessage(
+		public Agent(
 			Guid guid,
 			string name,
 			int cores,
@@ -79,7 +82,7 @@ namespace DistCL.RemoteCompilerService
 			CompilerUrls = compilerUrls;
 		}
 
-		public AgentRegistrationMessage(IAgent agent)
+		public Agent(IAgent agent)
 		{
 			Guid = agent.Guid;
 			Name = agent.Name;

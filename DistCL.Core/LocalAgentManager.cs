@@ -10,7 +10,7 @@ namespace DistCL
 		private readonly AgentPool _agentPool;
 		private readonly ICompiler _compiler;
 		private readonly Agent _stub;
-		private RemoteCompilerService.AgentRegistrationMessage _registrationMessage;
+		private RemoteCompilerService.Agent _registrationMessage;
 		private IAgentProxy _agentProxy;
 
 		private readonly PerformanceCounter _cpuCounter;
@@ -43,13 +43,13 @@ namespace DistCL
 			_logger.Debug("Created local agent description");
 		}
 
-		public RemoteCompilerService.AgentRegistrationMessage RegistrationMessage
+		public RemoteCompilerService.Agent RegistrationMessage
 		{
 			get
 			{
 				if (_registrationMessage == null || _registrationMessage.CPUUsage != CPUUsage)
 				{
-					_registrationMessage = new RemoteCompilerService.AgentRegistrationMessage(
+					_registrationMessage = new RemoteCompilerService.Agent(
 						_stub.Guid, _stub.Name, _stub.Cores, CPUUsage, _stub.AgentPoolUrls, _stub.CompilerUrls);
 					_logger.DebugFormat("Registration message updated (cpu = {0})", _registrationMessage.CPUUsage);
 				}

@@ -59,6 +59,9 @@ namespace DistCL
 
 						foreach (var ip in ipHostEntry.AddressList)
 						{
+							if (Equals(ip, IPAddress.Loopback) || Equals(ip, IPAddress.IPv6Loopback))
+								continue;
+
 							ub.Host = ip.ToString();
 							agentPoolUrls.Add(ub.Uri);
 							Logger.DebugFormat("Found agent endpoint '{0}' ({1})", ub.Uri, endpoint.Contract.ContractType);
@@ -78,6 +81,9 @@ namespace DistCL
 
 						foreach (var ip in ipHostEntry.AddressList)
 						{
+							if (Equals(ip, IPAddress.Loopback) || Equals(ip, IPAddress.IPv6Loopback))
+								continue;
+
 							ub.Host = ip.ToString();
 							compilerUrls.Add(ub.Uri);
 							Logger.DebugFormat("Found compiler endpoint '{0}' ({1})", ub.Uri, endpoint.Contract.ContractType);

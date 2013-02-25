@@ -7,28 +7,6 @@ using DistCL.Utils;
 
 namespace DistCL
 {
-	internal interface ICompileCoordinatorInternal
-	{
-		string Name { get; }
-
-		void RegisterAgent(IAgentProxy request);
-		Task RegisterAgentAsync(IAgentProxy request);
-
-		bool IncreaseErrorCount();
-		void ResetErrorCount();
-
-		IAgentProxy Proxy { get; }
-		
-		IAgent GetDescription();
-		Task<IAgent> GetDescriptionAsync();
-	}
-
-	internal interface IAgentPoolInternal : ICompileCoordinatorInternal
-	{
-		IEnumerable<IAgent> GetAgents();
-		Task<IEnumerable<IAgent>> GetAgentsAsync();
-	}
-
 	internal class AgentAddEventArgs : EventArgs
 	{
 		public AgentAddEventArgs(IAgentProxy agent)
@@ -129,7 +107,10 @@ namespace DistCL
 						if (_agentsSnapshot == null)
 						{
 							Logger.Debug("Take agents list snapshot");
-							_agentsSnapshot = _agents.Values.Select(agent => new Agent(agent.Proxy.Description)).ToArray();
+							_agentsSnapshot = _agents.Values
+													.Select(agent => agent.Proxy.Description as Agent
+																	?? new Agent(agent.Proxy.Description))
+													.ToArray();
 						}
 					}
 					finally

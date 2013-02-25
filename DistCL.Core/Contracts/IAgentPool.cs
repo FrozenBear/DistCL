@@ -13,7 +13,7 @@ namespace DistCL
 		Agent GetDescription();
 
 		[OperationContract(IsOneWay = true)]
-		void RegisterAgent(AgentRegistrationMessage request);
+		void RegisterAgent(Agent request);
 	}
 
 	[ServiceContract(Namespace = GeneralSettings.Namespace)]
@@ -26,15 +26,10 @@ namespace DistCL
 	public interface IAgent
 	{
 		Guid Guid { get; }
-
 		string Name { get; }
-
 		int Cores { get; }
-
 		int CPUUsage { get; }
-
 		Uri[] AgentPoolUrls { get; }
-
 		Uri[] CompilerUrls { get; }
 	}
 
@@ -126,11 +121,6 @@ namespace DistCL
 		}
 
 		#endregion
-	}
-
-	[DataContract(Namespace = GeneralSettings.CoordinatorMessageNamespace)]
-	public class AgentRegistrationMessage : Agent
-	{
 	}
 
 	#endregion

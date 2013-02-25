@@ -108,7 +108,7 @@ namespace DistCL
 			}
 		}
 
-		public void RegisterAgent(AgentRegistrationMessage request)
+		public void RegisterAgent(Agent request)
 		{
 			_agentPool.RegisterAgent(new RemoteAgentProxy(BindingsProvider, request));
 		}

@@ -9,17 +9,9 @@ using DistCL.RemoteCompilerService;
 
 namespace DistCL
 {
-	internal interface IAgentProxy
-	{
-		IAgent Description { get; }
-		ICompiler GetCompiler();
-		ICompileCoordinatorInternal GetCoordinator();
-		IAgentPoolInternal GetAgentPool();
-	}
-
 	internal class RemoteAgentProxy : IAgentProxy
 	{
-		private readonly IBindingsProvider _bindingsProvider1;
+		private readonly IBindingsProvider _bindingsProvider;
 		private readonly IAgent _description;
 
 		private CompilerProxy _compiler;
@@ -28,7 +20,7 @@ namespace DistCL
 
 		public RemoteAgentProxy(IBindingsProvider bindingsProvider, IAgent description)
 		{
-			_bindingsProvider1 = bindingsProvider;
+			_bindingsProvider = bindingsProvider;
 			_description = description;
 		}
 
@@ -65,7 +57,7 @@ namespace DistCL
 				try
 				{
 					RemoteCompilerService.ICompiler compiler = new CompilerClient(
-						_bindingsProvider1.GetBinding(url),
+						_bindingsProvider.GetBinding(url),
 						new EndpointAddress(url));
 					{
 						return compiler.IsReady() ? new CompilerProxy(compiler) : null;
@@ -167,7 +159,7 @@ namespace DistCL
 				{
 					try
 					{
-						var client = creation(_bindingsProvider1.GetBinding(url), new EndpointAddress(url));
+						var client = creation(_bindingsProvider.GetBinding(url), new EndpointAddress(url));
 						var result = func(client).Result;
 						setClient(client);
 						return result;
@@ -238,7 +230,7 @@ namespace DistCL
 			private const int MaxErrorCount = 3;
 			private int _errorCount;
 
-			private readonly RemoteAgentProxy _proxy1;
+			private readonly RemoteAgentProxy _proxy;
 			private IAgent _remoteDescription;
 
 			private readonly object _syncRoot = new object();
@@ -247,7 +239,20 @@ namespace DistCL
 
 			protected CompileCoordinatorProxyBase(RemoteAgentProxy proxy)
 			{
-				_proxy1 = proxy;
+				_proxy = proxy;
+			}
+
+			public IAgentProxy Proxy
+			{
+				get { return RemoteProxy; }
+			}
+			protected RemoteAgentProxy RemoteProxy
+			{
+				get { return _proxy; }
+			}
+			protected object SyncRoot
+			{
+				get { return _syncRoot; }
 			}
 
 			public string Name
@@ -257,25 +262,6 @@ namespace DistCL
 					return RemoteProxy.Description.Name;
 				}
 			}
-
-			public IAgentProxy Proxy
-			{
-				get { return RemoteProxy; }
-			}
-
-			protected RemoteAgentProxy RemoteProxy
-			{
-				get { return _proxy1; }
-			}
-
-			protected object SyncRoot
-			{
-				get { return _syncRoot; }
-			}
-
-			protected abstract void ConnectToAgent(Action<TClient> func);
-
-			protected abstract Task<TResult> ConnectToAgent<TResult>(Func<TClient, Task<TResult>> func) where TResult : class;
 
 			public IAgent GetDescription()
 			{
@@ -288,7 +274,6 @@ namespace DistCL
 
 				return _remoteDescription;
 			}
-
 			public Task<IAgent> GetDescriptionAsync()
 			{
 				return ConnectToAgent(client => client.GetDescriptionAsync()).ContinueWith(
@@ -301,6 +286,37 @@ namespace DistCL
 					TaskContinuationOptions.OnlyOnRanToCompletion);
 			}
 
+			public void RegisterAgent(IAgentProxy proxy)
+			{
+				var message = proxy.Description as RemoteCompilerService.Agent
+							?? new RemoteCompilerService.Agent(proxy.Description);
+
+				ConnectToAgent(pool => pool.RegisterAgent(message));
+			}
+			public Task RegisterAgentAsync(IAgentProxy proxy)
+			{
+				var message = proxy.Description as RemoteCompilerService.Agent
+							?? new RemoteCompilerService.Agent(proxy.Description);
+
+				return ConnectToAgent(pool => pool.RegisterAgentAsync(message).ContinueWith(task =>
+				{
+					task.GetAwaiter().GetResult();
+					return "";
+				}));
+			}
+
+			public bool IncreaseErrorCount()
+			{
+				return Interlocked.Increment(ref _errorCount) >= MaxErrorCount;
+			}
+			public void ResetErrorCount()
+			{
+				_errorCount = 0;
+			}
+
+			protected abstract void ConnectToAgent(Action<TClient> func);
+			protected abstract Task<TResult> ConnectToAgent<TResult>(Func<TClient, Task<TResult>> func) where TResult : class;
+
 			public void Dispose()
 			{
 				var disposable = Client as IDisposable;
@@ -310,42 +326,12 @@ namespace DistCL
 					disposable.Dispose();
 				}
 			}
-
-			public bool IncreaseErrorCount()
-			{
-				return Interlocked.Increment(ref _errorCount) >= MaxErrorCount;
-			}
-
-			public void ResetErrorCount()
-			{
-				_errorCount = 0;
-			}
 		}
 
 		private class CompileCoordinatorProxy : CompileCoordinatorProxyBase<CompileCoordinatorClient>, ICompileCoordinatorInternal
 		{
 			public CompileCoordinatorProxy(RemoteAgentProxy proxy) : base(proxy)
 			{
-			}
-
-			public void RegisterAgent(IAgentProxy proxy)
-			{
-				var message = proxy.Description as RemoteCompilerService.AgentRegistrationMessage
-							?? new RemoteCompilerService.AgentRegistrationMessage(proxy.Description);
-
-				ConnectToAgent(pool => pool.RegisterAgent(message));
-			}
-
-			public Task RegisterAgentAsync(IAgentProxy proxy)
-			{
-				var message = proxy.Description as RemoteCompilerService.AgentRegistrationMessage
-							?? new RemoteCompilerService.AgentRegistrationMessage(proxy.Description);
-
-				return ConnectToAgent(pool => pool.RegisterAgentAsync(message).ContinueWith(task =>
-					{
-						task.GetAwaiter().GetResult();
-						return "";
-					}));
 			}
 
 			protected override void ConnectToAgent(Action<CompileCoordinatorClient> func)
@@ -358,7 +344,6 @@ namespace DistCL
 					RemoteProxy.Description.AgentPoolUrls, 
 					func);
 			}
-
 			protected override Task<TResult> ConnectToAgent<TResult>(Func<CompileCoordinatorClient, Task<TResult>> func) 
 			{
 				return RemoteProxy.ConnectToAgent(
@@ -378,33 +363,12 @@ namespace DistCL
 			{
 			}
 
-			public void RegisterAgent(IAgentProxy proxy)
-			{
-				var message = proxy.Description as RemoteCompilerService.AgentRegistrationMessage
-							?? new RemoteCompilerService.AgentRegistrationMessage(proxy.Description);
-
-				ConnectToAgent(pool => pool.RegisterAgent(message));
-			}
-
-			public Task RegisterAgentAsync(IAgentProxy proxy)
-			{
-				var message = proxy.Description as RemoteCompilerService.AgentRegistrationMessage
-							?? new RemoteCompilerService.AgentRegistrationMessage(proxy.Description);
-
-				return ConnectToAgent(pool => pool.RegisterAgentAsync(message).ContinueWith(task =>
-				{
-					task.GetAwaiter().GetResult();
-					return "";
-				}));
-			}
-
 			public IEnumerable<IAgent> GetAgents()
 			{
 				IEnumerable<IAgent> result = null;
 				ConnectToAgent(pool => result = pool.GetAgents());
 				return result;
 			}
-
 			public Task<IEnumerable<IAgent>> GetAgentsAsync()
 			{
 				return ConnectToAgent(pool => pool.GetAgentsAsync().ContinueWith(task => task.Result.Cast<IAgent>()));
@@ -420,7 +384,6 @@ namespace DistCL
 					RemoteProxy.Description.AgentPoolUrls,
 					func);
 			}
-
 			protected override Task<TResult> ConnectToAgent<TResult>(Func<AgentPoolClient, Task<TResult>> func)
 			{
 				return RemoteProxy.ConnectToAgent(

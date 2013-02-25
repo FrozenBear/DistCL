@@ -13,14 +13,6 @@
     </xs:sequence>
   </xs:complexType>
   <xs:element name="Agent" nillable="true" type="tns:Agent" />
-  <xs:complexType name="AgentRegistrationMessage">
-    <xs:complexContent mixed="false">
-      <xs:extension base="tns:Agent">
-        <xs:sequence />
-      </xs:extension>
-    </xs:complexContent>
-  </xs:complexType>
-  <xs:element name="AgentRegistrationMessage" nillable="true" type="tns:AgentRegistrationMessage" />
   <xs:complexType name="ArrayOfAgent">
     <xs:sequence>
       <xs:element minOccurs="0" maxOccurs="unbounded" name="Agent" nillable="true" type="tns:Agent" />
