@@ -1,10 +1,10 @@
-﻿namespace DistCL
+﻿namespace DistCL.Proxies
 {
 	internal interface IAgentProxy
 	{
 		IAgent Description { get; }
 		ICompiler GetCompiler();
-		ICompileCoordinatorInternal GetCoordinator();
-		IAgentPoolInternal GetAgentPool();
+		ICompileCoordinatorProxy GetCoordinator();
+		IAgentPoolProxy GetAgentPool();
 	}
 }

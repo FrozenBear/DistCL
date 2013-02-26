@@ -24,6 +24,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <PlatformTarget>x86</PlatformTarget>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -58,12 +59,12 @@
     <Compile Include="Contracts\ICompileManager.cs" />
     <Compile Include="Contracts\ICompiler.cs" />
     <Compile Include="Contracts\ILocalCompiler.cs" />
-    <Compile Include="Proxies\ICompileCoordinatorInternal.cs" />
-    <Compile Include="Proxies\IAgentPoolInternal.cs" />
+    <Compile Include="Proxies\IAgentPoolProxy.cs" />
     <Compile Include="LocalAgentManager.cs" />
     <Compile Include="NetworkBuilder.cs" />
     <Compile Include="Proxies\AgentProxy.cs" />
     <Compile Include="Proxies\IAgentProxy.cs" />
+    <Compile Include="Proxies\ICompileCoordinatorProxy.cs" />
     <Compile Include="RemoteCompilerService\RemoteCompilerEntities.cs" />
     <Compile Include="GeneralSettings.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

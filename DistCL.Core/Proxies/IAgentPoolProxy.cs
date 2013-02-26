@@ -1,9 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace DistCL
+namespace DistCL.Proxies
 {
-	internal interface IAgentPoolInternal : ICompileCoordinatorInternal
+	internal interface IAgentPoolProxy : ICompileCoordinatorProxy
 	{
 		IEnumerable<IAgent> GetAgents();
 		Task<IEnumerable<IAgent>> GetAgentsAsync();

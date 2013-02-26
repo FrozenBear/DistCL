@@ -1,8 +1,8 @@
 ﻿using System.Threading.Tasks;
 
-namespace DistCL
+namespace DistCL.Proxies
 {
-	internal interface ICompileCoordinatorInternal
+	internal interface ICompileCoordinatorProxy
 	{
 		string Name { get; }
 

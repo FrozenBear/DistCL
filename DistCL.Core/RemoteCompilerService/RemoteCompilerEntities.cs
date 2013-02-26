@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Threading;
 using System.Threading.Tasks;
 
 namespace DistCL.RemoteCompilerService
@@ -41,26 +40,22 @@ namespace DistCL.RemoteCompilerService
 	}
 
 /*
-	partial class AgentPoolClient //: IAgentPoolInternal
+	partial class AgentPoolClient //: IAgentPoolProxy
 	{
 		public string Name { get { return Endpoint.ListenUri.ToString(); } }
 
-//		IEnumerable<IAgent> IAgentPoolInternal.GetAgents()
+//		IEnumerable<IAgent> IAgentPoolProxy.GetAgents()
 //		{
 //			return GetAgents();
 //		}
 //
-//		Task<IEnumerable<IAgent>> IAgentPoolInternal.GetAgentsAsync()
+//		Task<IEnumerable<IAgent>> IAgentPoolProxy.GetAgentsAsync()
 //		{
 //			return GetAgentsAsync().ContinueWith(task => (IEnumerable<IAgent>) task.Result);
 //		}
 
 	}
 */
-
-	partial class Agent : IAgent
-	{
-	}
 
 	partial class Agent : IAgent
 	{
@@ -72,7 +67,8 @@ namespace DistCL.RemoteCompilerService
 			int cores,
 			int cpuUsage,
 			Uri[] agentPoolUrls,
-			Uri[] compilerUrls)
+			Uri[] compilerUrls,
+			string[] compilerVersions)
 		{
 			Guid = guid;
 			Name = name;
@@ -80,6 +76,7 @@ namespace DistCL.RemoteCompilerService
 			CPUUsage = cpuUsage;
 			AgentPoolUrls = agentPoolUrls;
 			CompilerUrls = compilerUrls;
+			CompilerVersions = compilerVersions;
 		}
 
 		public Agent(IAgent agent)
@@ -90,6 +87,7 @@ namespace DistCL.RemoteCompilerService
 			CPUUsage = agent.CPUUsage;
 			AgentPoolUrls = agent.AgentPoolUrls;
 			CompilerUrls = agent.CompilerUrls;
+			CompilerVersions = agent.CompilerVersions;
 		}
 
 		Guid IAgent.Guid

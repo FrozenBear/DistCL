@@ -7,7 +7,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using DistCL.RemoteCompilerService;
 
-namespace DistCL
+namespace DistCL.Proxies
 {
 	internal class RemoteAgentProxy : IAgentProxy
 	{
@@ -15,7 +15,7 @@ namespace DistCL
 		private readonly IAgent _description;
 
 		private CompilerProxy _compiler;
-		private ICompileCoordinatorInternal _compileCoordinatorProxy;
+		private ICompileCoordinatorProxy _compileCoordinatorProxy;
 		private AgentPoolProxy _agentPool;
 
 		public RemoteAgentProxy(IBindingsProvider bindingsProvider, IAgent description)
@@ -35,17 +35,17 @@ namespace DistCL
 			return _compiler;
 		}
 
-		public ICompileCoordinatorInternal GetCoordinator()
+		public ICompileCoordinatorProxy GetCoordinator()
 		{
 			LazyInitializer.EnsureInitialized(ref _compileCoordinatorProxy,
 											() =>
 											Description.AgentPoolUrls != null && Description.AgentPoolUrls.Length > 0
-												? (ICompileCoordinatorInternal)GetAgentPool()
+												? (ICompileCoordinatorProxy)GetAgentPool()
 												: new CompileCoordinatorProxy(this));
 			return _compileCoordinatorProxy;
 		}
 
-		public IAgentPoolInternal GetAgentPool()
+		public IAgentPoolProxy GetAgentPool()
 		{
 			return LazyInitializer.EnsureInitialized(ref _agentPool, () => new AgentPoolProxy(this));
 		}
@@ -328,7 +328,7 @@ namespace DistCL
 			}
 		}
 
-		private class CompileCoordinatorProxy : CompileCoordinatorProxyBase<CompileCoordinatorClient>, ICompileCoordinatorInternal
+		private class CompileCoordinatorProxy : CompileCoordinatorProxyBase<CompileCoordinatorClient>, ICompileCoordinatorProxy
 		{
 			public CompileCoordinatorProxy(RemoteAgentProxy proxy) : base(proxy)
 			{
@@ -356,7 +356,7 @@ namespace DistCL
 			}
 		}
 
-		private class AgentPoolProxy : CompileCoordinatorProxyBase<AgentPoolClient>, IAgentPoolInternal
+		private class AgentPoolProxy : CompileCoordinatorProxyBase<AgentPoolClient>, IAgentPoolProxy
 		{
 			public AgentPoolProxy(RemoteAgentProxy proxy)
 				: base(proxy)

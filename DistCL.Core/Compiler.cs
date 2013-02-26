@@ -1,12 +1,16 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.ServiceModel;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using DistCL.Proxies;
 using DistCL.Utils;
+using System.Linq;
+using Microsoft.Win32;
 
 namespace DistCL
 {
@@ -20,15 +24,49 @@ namespace DistCL
 		private int _workersCount;
 		private readonly object _syncRoot = new object();
 		readonly ConcurrentDictionary<Guid, string> _preprocessTokens = new ConcurrentDictionary<Guid, string>();
+		private readonly string[] _compilerVersions;
 
 		public Compiler()
 		{
 			_maxWorkersCount = Math.Max(1, Environment.ProcessorCount-1);
+
+
+			var compilerVersions = new HashSet<string>();
+			using (var visualStudioRegistry = Registry.LocalMachine.OpenSubKey(@"SOFTWARE\Microsoft\VisualStudio"))
+			{
+				if (visualStudioRegistry == null)
+					throw new InvalidOperationException("Visual Studio required");
+
+				foreach (var version in visualStudioRegistry.GetSubKeyNames())
+				{
+					using (var vs = visualStudioRegistry.OpenSubKey(version))
+					{
+						var installDir = (string) vs.GetValue("InstallDir");
+
+						if (! string.IsNullOrEmpty(installDir))
+						{
+							var vcPath = Path.Combine(installDir, @"..\..\VC\bin");
+
+							var clPath = Path.Combine(vcPath, Utils.CompilerSettings.CLExeFilename);
+							if (!File.Exists(clPath))
+								continue;
+
+							compilerVersions.Add(FileVersionInfo.GetVersionInfo(clPath).FileVersion);
+						}
+					}
+				}
+			}
+			_compilerVersions = compilerVersions.ToArray();
 		}
 
 		public int MaxWorkersCount
 		{
 			get { return _maxWorkersCount; }
+		}
+
+		public string[] CompilerVersions
+		{
+			get { return _compilerVersions; }
 		}
 
 		internal IBindingsProvider BindingsProvider { get; set; }

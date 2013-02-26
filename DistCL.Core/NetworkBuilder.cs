@@ -6,6 +6,7 @@ using System.ServiceModel;
 using System.ServiceModel.Configuration;
 using System.Threading;
 using System.Threading.Tasks;
+using DistCL.Proxies;
 using DistCL.RemoteCompilerService;
 using DistCL.Utils;
 
@@ -85,7 +86,7 @@ namespace DistCL
 
 			var configPools = GetAgentPools(ServiceModelSectionGroup);
 
-			var pools = new ConcurrentDictionary<Guid, ICompileCoordinatorInternal>();
+			var pools = new ConcurrentDictionary<Guid, ICompileCoordinatorProxy>();
 			pools.TryAdd(LocalAgentManager.AgentProxy.Description.Guid, LocalAgentManager.AgentProxy.GetCoordinator());
 
 			Logger.LogAgent("Init", LocalAgentManager.RegistrationMessage.Name);
@@ -94,7 +95,7 @@ namespace DistCL
 
 			lock (_syncRoot)
 			{
-				var problemPools = new ConcurrentQueue<ICompileCoordinatorInternal>();
+				var problemPools = new ConcurrentQueue<ICompileCoordinatorProxy>();
 
 				while (!_closed)
 				{
@@ -164,7 +165,7 @@ namespace DistCL
 					if (!ReferenceEquals(agents, _agentsSnapshot) || nextBuild < DateTime.Now)
 					{
 						ConvertAgents2PoolsRequestAgents(
-							pools.Values.OfType<IAgentPoolInternal>(), 
+							pools.Values.OfType<IAgentPoolProxy>(), 
 							LocalAgentManager, 
 							pools,
 							ts,
@@ -185,7 +186,7 @@ namespace DistCL
 
 					while (!problemPools.IsEmpty)
 					{
-						ICompileCoordinatorInternal pool;
+						ICompileCoordinatorProxy pool;
 						if (problemPools.TryDequeue(out pool))
 						{
 							RemoveCoordinator(pools, pool);
@@ -196,9 +197,9 @@ namespace DistCL
 		}
 
 		private void ConvertAgents2PoolsRequestAgents(
-			IEnumerable<IAgentPoolInternal> knownAgentPools,
+			IEnumerable<IAgentPoolProxy> knownAgentPools,
 			LocalAgentManager localAgent,
-			ConcurrentDictionary<Guid, ICompileCoordinatorInternal> pools,
+			ConcurrentDictionary<Guid, ICompileCoordinatorProxy> pools,
 			CancellationTokenSource ts,
 			bool tryKnownAgents)
 		{
@@ -212,7 +213,7 @@ namespace DistCL
 					knownAgentPool =>
 					knownAgentPool.GetAgentsAsync().ContinueWith(
 						ConvertAgents2PoolsProcessAgents,
-						new KeyValuePair<IAgentPoolInternal, object>(knownAgentPool, cookie),
+						new KeyValuePair<IAgentPoolProxy, object>(knownAgentPool, cookie),
 						ts.Token))
 				.ToArray();
 
@@ -222,7 +223,7 @@ namespace DistCL
 				{
 					if (poolsCount < pools.Count)
 					{
-						ConvertAgents2PoolsRequestAgents(pools.Values.OfType<IAgentPoolInternal>(), localAgent, pools, ts, false);
+						ConvertAgents2PoolsRequestAgents(pools.Values.OfType<IAgentPoolProxy>(), localAgent, pools, ts, false);
 					}
 					else
 					{
@@ -234,7 +235,7 @@ namespace DistCL
 
 		private void ConvertAgents2PoolsProcessAgents(Task<IEnumerable<IAgent>> getAgentsTask, object state)
 		{
-			var statePair = (KeyValuePair<IAgentPoolInternal, object>) state;
+			var statePair = (KeyValuePair<IAgentPoolProxy, object>) state;
 
 			if (getAgentsTask.Exception != null)
 			{
@@ -273,7 +274,7 @@ namespace DistCL
 			Task.WaitAll(tasks.ToArray(), cookie.CancellationTokenSource.Token);
 		}
 
-		private Task ConvertAgents2PoolsProcessAgent(ConcurrentDictionary<Guid, ICompileCoordinatorInternal> pools, LocalAgentManager localAgent, IAgent agent, Func<IAgentProxy> getAgent)
+		private Task ConvertAgents2PoolsProcessAgent(ConcurrentDictionary<Guid, ICompileCoordinatorProxy> pools, LocalAgentManager localAgent, IAgent agent, Func<IAgentProxy> getAgent)
 		{
 			if (!pools.ContainsKey(agent.Guid))
 			{
@@ -298,13 +299,13 @@ namespace DistCL
 		private class ConvertAgents2PoolsToken
 		{
 			private readonly LocalAgentManager _localAgent;
-			private readonly ConcurrentDictionary<Guid, ICompileCoordinatorInternal> _pools;
+			private readonly ConcurrentDictionary<Guid, ICompileCoordinatorProxy> _pools;
 			private readonly CancellationTokenSource _cancellationTokenSource;
 			private readonly bool _tryKnownAgents;
 
 			public ConvertAgents2PoolsToken(
 				LocalAgentManager localAgent,
-				ConcurrentDictionary<Guid, ICompileCoordinatorInternal> pools,
+				ConcurrentDictionary<Guid, ICompileCoordinatorProxy> pools,
 				CancellationTokenSource cancellationTokenSource,
 				bool tryKnownAgents)
 			{
@@ -319,7 +320,7 @@ namespace DistCL
 				get { return _localAgent; }
 			}
 
-			public ConcurrentDictionary<Guid, ICompileCoordinatorInternal> Pools
+			public ConcurrentDictionary<Guid, ICompileCoordinatorProxy> Pools
 			{
 				get { return _pools; }
 			}
@@ -382,7 +383,7 @@ namespace DistCL
 			return pools.ToArray();
 		}
 
-		private void AddCoordinator(ConcurrentDictionary<Guid, ICompileCoordinatorInternal> pools, ICompileCoordinatorInternal pool)
+		private void AddCoordinator(ConcurrentDictionary<Guid, ICompileCoordinatorProxy> pools, ICompileCoordinatorProxy pool)
 		{
 			if (!pools.TryAdd(pool.Proxy.Description.Guid, pool))
 			{
@@ -394,7 +395,7 @@ namespace DistCL
 			}
 		}
 
-		private void RemoveCoordinator(ConcurrentDictionary<Guid, ICompileCoordinatorInternal> pools, ICompileCoordinatorInternal pool)
+		private void RemoveCoordinator(ConcurrentDictionary<Guid, ICompileCoordinatorProxy> pools, ICompileCoordinatorProxy pool)
 		{
 			if (pools.TryRemove(pool.Proxy.Description.Guid, out pool))
 			{

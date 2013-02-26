@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using DistCL.Proxies;
 using DistCL.Utils;
 
 namespace DistCL
@@ -17,7 +18,7 @@ namespace DistCL
 		public IAgentProxy Agent { get; private set; }
 	}
 
-	internal class AgentPool : IAgentPoolInternal
+	internal class AgentPool : IAgentPoolProxy
 	{
 		private readonly Dictionary<Guid, RegisteredAgent> _agents = new Dictionary<Guid, RegisteredAgent>();
 
@@ -242,31 +243,31 @@ namespace DistCL
 			}
 		}
 
-		#region IAgentPoolInternal
+		#region IAgentPoolProxy
 
-		string ICompileCoordinatorInternal.Name { get { return "<local agent pool>"; } }
+		string ICompileCoordinatorProxy.Name { get { return "<local agent pool>"; } }
 
-		IEnumerable<IAgent> IAgentPoolInternal.GetAgents()
+		IEnumerable<IAgent> IAgentPoolProxy.GetAgents()
 		{
 			return GetAgents();
 		}
 
-		Task<IEnumerable<IAgent>> IAgentPoolInternal.GetAgentsAsync()
+		Task<IEnumerable<IAgent>> IAgentPoolProxy.GetAgentsAsync()
 		{
 			return Task.FromResult((IEnumerable<IAgent>)GetAgents());
 		}
 
-		Task ICompileCoordinatorInternal.RegisterAgentAsync(IAgentProxy request)
+		Task ICompileCoordinatorProxy.RegisterAgentAsync(IAgentProxy request)
 		{
 			return Task.Run(() => RegisterAgent(request));
 		}
 
-		bool ICompileCoordinatorInternal.IncreaseErrorCount()
+		bool ICompileCoordinatorProxy.IncreaseErrorCount()
 		{
 			return false;
 		}
 
-		void ICompileCoordinatorInternal.ResetErrorCount()
+		void ICompileCoordinatorProxy.ResetErrorCount()
 		{
 		}
 

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
+using DistCL.Proxies;
 using DistCL.Utils;
 
 namespace DistCL
@@ -30,7 +31,8 @@ namespace DistCL
 				compiler.MaxWorkersCount,
 				-1,
 				agentPoolUrls,
-				compilerUrls);
+				compilerUrls,
+				compiler.CompilerVersions);
 
 			_cpuCounter = new PerformanceCounter
 				{
@@ -50,7 +52,7 @@ namespace DistCL
 				if (_registrationMessage == null || _registrationMessage.CPUUsage != CPUUsage)
 				{
 					_registrationMessage = new RemoteCompilerService.Agent(
-						_stub.Guid, _stub.Name, _stub.Cores, CPUUsage, _stub.AgentPoolUrls, _stub.CompilerUrls);
+						_stub.Guid, _stub.Name, _stub.Cores, CPUUsage, _stub.AgentPoolUrls, _stub.CompilerUrls, _stub.CompilerVersions);
 					_logger.DebugFormat("Registration message updated (cpu = {0})", _registrationMessage.CPUUsage);
 				}
 				return _registrationMessage;
@@ -91,9 +93,9 @@ namespace DistCL
 		{
 			private readonly IAgent _description;
 			private readonly ICompiler _compiler;
-			private readonly IAgentPoolInternal _agentPool;
+			private readonly IAgentPoolProxy _agentPool;
 
-			public LocalAgentProxy(IAgent description, ICompiler compiler, IAgentPoolInternal agentPool)
+			public LocalAgentProxy(IAgent description, ICompiler compiler, IAgentPoolProxy agentPool)
 			{
 				_compiler = compiler;
 				_agentPool = agentPool;
@@ -110,12 +112,12 @@ namespace DistCL
 				return _compiler.IsReady() ? _compiler : null;
 			}
 
-			public IAgentPoolInternal GetAgentPool()
+			public IAgentPoolProxy GetAgentPool()
 			{
 				return _agentPool;
 			}
 
-			public ICompileCoordinatorInternal GetCoordinator()
+			public ICompileCoordinatorProxy GetCoordinator()
 			{
 				return _agentPool;
 			}

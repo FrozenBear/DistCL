@@ -31,6 +31,7 @@ namespace DistCL
 		int CPUUsage { get; }
 		Uri[] AgentPoolUrls { get; }
 		Uri[] CompilerUrls { get; }
+		string[] CompilerVersions { get; }
 	}
 
 	#region Agent
@@ -50,9 +51,10 @@ namespace DistCL
 			CPUUsage = agent.CPUUsage;
 			AgentPoolUrls = agent.AgentPoolUrls;
 			CompilerUrls = agent.CompilerUrls;
+			CompilerVersions = agent.CompilerVersions;
 		}
 
-		public Agent(Guid guid, string name, int cores, int cpuUsage, Uri[] agentPoolUrls, Uri[] compilerUrls)
+		public Agent(Guid guid, string name, int cores, int cpuUsage, Uri[] agentPoolUrls, Uri[] compilerUrls, string[] compilerVersions)
 		{
 			Guid = guid;
 			Name = name;
@@ -60,6 +62,7 @@ namespace DistCL
 			CPUUsage = cpuUsage;
 			AgentPoolUrls = agentPoolUrls;
 			CompilerUrls = compilerUrls;
+			CompilerVersions = compilerVersions;
 		}
 
 		[DataMember]
@@ -73,6 +76,9 @@ namespace DistCL
 
 		[DataMember]
 		public Uri[] CompilerUrls { get; private set; }
+
+		[DataMember]
+		public string[] CompilerVersions { get; private set; }
 
 		[DataMember]
 		public int Cores { get; private set; }

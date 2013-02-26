@@ -109,6 +109,9 @@ namespace DistCL.RemoteCompilerService {
         private System.Uri[] CompilerUrlsField;
         
         [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private string[] CompilerVersionsField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
         private int CoresField;
         
         [System.Runtime.Serialization.OptionalFieldAttribute()]
@@ -162,6 +165,19 @@ namespace DistCL.RemoteCompilerService {
                 if ((object.ReferenceEquals(this.CompilerUrlsField, value) != true)) {
                     this.CompilerUrlsField = value;
                     this.RaisePropertyChanged("CompilerUrls");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public string[] CompilerVersions {
+            get {
+                return this.CompilerVersionsField;
+            }
+            set {
+                if ((object.ReferenceEquals(this.CompilerVersionsField, value) != true)) {
+                    this.CompilerVersionsField = value;
+                    this.RaisePropertyChanged("CompilerVersions");
                 }
             }
         }
