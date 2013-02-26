@@ -28,22 +28,23 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.serviceProcessInstaller = new System.ServiceProcess.ServiceProcessInstaller();
-            this.compileServiceInstaller = new System.ServiceProcess.ServiceInstaller();
-            // 
-            // serviceProcessInstaller
-            // 
-            this.serviceProcessInstaller.Password = null;
-            this.serviceProcessInstaller.Username = null;
-            // 
-            // compileServiceInstaller
-            // 
-            this.compileServiceInstaller.ServiceName = "DistCL Service";
-            this.compileServiceInstaller.StartType = System.ServiceProcess.ServiceStartMode.Automatic;
-            // 
-            // ProjectInstaller
-            // 
-            this.Installers.AddRange(new System.Configuration.Install.Installer[] {
+			this.serviceProcessInstaller = new System.ServiceProcess.ServiceProcessInstaller();
+			this.compileServiceInstaller = new System.ServiceProcess.ServiceInstaller();
+			// 
+			// serviceProcessInstaller
+			// 
+			this.serviceProcessInstaller.Account = System.ServiceProcess.ServiceAccount.NetworkService;
+			this.serviceProcessInstaller.Password = null;
+			this.serviceProcessInstaller.Username = null;
+			// 
+			// compileServiceInstaller
+			// 
+			this.compileServiceInstaller.ServiceName = "DistCL Service";
+			this.compileServiceInstaller.StartType = System.ServiceProcess.ServiceStartMode.Automatic;
+			// 
+			// ProjectInstaller
+			// 
+			this.Installers.AddRange(new System.Configuration.Install.Installer[] {
             this.serviceProcessInstaller,
             this.compileServiceInstaller});
 

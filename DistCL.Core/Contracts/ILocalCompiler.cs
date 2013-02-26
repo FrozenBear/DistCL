@@ -20,6 +20,9 @@ namespace DistCL
 	public class LocalCompileInput
 	{
 		[MessageBodyMember(Namespace = GeneralSettings.LocalCompilerMessageNamespace)]
+		public string CompilerVersion { get; set; }
+
+		[MessageBodyMember(Namespace = GeneralSettings.LocalCompilerMessageNamespace)]
 		public string Arguments { get; set; }
 
 		[MessageBodyMember(Namespace = GeneralSettings.LocalCompilerMessageNamespace)]

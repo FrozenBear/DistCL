@@ -34,12 +34,25 @@
   </xs:element>
   <xs:element xmlns:q4="http://schemas.microsoft.com/Message" name="Src" type="q4:StreamBody" />
   <xs:element name="Arguments" nillable="true" type="xs:string" />
+  <xs:element name="CompilerVersion" nillable="true" type="xs:string" />
   <xs:element name="SrcLength" type="xs:long" />
   <xs:element name="SrcName" nillable="true" type="xs:string" />
+  <xs:element name="GetDescription">
+    <xs:complexType>
+      <xs:sequence />
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="GetDescriptionResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element xmlns:q5="urn:distcl:agents:messages" minOccurs="0" name="GetDescriptionResult" nillable="true" type="q5:Agent" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
   <xs:element name="RegisterAgent">
     <xs:complexType>
       <xs:sequence>
-        <xs:element xmlns:q5="urn:distcl:agents:messages" minOccurs="0" name="request" nillable="true" type="q5:AgentRegistrationMessage" />
+        <xs:element xmlns:q6="urn:distcl:agents:messages" minOccurs="0" name="request" nillable="true" type="q6:Agent" />
       </xs:sequence>
     </xs:complexType>
   </xs:element>
@@ -51,7 +64,7 @@
   <xs:element name="GetAgentsResponse">
     <xs:complexType>
       <xs:sequence>
-        <xs:element xmlns:q6="urn:distcl:agents:messages" minOccurs="0" name="GetAgentsResult" nillable="true" type="q6:ArrayOfAgent" />
+        <xs:element xmlns:q7="urn:distcl:agents:messages" minOccurs="0" name="GetAgentsResult" nillable="true" type="q7:ArrayOfAgent" />
       </xs:sequence>
     </xs:complexType>
   </xs:element>

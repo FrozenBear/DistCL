@@ -29,7 +29,7 @@ namespace DistCL
 		private readonly ReaderWriterLock _agentsSnapshotLock = new ReaderWriterLock();
 		private readonly TimeSpan _lockTimeout = TimeSpan.FromMinutes(1);
 		private readonly Random _random = new Random();
-		private List<MeasuredAgent> _weightsSnapshot;
+		private Dictionary<string, List<MeasuredAgent>> _weightsSnapshot;
 		private Agent[] _agentsSnapshot;
 
 		public Logger Logger
@@ -128,7 +128,7 @@ namespace DistCL
 			}
 		}
 
-		private List<MeasuredAgent> GetWeights()
+		private List<MeasuredAgent> GetWeights(string compilerVersion)
 		{
 			_agentsLock.AcquireReaderLock(_lockTimeout);
 			try
@@ -142,14 +142,28 @@ namespace DistCL
 						{
 							Logger.Debug("Calculate weights");
 
-							var weights = new List<MeasuredAgent>();
-							var weightPosition = 0;
+							var weights = new Dictionary<string, List<MeasuredAgent>>();
+							var weightPositions = new Dictionary<string,int>();
 
 							foreach (var agent in _agents.Values)
 							{
-								var item = new MeasuredAgent(agent.Proxy, weightPosition);
-								weightPosition += item.Weight;
-								weights.Add(item);
+								foreach (var version in agent.Proxy.Description.CompilerVersions)
+								{
+									int weightPosition;
+									weightPositions.TryGetValue(version, out weightPosition);
+
+									var item = new MeasuredAgent(agent.Proxy, weightPosition);
+
+									List<MeasuredAgent> list;
+									if (!weights.TryGetValue(version, out list))
+									{
+										list = new List<MeasuredAgent>();
+										weights.Add(version, list);
+									}
+									list.Add(item);
+
+									weightPositions[version] = weightPosition + item.Weight;
+								}
 							}
 
 							//weights.Sort((a, b) => a.WeightStart.CompareTo(b.WeightStart));
@@ -163,7 +177,7 @@ namespace DistCL
 					}
 				}
 
-				return _weightsSnapshot;
+				return _weightsSnapshot[compilerVersion];
 			}
 			finally
 			{
@@ -171,22 +185,22 @@ namespace DistCL
 			}
 		}
 
-		public ICompiler GetRandomCompiler()
+		public ICompiler GetRandomCompiler(string compilerVersion)
 		{
 			ICompiler compiler = null;
 
 			SpinWait.SpinUntil(delegate
 				{
-					compiler = GetRandomCompilerInternal();
+					compiler = GetRandomCompilerInternal(compilerVersion);
 					return compiler != null;
 				});
 
 			return compiler;
 		}
 
-		private ICompiler GetRandomCompilerInternal()
+		private ICompiler GetRandomCompilerInternal(string compilerVersion)
 		{
-			var weights = GetWeights();
+			var weights = GetWeights(compilerVersion);
 
 			if (weights.Count == 0)
 				return null;

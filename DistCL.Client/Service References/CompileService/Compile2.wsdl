@@ -69,6 +69,7 @@
       <soap:operation soapAction="urn:distcl/ICompiler/Compile" style="document" />
       <wsdl:input name="CompileInput">
         <soap:header message="i0:CompileInput_Headers" part="Arguments" use="literal" />
+        <soap:header message="i0:CompileInput_Headers" part="CompilerVersion" use="literal" />
         <soap:header message="i0:CompileInput_Headers" part="SrcLength" use="literal" />
         <soap:header message="i0:CompileInput_Headers" part="SrcName" use="literal" />
         <soap:body use="literal" />
@@ -81,6 +82,15 @@
   </wsdl:binding>
   <wsdl:binding name="basicHttpEndpoint_AgentPool" type="i0:IAgentPool">
     <soap:binding transport="http://schemas.xmlsoap.org/soap/http" />
+    <wsdl:operation name="GetDescription">
+      <soap:operation soapAction="urn:distcl/ICompileCoordinator/GetDescription" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
     <wsdl:operation name="RegisterAgent">
       <soap:operation soapAction="urn:distcl/ICompileCoordinator/RegisterAgent" style="document" />
       <wsdl:input>
@@ -95,6 +105,24 @@
       <wsdl:output>
         <soap:body use="literal" />
       </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:binding name="basicHttpEndpoint_CompileCoordinator" type="i0:ICompileCoordinator">
+    <soap:binding transport="http://schemas.xmlsoap.org/soap/http" />
+    <wsdl:operation name="GetDescription">
+      <soap:operation soapAction="urn:distcl/ICompileCoordinator/GetDescription" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="RegisterAgent">
+      <soap:operation soapAction="urn:distcl/ICompileCoordinator/RegisterAgent" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
     </wsdl:operation>
   </wsdl:binding>
   <wsdl:binding name="basicHttpEndpoint_CompileManager" type="i0:ICompileManager">
@@ -112,12 +140,22 @@
       <soap:operation soapAction="urn:distcl/ICompiler/Compile" style="document" />
       <wsdl:input name="CompileInput">
         <soap:header message="i0:CompileInput_Headers" part="Arguments" use="literal" />
+        <soap:header message="i0:CompileInput_Headers" part="CompilerVersion" use="literal" />
         <soap:header message="i0:CompileInput_Headers" part="SrcLength" use="literal" />
         <soap:header message="i0:CompileInput_Headers" part="SrcName" use="literal" />
         <soap:body use="literal" />
       </wsdl:input>
       <wsdl:output name="CompileOutput">
         <soap:header message="i0:CompileOutput_Headers" part="Status" use="literal" />
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetDescription">
+      <soap:operation soapAction="urn:distcl/ICompileCoordinator/GetDescription" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
         <soap:body use="literal" />
       </wsdl:output>
     </wsdl:operation>
@@ -153,6 +191,7 @@
       <soap12:operation soapAction="urn:distcl/ICompiler/Compile" style="document" />
       <wsdl:input name="CompileInput">
         <soap12:header message="i0:CompileInput_Headers" part="Arguments" use="literal" />
+        <soap12:header message="i0:CompileInput_Headers" part="CompilerVersion" use="literal" />
         <soap12:header message="i0:CompileInput_Headers" part="SrcLength" use="literal" />
         <soap12:header message="i0:CompileInput_Headers" part="SrcName" use="literal" />
         <soap12:body use="literal" />

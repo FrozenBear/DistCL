@@ -12,6 +12,9 @@
     <wsdl:port name="basicHttpEndpoint_AgentPool" binding="i0:basicHttpEndpoint_AgentPool">
       <soap:address location="http://localhost:8733/Compile/AgentPool" />
     </wsdl:port>
+    <wsdl:port name="basicHttpEndpoint_CompileCoordinator" binding="i0:basicHttpEndpoint_CompileCoordinator">
+      <soap:address location="http://localhost:8733/Compile/CompileCoordinator" />
+    </wsdl:port>
     <wsdl:port name="basicHttpEndpoint_CompileManager" binding="i0:basicHttpEndpoint_CompileManager">
       <soap:address location="http://localhost:8733/Compile/Manager" />
     </wsdl:port>
@@ -20,7 +23,7 @@
       <wsa10:EndpointReference>
         <wsa10:Address>net.tcp://localhost:8734/Compile</wsa10:Address>
         <Identity xmlns="http://schemas.xmlsoap.org/ws/2006/02/addressingidentity">
-          <Upn>npopov\profiler</Upn>
+          <Spn>host/laika</Spn>
         </Identity>
       </wsa10:EndpointReference>
     </wsdl:port>

@@ -6,6 +6,7 @@
     <xs:complexType>
       <xs:sequence>
         <xs:element minOccurs="0" name="Arguments" nillable="true" type="xs:string" />
+        <xs:element minOccurs="0" name="CompilerVersion" nillable="true" type="xs:string" />
         <xs:element xmlns:q1="http://schemas.microsoft.com/2003/10/Serialization/" minOccurs="0" name="PreprocessToken" type="q1:guid" />
         <xs:element minOccurs="0" name="Src" nillable="true" type="xs:string" />
         <xs:element minOccurs="0" name="SrcName" nillable="true" type="xs:string" />

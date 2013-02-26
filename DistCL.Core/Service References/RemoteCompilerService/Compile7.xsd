@@ -34,6 +34,7 @@
   </xs:element>
   <xs:element xmlns:q4="http://schemas.microsoft.com/Message" name="Src" type="q4:StreamBody" />
   <xs:element name="Arguments" nillable="true" type="xs:string" />
+  <xs:element name="CompilerVersion" nillable="true" type="xs:string" />
   <xs:element name="SrcLength" type="xs:long" />
   <xs:element name="SrcName" nillable="true" type="xs:string" />
   <xs:element name="GetDescription">

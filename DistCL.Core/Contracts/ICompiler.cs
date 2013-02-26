@@ -53,6 +53,9 @@ namespace DistCL
 		}
 
 		[MessageHeader]
+		public string CompilerVersion { get; set; }
+
+		[MessageHeader]
 		public string Arguments { get; set; }
 
 		[MessageBodyMember]

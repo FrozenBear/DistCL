@@ -69,6 +69,7 @@
       <soap:operation soapAction="urn:distcl/ICompiler/Compile" style="document" />
       <wsdl:input name="CompileInput">
         <soap:header message="i0:CompileInput_Headers" part="Arguments" use="literal" />
+        <soap:header message="i0:CompileInput_Headers" part="CompilerVersion" use="literal" />
         <soap:header message="i0:CompileInput_Headers" part="SrcLength" use="literal" />
         <soap:header message="i0:CompileInput_Headers" part="SrcName" use="literal" />
         <soap:body use="literal" />
@@ -139,6 +140,7 @@
       <soap:operation soapAction="urn:distcl/ICompiler/Compile" style="document" />
       <wsdl:input name="CompileInput">
         <soap:header message="i0:CompileInput_Headers" part="Arguments" use="literal" />
+        <soap:header message="i0:CompileInput_Headers" part="CompilerVersion" use="literal" />
         <soap:header message="i0:CompileInput_Headers" part="SrcLength" use="literal" />
         <soap:header message="i0:CompileInput_Headers" part="SrcName" use="literal" />
         <soap:body use="literal" />
@@ -189,6 +191,7 @@
       <soap12:operation soapAction="urn:distcl/ICompiler/Compile" style="document" />
       <wsdl:input name="CompileInput">
         <soap12:header message="i0:CompileInput_Headers" part="Arguments" use="literal" />
+        <soap12:header message="i0:CompileInput_Headers" part="CompilerVersion" use="literal" />
         <soap12:header message="i0:CompileInput_Headers" part="SrcLength" use="literal" />
         <soap12:header message="i0:CompileInput_Headers" part="SrcName" use="literal" />
         <soap12:body use="literal" />

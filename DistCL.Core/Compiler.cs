@@ -234,7 +234,7 @@ namespace DistCL
 						SrcName = input.SrcName
 					};
 
-				using (var remoteOutput = AgentPool.GetRandomCompiler().Compile(remoteInput))
+				using (var remoteOutput = AgentPool.GetRandomCompiler(input.CompilerVersion).Compile(remoteInput))
 				{
 					var remoteStreams = new Dictionary<CompileArtifactType, Stream>();
 					var cookies = new List<CompileArtifactCookie>();
