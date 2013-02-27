@@ -196,6 +196,7 @@ namespace DistCL.Proxies
 			{
 				var remoteInput = new RemoteCompilerService.CompileInput
 					{
+						CompilerVersion = localInput.CompilerVersion,
 						Arguments = localInput.Arguments,
 						Src = localInput.Src,
 						SrcLength = localInput.SrcLength,

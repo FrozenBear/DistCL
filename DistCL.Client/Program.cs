@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using DistCL.Client.CompileService;
 using DistCL.Utils;
 
@@ -10,6 +12,7 @@ namespace DistCL.Client
 	internal class Program
 	{
 		private static readonly Logger Logger = new Logger("CLIENT");
+		private static string _compilerVersion;
 
 		private static int Main(string[] args)
 		{
@@ -55,6 +58,7 @@ namespace DistCL.Client
 
 				var output = compiler.LocalCompile(new LocalCompileInput
 					{
+						CompilerVersion = CompilerVersion,
 						Arguments = driver.RemoteCommandLine,
 						SrcName = driver.SourceFiles[0],
 						Src = ppFilename,
@@ -112,6 +116,30 @@ namespace DistCL.Client
 			finally
 			{
 				File.Delete(ppFilename);
+			}
+		}
+
+		public static string CompilerVersion
+		{
+			get
+			{
+				if (_compilerVersion == null)
+				{
+					string envPathValue = Environment.GetEnvironmentVariable("PATH") ?? "";
+					foreach (var folder in new[] {"."}.Concat(envPathValue.Split(new[] {';'}, StringSplitOptions.RemoveEmptyEntries)))
+					{
+						var clPath = Path.Combine(folder, Utils.CompilerSettings.CLExeFilename);
+						if (!File.Exists(clPath))
+							continue;
+
+						_compilerVersion = FileVersionInfo.GetVersionInfo(clPath).FileVersion;
+						break;
+					}
+
+					if (_compilerVersion == null)
+					throw new Exception("Compiler not found");
+				}
+				return _compilerVersion;
 			}
 		}
 	}

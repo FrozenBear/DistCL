@@ -56,13 +56,13 @@ namespace DistCL
 				}
 			}
 			string envPathValue = Environment.GetEnvironmentVariable("PATH") ?? "";
-			foreach (var folder in envPathValue.Split(new[]{';'}, StringSplitOptions.RemoveEmptyEntries).Concat(new[]{"."}))
+			foreach (var folder in new[] {"."}.Concat(envPathValue.Split(new[] {';'}, StringSplitOptions.RemoveEmptyEntries).Reverse()))
 			{
 				var clPath = Path.Combine(folder, Utils.CompilerSettings.CLExeFilename);
 				if (!File.Exists(clPath))
 					continue;
 
-				compilerVersions[FileVersionInfo.GetVersionInfo(clPath).FileVersion] = clPath;
+				compilerVersions[FileVersionInfo.GetVersionInfo(clPath).FileVersion] = clPath;	// reverse + dict[] set = first win
 			}
 			_compilerVersions = compilerVersions;
 		}
@@ -119,46 +119,54 @@ namespace DistCL
 		{
 			Logger.InfoFormat("Compiling '{0}'...", input.SrcName);
 
-			string clPath;
-			if (!CompilerVersions.TryGetValue(input.CompilerVersion, out clPath))
-			{
-				var error = string.Format("Compiler with specified version not found ({0})", input.CompilerVersion);
-				Logger.Warn(error);
-				throw new Exception(error);
-			}
-
-			var tmpPath = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
-
-			if (!Directory.Exists(tmpPath))
-				Directory.CreateDirectory(tmpPath);
-
 			try
 			{
-				var srcName = Path.Combine(tmpPath, Path.GetFileName(input.SrcName));
-				using (var src = File.OpenWrite(srcName))
+				string clPath;
+				if (!CompilerVersions.TryGetValue(input.CompilerVersion, out clPath))
 				{
-					Logger.DebugFormat("Copying source to {0}...", srcName);
-					input.Src.CopyTo(src);
-					Logger.Debug("Source copied to local file");
+					var error = string.Format("Compiler with specified version not found ({0})", input.CompilerVersion);
+					Logger.Warn(error);
+					throw new Exception(error);
 				}
 
-				Dictionary<CompileArtifactDescription, Stream> streams;
-				var errorCode = RunCompiler(clPath, input.Arguments, srcName, tmpPath, out streams);
+				var tmpPath = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
 
-				if (errorCode == 0)
+				if (!Directory.Exists(tmpPath))
+					Directory.CreateDirectory(tmpPath);
+
+				try
 				{
-					Logger.InfoFormat("'{0}' compiled successfully", srcName);
+					var srcName = Path.Combine(tmpPath, Path.GetFileName(input.SrcName));
+					using (var src = File.OpenWrite(srcName))
+					{
+						Logger.DebugFormat("Copying source to {0}...", srcName);
+						input.Src.CopyTo(src);
+						Logger.Debug("Source copied to local file");
+					}
+
+					Dictionary<CompileArtifactDescription, Stream> streams;
+					var errorCode = RunCompiler(clPath, input.Arguments, srcName, tmpPath, out streams);
+
+					if (errorCode == 0)
+					{
+						Logger.InfoFormat("'{0}' compiled successfully", srcName);
+					}
+					else
+					{
+						Logger.WarnFormat("'{0}' compiled with non-zero error code", srcName);
+					}
+
+					return new CompileOutput(errorCode == 0, errorCode, streams, null);
 				}
-				else
+				finally
 				{
-					Logger.WarnFormat("'{0}' compiled with errors", srcName);
+					Directory.Delete(tmpPath, true);
 				}
-				
-				return new CompileOutput(errorCode == 0, errorCode, streams, null);
 			}
-			finally
+			catch (Exception e)
 			{
-				Directory.Delete(tmpPath, true);
+				Logger.LogException(string.Format("Exception in CompileInternal({0})", input.SrcName), e);
+				throw;
 			}
 		}
 
@@ -244,6 +252,7 @@ namespace DistCL
 			{
 				var remoteInput = new CompileInput
 					{
+						CompilerVersion = input.CompilerVersion,
 						Arguments = input.Arguments,
 						Src = inputStream,
 						SrcLength = inputStream.Length,

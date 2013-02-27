@@ -187,6 +187,9 @@ namespace DistCL
 
 		public ICompiler GetRandomCompiler(string compilerVersion)
 		{
+			if (string.IsNullOrEmpty(compilerVersion))
+				throw new ArgumentNullException("compilerVersion");
+
 			ICompiler compiler = null;
 
 			SpinWait.SpinUntil(delegate
