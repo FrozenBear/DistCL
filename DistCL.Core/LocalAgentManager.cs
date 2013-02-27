@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
+using System.Linq;
 using DistCL.Proxies;
 using DistCL.Utils;
 
@@ -32,7 +33,7 @@ namespace DistCL
 				-1,
 				agentPoolUrls,
 				compilerUrls,
-				compiler.CompilerVersions);
+				compiler.CompilerVersions.Keys.ToArray());
 
 			_cpuCounter = new PerformanceCounter
 				{

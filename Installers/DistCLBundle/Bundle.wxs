@@ -17,7 +17,7 @@
         SourceFile="$(var.DistCLClient.TargetPath)"
         Vital="yes">
         <MsiProperty Name="INSTALLLOCATION" Value="[InstallFolder]\Client" />
-        <MsiProperty Name="XX" />
+        <MsiProperty Name="XX" Value="YY" />
       </MsiPackage>
     </Chain>
   </Bundle>

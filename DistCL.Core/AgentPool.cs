@@ -203,7 +203,9 @@ namespace DistCL
 			var weights = GetWeights(compilerVersion);
 
 			if (weights.Count == 0)
-				return null;
+			{
+				throw new Exception("No any agents with specified compiler found");
+			}
 
 			var target = new MeasuredAgent(_random.Next(weights[weights.Count - 1].WeightEnd));
 

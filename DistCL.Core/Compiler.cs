@@ -24,14 +24,13 @@ namespace DistCL
 		private int _workersCount;
 		private readonly object _syncRoot = new object();
 		readonly ConcurrentDictionary<Guid, string> _preprocessTokens = new ConcurrentDictionary<Guid, string>();
-		private readonly string[] _compilerVersions;
+		private readonly Dictionary<string, string> _compilerVersions;
 
 		public Compiler()
 		{
 			_maxWorkersCount = Math.Max(1, Environment.ProcessorCount-1);
 
-
-			var compilerVersions = new HashSet<string>();
+			var compilerVersions = new Dictionary<string, string>();
 			using (var visualStudioRegistry = Registry.LocalMachine.OpenSubKey(@"SOFTWARE\Microsoft\VisualStudio"))
 			{
 				if (visualStudioRegistry == null)
@@ -51,12 +50,21 @@ namespace DistCL
 							if (!File.Exists(clPath))
 								continue;
 
-							compilerVersions.Add(FileVersionInfo.GetVersionInfo(clPath).FileVersion);
+							compilerVersions[FileVersionInfo.GetVersionInfo(clPath).FileVersion] = clPath;
 						}
 					}
 				}
 			}
-			_compilerVersions = compilerVersions.ToArray();
+			string envPathValue = Environment.GetEnvironmentVariable("PATH") ?? "";
+			foreach (var folder in envPathValue.Split(new[]{';'}, StringSplitOptions.RemoveEmptyEntries).Concat(new[]{"."}))
+			{
+				var clPath = Path.Combine(folder, Utils.CompilerSettings.CLExeFilename);
+				if (!File.Exists(clPath))
+					continue;
+
+				compilerVersions[FileVersionInfo.GetVersionInfo(clPath).FileVersion] = clPath;
+			}
+			_compilerVersions = compilerVersions;
 		}
 
 		public int MaxWorkersCount
@@ -64,7 +72,7 @@ namespace DistCL
 			get { return _maxWorkersCount; }
 		}
 
-		public string[] CompilerVersions
+		public Dictionary<string, string> CompilerVersions
 		{
 			get { return _compilerVersions; }
 		}
@@ -111,6 +119,14 @@ namespace DistCL
 		{
 			Logger.InfoFormat("Compiling '{0}'...", input.SrcName);
 
+			string clPath;
+			if (!CompilerVersions.TryGetValue(input.CompilerVersion, out clPath))
+			{
+				var error = string.Format("Compiler with specified version not found ({0})", input.CompilerVersion);
+				Logger.Warn(error);
+				throw new Exception(error);
+			}
+
 			var tmpPath = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
 
 			if (!Directory.Exists(tmpPath))
@@ -127,7 +143,7 @@ namespace DistCL
 				}
 
 				Dictionary<CompileArtifactDescription, Stream> streams;
-				var errorCode = RunCompiler(input.Arguments, srcName, tmpPath, out streams);
+				var errorCode = RunCompiler(clPath, input.Arguments, srcName, tmpPath, out streams);
 
 				if (errorCode == 0)
 				{
@@ -287,7 +303,12 @@ namespace DistCL
 			}
 		}
 
-		private int RunCompiler(string commmandLine, string inputPath, string outputPath, out Dictionary<CompileArtifactDescription, Stream> streams)
+		private int RunCompiler(
+			string clPath,
+			string commmandLine,
+			string inputPath,
+			string outputPath,
+			out Dictionary<CompileArtifactDescription, Stream> streams)
 		{
 			streams = new Dictionary<CompileArtifactDescription, Stream>();
 
@@ -309,10 +330,10 @@ namespace DistCL
 				// TODO dirty code.
 				commmandLine += " /Fo" + StringUtils.QuoteString(objFilename);
 				commmandLine += " " + StringUtils.QuoteString(inputPath);
-				
+
 				Logger.DebugFormat("Call compiler '{0}' with cmdline '{1}'", Utils.CompilerSettings.CLExeFilename, commmandLine);
 
-				errCode = ProcessRunner.Run(Utils.CompilerSettings.CLExeFilename, commmandLine, outWriter, errWriter);
+				errCode = ProcessRunner.Run(clPath, commmandLine, outWriter, errWriter);
 				Logger.DebugFormat("Compilation is completed.");
 			}
 
@@ -325,7 +346,8 @@ namespace DistCL
 				using (var errReader = new StreamReader(stdErrStream, encoding, true, bufferSize, true))
 				{
 
-					Logger.DebugFormat("errorCode: {0}, stdout: {1}, stderr: {2}", errCode, outReader.ReadToEnd(), errReader.ReadToEnd());
+					Logger.DebugFormat("errorCode: {0}, stdout: {1}, stderr: {2}",
+										errCode, outReader.ReadToEnd(), errReader.ReadToEnd());
 				}
 			}
 
