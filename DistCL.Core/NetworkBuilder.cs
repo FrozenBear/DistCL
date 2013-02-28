@@ -282,12 +282,15 @@ namespace DistCL
 				var coordinator = proxy.GetCoordinator();
 				if (coordinator != null)
 				{
-					coordinator.GetDescriptionAsync().ContinueWith(delegate(Task<IAgent> task)
+					return coordinator.GetDescriptionAsync().ContinueWith(delegate(Task<IAgent> task)
 						{
 							if (task.Status == TaskStatus.RanToCompletion)
 							{
-								AddCoordinator(pools, coordinator);
-								coordinator.RegisterAgent(localAgent.AgentProxy);
+								if (task.Result.Guid == proxy.Description.Guid)
+								{
+									AddCoordinator(pools, coordinator);
+									coordinator.RegisterAgent(localAgent.AgentProxy);
+								}
 							}
 						});
 				}

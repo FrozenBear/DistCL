@@ -2,7 +2,6 @@
 using System.Diagnostics;
 using System.IO;
 using System.Security.Permissions;
-using System.Threading;
 
 namespace DistCL.Utils
 {
@@ -10,8 +9,12 @@ namespace DistCL.Utils
 	public sealed class ProcessRunner
 	{
 
-		public static int Run(string fileName, string arguments,
-							  TextWriter stdOutput, TextWriter stdErr)
+		public static int Run(
+			string fileName,
+			string arguments,
+			TextWriter stdOutput,
+			TextWriter stdErr,
+			string workingDirectory)
 		{
 			var process = new Process();
 			using (process)
@@ -22,6 +25,7 @@ namespace DistCL.Utils
 				process.StartInfo.CreateNoWindow = true;
 				process.StartInfo.RedirectStandardOutput = true;
 				process.StartInfo.RedirectStandardError = true;
+				process.StartInfo.WorkingDirectory = workingDirectory;
 
 				process.OutputDataReceived += (sender, args) =>
 					{ if (!String.IsNullOrEmpty(args.Data)) stdOutput.WriteLine(args.Data); };
@@ -44,4 +48,3 @@ namespace DistCL.Utils
 		}
 	}
 }
-

@@ -31,8 +31,22 @@ namespace DistCL.Proxies
 
 		public ICompiler GetCompiler()
 		{
-			LazyInitializer.EnsureInitialized(ref _compiler, GetCompilerInternal);
-			return _compiler;
+			bool? isReady = null;
+
+			LazyInitializer.EnsureInitialized(ref _compiler, delegate
+				{
+					bool isReadyLocal;
+					var compiler = GetCompilerInternal(out isReadyLocal);
+					isReady = isReadyLocal;
+					return compiler;
+				});
+
+			if (! isReady.HasValue)
+			{
+				isReady = _compiler.IsReady();
+			}
+
+			return isReady.Value ? _compiler : null;
 		}
 
 		public ICompileCoordinatorProxy GetCoordinator()
@@ -50,7 +64,7 @@ namespace DistCL.Proxies
 			return LazyInitializer.EnsureInitialized(ref _agentPool, () => new AgentPoolProxy(this));
 		}
 
-		private CompilerProxy GetCompilerInternal()
+		private CompilerProxy GetCompilerInternal(out bool isReady)
 		{
 			foreach (var url in _description.CompilerUrls)
 			{
@@ -60,7 +74,8 @@ namespace DistCL.Proxies
 						_bindingsProvider.GetBinding(url),
 						new EndpointAddress(url));
 					{
-						return compiler.IsReady() ? new CompilerProxy(compiler) : null;
+						isReady = compiler.IsReady();
+						return new CompilerProxy(compiler);
 					}
 				}
 				catch (Exception e)
@@ -69,6 +84,7 @@ namespace DistCL.Proxies
 				}
 			}
 
+			isReady = false;
 			return null;
 		}
 

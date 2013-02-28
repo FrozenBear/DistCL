@@ -10,10 +10,10 @@ namespace DistCL
 	public interface ILocalCompiler
 	{
 		[OperationContract]
-		LocalCompileOutput LocalCompile(LocalCompileInput input);
+		Guid GetPreprocessToken(string name);
 
 		[OperationContract]
-		Guid GetPreprocessToken(string name);
+		LocalCompileOutput LocalCompile(LocalCompileInput input);
 	}
 
 	[MessageContract(WrapperNamespace = GeneralSettings.LocalCompilerMessageNamespace)]

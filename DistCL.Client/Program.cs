@@ -37,18 +37,18 @@ namespace DistCL.Client
 			var driver = new CLDriver(arguments);
 
 			// Run preprocessor
-			string ppFilename = Path.GetTempFileName();
+			var ppFileName = Path.GetTempFileName();
 			try
 			{
 				ILocalCompiler compiler = new LocalCompilerClient("basicHttpEndpoint_LocalCompiler");
 
 				var preprocessToken = compiler.GetPreprocessToken(driver.SourceFiles[0]);
 
-				using (var preprocOutput = new FileStream(ppFilename, FileMode.Create, FileAccess.Write, FileShare.Read))
+				using (var preprocOutput = new FileStream(ppFileName, FileMode.Create, FileAccess.Write, FileShare.Read))
 				using (var stdOut = new StreamWriter(preprocOutput))
 				using (var stdErr = new StringWriter())
 				{
-					var errCode = ProcessRunner.Run(CompilerSettings.CLExeFilename, driver.LocalCommandLine, stdOut, stdErr);
+					var errCode = ProcessRunner.Run(CompilerSettings.CLExeFilename, driver.LocalCommandLine, stdOut, stdErr, Environment.CurrentDirectory);
 					if (errCode != 0)
 						throw new Win32Exception(
 							errCode,
@@ -61,7 +61,7 @@ namespace DistCL.Client
 						CompilerVersion = CompilerVersion,
 						Arguments = driver.RemoteCommandLine,
 						SrcName = driver.SourceFiles[0],
-						Src = ppFilename,
+						Src = ppFileName,
 						PreprocessToken = preprocessToken
 					});
 
@@ -79,7 +79,7 @@ namespace DistCL.Client
 							streams.Add(((ICompileArtifactCookie) artifact).Type, Console.OpenStandardError());
 							break;
 						case CompileArtifactType.Obj:
-							var tmpFile = Path.Combine(Path.GetDirectoryName(ppFilename), artifact.Name);
+							var tmpFile = Path.Combine(Path.GetDirectoryName(ppFileName), artifact.Name);
 							var resultFile = driver.OutputFiles[0].Path;
 							if (File.Exists(resultFile))
 							{
@@ -115,7 +115,7 @@ namespace DistCL.Client
 			}
 			finally
 			{
-				File.Delete(ppFilename);
+				File.Delete(ppFileName);
 			}
 		}
 
