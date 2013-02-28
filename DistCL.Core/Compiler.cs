@@ -18,17 +18,20 @@ namespace DistCL
 	[BindingNamespaceBehavior]
 	public class Compiler : ICompileManager, ILocalCompiler
 	{
+		private const int PreprocessWorkerCount = 1;
+		private const int CompileWorkerCount = 2 * PreprocessWorkerCount;
+		private readonly Semaphore _semaphore;
+		private readonly int _maxWorkersCount;
+
 		private readonly AgentPool _agentPool = new AgentPool();
 		private readonly Logger _logger = new Logger("COMPILER");
-		private readonly int _maxWorkersCount;
-		private int _workersCount;
-		private readonly object _syncRoot = new object();
 		readonly ConcurrentDictionary<Guid, string> _preprocessTokens = new ConcurrentDictionary<Guid, string>();
 		private readonly Dictionary<string, string> _compilerVersions;
 
 		public Compiler()
 		{
 			_maxWorkersCount = Math.Max(1, Environment.ProcessorCount-1);
+			_semaphore = new Semaphore(0, _maxWorkersCount*CompileWorkerCount);
 
 			var compilerVersions = new Dictionary<string, string>();
 			using (var visualStudioRegistry = Registry.LocalMachine.OpenSubKey(@"SOFTWARE\Microsoft\VisualStudio"))
@@ -40,6 +43,9 @@ namespace DistCL
 				{
 					using (var vs = visualStudioRegistry.OpenSubKey(version))
 					{
+						if (vs == null)
+							continue;
+
 						var installDir = (string) vs.GetValue("InstallDir");
 
 						if (! string.IsNullOrEmpty(installDir))
@@ -91,15 +97,7 @@ namespace DistCL
 
 		public CompileOutput Compile(CompileInput input)
 		{
-			lock (_syncRoot)
-			{
-				while (_workersCount >= _maxWorkersCount)
-				{
-					Monitor.Wait(_syncRoot);
-				}
-
-				_workersCount ++;
-			}
+			AcquireWorkers(CompileWorkerCount);
 
 			try
 			{
@@ -107,11 +105,7 @@ namespace DistCL
 			}
 			finally
 			{
-				lock (_syncRoot)
-				{
-					_workersCount--;
-					Monitor.Pulse(_syncRoot);
-				}
+				ReleaseWorkers(CompileWorkerCount);
 			}
 		}
 
@@ -188,24 +182,21 @@ namespace DistCL
 
 		public bool IsReady()
 		{
-			lock (_syncRoot)
+			var ready = _semaphore.WaitOne(0); // true will be returned even if we can run only preprocess, not compile
+			
+			if (ready)
 			{
-				return _workersCount < _maxWorkersCount;
+				_semaphore.Release();
 			}
+			
+			return ready;
 		}
 
 		public Guid GetPreprocessToken(string name)
 		{
 			Logger.DebugFormat("Preprocess token requested ({0})", name);
-			lock (_syncRoot)
-			{
-				while (_workersCount >= _maxWorkersCount)
-				{
-					Monitor.Wait(_syncRoot);
-				}
 
-				_workersCount++;
-			}
+			AcquireWorkers(PreprocessWorkerCount);
 
 			var token = Guid.NewGuid();
 			Task.Delay(TimeSpan.FromMinutes(1)).ContinueWith(PreprocessTokenRemove, token);
@@ -222,11 +213,7 @@ namespace DistCL
 			if (_preprocessTokens.TryRemove(token, out name))
 			{
 				Logger.WarnFormat("Preprocess token expired: {0}", name);
-				lock (_syncRoot)
-				{
-					_workersCount--;
-					Monitor.Pulse(_syncRoot);
-				}
+				ReleaseWorkers(PreprocessWorkerCount);
 			}
 		}
 
@@ -237,11 +224,7 @@ namespace DistCL
 			string preprocessName;
 			if (_preprocessTokens.TryRemove(input.PreprocessToken, out preprocessName))
 			{
-				lock (_syncRoot)
-				{
-					_workersCount--;
-					Monitor.Pulse(_syncRoot);
-				}
+				ReleaseWorkers(PreprocessWorkerCount);
 			}
 			else
 			{
@@ -374,6 +357,18 @@ namespace DistCL
 			}
 
 			return errCode;
+		}
+
+		private void AcquireWorkers(int count)
+		{
+			for (var i = 0; i < count; i++)
+			{
+				_semaphore.WaitOne();
+			}
+		}
+		private void ReleaseWorkers(int count)
+		{
+			_semaphore.Release(count);
 		}
 	}
 }
