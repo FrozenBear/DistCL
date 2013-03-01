@@ -25,12 +25,24 @@
     <Compile Include="Bundle.wxs" />
   </ItemGroup>
   <ItemGroup>
+    <WixExtension Include="WixNetFxExtension">
+      <HintPath>$(WixExtDir)\WixNetFxExtension.dll</HintPath>
+      <Name>WixNetFxExtension</Name>
+    </WixExtension>
     <WixExtension Include="WixBalExtension">
       <HintPath>$(WixExtDir)\WixBalExtension.dll</HintPath>
       <Name>WixBalExtension</Name>
     </WixExtension>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\DistCLAgent\DistCLAgent.wixproj">
+      <Name>DistCLAgent</Name>
+      <Project>{9d3c7fb7-62d1-4e9a-b793-b7e43a0e99d3}</Project>
+      <Private>True</Private>
+      <DoNotHarvest>True</DoNotHarvest>
+      <RefProjectOutputGroups>Binaries;Content;Satellites</RefProjectOutputGroups>
+      <RefTargetDir>INSTALLFOLDER</RefTargetDir>
+    </ProjectReference>
     <ProjectReference Include="..\DistCLClient\DistCLClient.wixproj">
       <Name>DistCLClient</Name>
       <Project>{e6990679-c5b4-4661-b4be-dbb975d6144d}</Project>

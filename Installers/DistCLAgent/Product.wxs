@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi"
+     xmlns:util="http://schemas.microsoft.com/wix/UtilExtension">
+
+  <?ifndef Version?>
+  <?define Version = "1.0.0" ?>
+  <?endif ?>
+
+  <?define ProductName="DistCL Agent" ?>
+
+  <?define OUT_DIR=$(var.DistCL.Service.TargetDir) ?>
+
+  <Product Name="$(var.ProductName)" Id="56B8905A-4CB9-4E97-AC58-FA8B81FFBD17" UpgradeCode="CABD7829-B2BD-44E3-96BC-0405C5865B9F"
+    Language="1033" Codepage="1252" Version="$(var.Version)" Manufacturer="Frozen Bear">
+
+    <Package Id="*" Keywords="Installer" Description="DistCL Agent Installer"
+             InstallPrivileges="elevated"
+             InstallScope="perMachine"
+             Manufacturer="Frozen Bear"
+             InstallerVersion="300" Languages="1033" Compressed="yes" SummaryCodepage="1252" />
+
+    <!-- Fo the future use
+    <Property Id="IS_MAJOR_UPGRADE" Secure="yes" />
+    <Upgrade Id="CABD7829-B2BD-44E3-96BC-0405C5865B9F">
+      <UpgradeVersion IncludeMaximum="no" Maximum="$(var.Version)" Property="IS_MAJOR_UPGRADE" />
+    </Upgrade>-->
+
+    <Media Id="1" Cabinet="DistCLAgent.cab" EmbedCab="yes" />
+
+    <PropertyRef Id="NETFRAMEWORK45"/>
+    <Condition Message="This application requires .NET Framework 4.5. Please install the .NET Framework then run this installer again.">
+      <![CDATA[Installed OR NETFRAMEWORK45]]>
+    </Condition>
+
+    <Property Id="DISTCL_AGENT_BINDING_PORT" Value="48480" />
+
+    <Directory Id="TARGETDIR" Name="SourceDir">
+      <Directory Id="ProgramFilesFolder" Name="PFiles">
+        <Directory Id="FrozenBearDir" Name="Frozen Bear">
+          <Directory Id="INSTALLDIR" Name="$(var.ProductName)">
+
+            <!-- Makes backup copy of Web.config and delete it. -->
+            <Component Id="DistCL.Service.exe.config_backup" Guid="2C7237BB-D049-4C0D-AD0B-20C518B96082">
+              <CopyFile Id="DistCL.Service.exe.config_backup" Delete="yes" DestinationDirectory="INSTALLDIR" DestinationName="DistCL.Service.exe.config.bak" SourceDirectory="INSTALLDIR" SourceName="DistCL.Service.exe.config" />
+              <RemoveFile Id="DistCL.Service.exe.config_delete" On="uninstall"  Name="DistCL.Service.exe.config.bak" />
+            </Component>
+
+            <Component Id="DistCL.Service.exe.config" Guid="1C39F938-AEE4-4C9E-BF07-7496679A58B3">
+              <File Id="DistCL.Service.exe.config" KeyPath="yes" Source="$(var.OUT_DIR)\DistCL.Service.exe.config" />
+              <util:XmlFile Id="SetLogsPath" Action="setValue" ElementPath="configuration/log4net/appender[\[]@name='RollingLogFileAppender'[\]]/file" File="[#DistCL.Service.exe.config]" Value="${ALLUSERSPROFILE}/FrozenBear/!(var.ProductName)/Logs/DistCL.log" Name="value" SelectionLanguage="XPath" />
+            </Component>
+
+            <Component Id="DistCL.config" Guid="5CD70B2F-4035-4FE1-9D41-8793694FE0FF">
+              <File Id="DistCL.config" KeyPath="yes" Source="$(var.OUT_DIR)\DistCL.config" />
+              <util:XmlFile Id="DeleteEndpoints" Action="deleteValue" ElementPath="configuration/system.serviceModel/services/service[\[]@behaviorConfiguration='DefaultCompileServiceBehavior'[\]] and service[\[]@name='DistCL.Compiler'[\]]/host/baseAddresses/*" File="[#DistCL.config]" SelectionLanguage="XPath" Sequence="100" />
+              <util:XmlFile Id="CreateEndpoint" Action="createElement" ElementPath="configuration/system.serviceModel/services/service[\[]@behaviorConfiguration='DefaultCompileServiceBehavior'[\]] and service[\[]@name='DistCL.Compiler'[\]]/host/baseAddresses" File="[#DistCL.config]" Name="add" SelectionLanguage="XPath" Sequence="101" />
+              <util:XmlFile Id="SetEndpoint" Action="setValue" ElementPath="configuration/system.serviceModel/services/service[\[]@behaviorConfiguration='DefaultCompileServiceBehavior'[\]] and service[\[]@name='DistCL.Compiler'[\]]/host/baseAddresses/add" File="[#DistCL.config]" Value="[DISTCL_AGENT_BINDING_PORT]" Name="baseAddress" SelectionLanguage="XPath" Sequence="102" />
+            </Component>
+
+            <Component Id="DistCL.Core.dll" Guid="30D638B0-97B0-4F7A-B9F3-1047EB59C243">
+              <File Id="DistCL.Core.dll" KeyPath="yes" Source="$(var.OUT_DIR)\DistCL.Core.dll" />
+            </Component>
+            <Component Id="DistCL.Service.exe" Guid="354CA3DA-2D22-42A0-AA30-E7343F09871B">
+              <File Id="DistCL.Service.exe" KeyPath="yes" Source="$(var.OUT_DIR)\DistCL.Service.exe" />
+            </Component>
+            <Component Id="DistCL.Utils.dll" Guid="F18162DD-D525-4099-8DCD-A28BAE40C39B">
+              <File Id="DistCL.Utils.dll" KeyPath="yes" Source="$(var.OUT_DIR)\DistCL.Utils.dll" />
+            </Component>
+            <Component Id="HttpNamespaceManagerLib.dll" Guid="72EEDAAE-272E-48BC-A4E3-2C62DCAE6ADF">
+              <File Id="HttpNamespaceManagerLib.dll" KeyPath="yes" Source="$(var.OUT_DIR)\HttpNamespaceManagerLib.dll" />
+            </Component>
+            <Component Id="log4net.dll" Guid="C34F6E12-CF75-4FE4-A49B-DD8F082D65A4">
+              <File Id="log4net.dll" KeyPath="yes" Source="$(var.OUT_DIR)\log4net.dll" />
+            </Component>
+
+          </Directory>
+        </Directory>
+      </Directory>
+    </Directory>
+
+    <Feature Id="Complete" Level="1">
+      <ComponentRef Id="DistCL.Service.exe.config_backup"/>
+      <ComponentRef Id="DistCL.Service.exe.config"/>
+      <ComponentRef Id="DistCL.config"/>
+      <ComponentRef Id="DistCL.Core.dll"/>
+      <ComponentRef Id="DistCL.Service.exe"/>
+      <ComponentRef Id="DistCL.Utils.dll"/>
+      <ComponentRef Id="HttpNamespaceManagerLib.dll" />
+      <ComponentRef Id="log4net.dll"/>
+    </Feature>
+  </Product>
+</Wix>

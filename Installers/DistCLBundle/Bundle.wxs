@@ -4,21 +4,39 @@
 <?define Version = "1.0.0.0" ?>
 <?endif ?>
 
-<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
-  <Bundle Name="DistCL" Version="$(var.Version)" Manufacturer="Bored Inc." UpgradeCode="e2e0b529-2ba7-48b0-bf33-27a7d97158fe">
-    <BootstrapperApplicationRef Id="WixStandardBootstrapperApplication.HyperlinkLicense" />
-    <WixVariable Id="WixStdbaLicenseUrl" Value="" />
-    <Variable Name="InstallFolder" Type="string" Value="[ProgramFilesFolder]Bored\DistCL" />
-
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi"
+     xmlns:bal="http://schemas.microsoft.com/wix/BalExtension">
+  
+  <Bundle Name="DistCL" Version="$(var.Version)" Manufacturer="Frozen Bear" UpgradeCode="e2e0b529-2ba7-48b0-bf33-27a7d97158fe">
+    <BootstrapperApplicationRef Id="WixStandardBootstrapperApplication.HyperlinkLicense">
+      <bal:WixStandardBootstrapperApplication
+            LicenseUrl="http://example.com/license.html"
+            LogoFile="$(var.ProjectDir)\..\Resources\FrozenBearLogo.png"
+            />
+    </BootstrapperApplicationRef>
+    
+    <Variable Name="InstallFolder" Type="string" Value="[ProgramFilesFolder]Frozen Bear\DistCL" />
+    
     <Chain>
+      <PackageGroupRef Id="NetFx45Web"/>
+      
       <MsiPackage
-        Id="Setup"
+        Id="ClientSetup"
         Compressed="yes"
         SourceFile="$(var.DistCLClient.TargetPath)"
         Vital="yes">
         <MsiProperty Name="INSTALLLOCATION" Value="[InstallFolder]\Client" />
+      </MsiPackage>    
+    
+      <MsiPackage
+        Id="AgentSetup"
+        Compressed="yes"
+        SourceFile="$(var.DistCLAgent.TargetPath)"
+        Vital="yes">
+        <MsiProperty Name="INSTALLLOCATION" Value="[InstallFolder]\Agent" />
         <MsiProperty Name="XX" Value="YY" />
-      </MsiPackage>
+      </MsiPackage>   
+
     </Chain>
   </Bundle>
 </Wix>

@@ -173,11 +173,6 @@ namespace DistCL
 				return "net.tcp";
 			}
 
-			if (typeof(NetPeerTcpBinding).IsAssignableFrom(bindingType))
-			{
-				return "net.p2p";
-			}
-
 			return null;
 		}
 

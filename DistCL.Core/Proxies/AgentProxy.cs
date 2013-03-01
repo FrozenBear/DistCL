@@ -78,7 +78,7 @@ namespace DistCL.Proxies
 						return new CompilerProxy(compiler);
 					}
 				}
-				catch (Exception e)
+				catch (Exception)
 				{
 					// TODO logger?
 				}
@@ -112,7 +112,7 @@ namespace DistCL.Proxies
 						func(client);
 					}
 				}
-				catch (Exception ex)
+				catch (Exception)
 				{
 					// TODO logging
 				}
