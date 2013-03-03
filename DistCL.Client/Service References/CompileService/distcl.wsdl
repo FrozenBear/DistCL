@@ -3,6 +3,7 @@
   <wsdl:types>
     <xsd:schema targetNamespace="urn:distcl/Imports">
       <xsd:import namespace="urn:distcl" />
+      <xsd:import namespace="http://schemas.datacontract.org/2004/07/DistCL" />
       <xsd:import namespace="http://schemas.microsoft.com/2003/10/Serialization/" />
       <xsd:import namespace="urn:distcl:compiler:local:messages" />
       <xsd:import namespace="http://schemas.microsoft.com/Message" />
@@ -18,14 +19,20 @@
   <wsdl:message name="ILocalCompiler_GetPreprocessToken_OutputMessage">
     <wsdl:part name="parameters" element="tns:GetPreprocessTokenResponse" />
   </wsdl:message>
+  <wsdl:message name="ILocalCompiler_GetPreprocessToken_CompilerNotFoundFaultContractFault_FaultMessage">
+    <wsdl:part xmlns:q1="http://schemas.datacontract.org/2004/07/DistCL" name="detail" element="q1:CompilerNotFoundFaultContract" />
+  </wsdl:message>
   <wsdl:message name="LocalCompileInput">
-    <wsdl:part xmlns:q1="urn:distcl:compiler:local:messages" name="parameters" element="q1:LocalCompileInput" />
+    <wsdl:part xmlns:q2="urn:distcl:compiler:local:messages" name="parameters" element="q2:LocalCompileInput" />
   </wsdl:message>
   <wsdl:message name="LocalCompileOutput">
-    <wsdl:part xmlns:q2="urn:distcl:compiler:local:messages" name="parameters" element="q2:LocalCompileOutput" />
+    <wsdl:part xmlns:q3="urn:distcl:compiler:local:messages" name="parameters" element="q3:LocalCompileOutput" />
   </wsdl:message>
   <wsdl:message name="LocalCompileOutput_Headers">
     <wsdl:part name="Status" element="tns:Status" />
+  </wsdl:message>
+  <wsdl:message name="ILocalCompiler_LocalCompile_CompilerNotFoundFaultContractFault_FaultMessage">
+    <wsdl:part xmlns:q4="http://schemas.datacontract.org/2004/07/DistCL" name="detail" element="q4:CompilerNotFoundFaultContract" />
   </wsdl:message>
   <wsdl:message name="ICompileManager_IsReady_InputMessage">
     <wsdl:part name="parameters" element="tns:IsReady" />
@@ -34,7 +41,7 @@
     <wsdl:part name="parameters" element="tns:IsReadyResponse" />
   </wsdl:message>
   <wsdl:message name="CompileInput">
-    <wsdl:part xmlns:q3="urn:distcl:compiler:messages" name="parameters" element="q3:CompileInput" />
+    <wsdl:part xmlns:q5="urn:distcl:compiler:messages" name="parameters" element="q5:CompileInput" />
   </wsdl:message>
   <wsdl:message name="CompileInput_Headers">
     <wsdl:part name="Arguments" element="tns:Arguments" />
@@ -43,10 +50,13 @@
     <wsdl:part name="SrcName" element="tns:SrcName" />
   </wsdl:message>
   <wsdl:message name="CompileOutput">
-    <wsdl:part xmlns:q4="urn:distcl:compiler:messages" name="parameters" element="q4:CompileOutput" />
+    <wsdl:part xmlns:q6="urn:distcl:compiler:messages" name="parameters" element="q6:CompileOutput" />
   </wsdl:message>
   <wsdl:message name="CompileOutput_Headers">
     <wsdl:part name="Status" element="tns:Status" />
+  </wsdl:message>
+  <wsdl:message name="ICompileManager_Compile_CompilerNotFoundFaultContractFault_FaultMessage">
+    <wsdl:part xmlns:q7="http://schemas.datacontract.org/2004/07/DistCL" name="detail" element="q7:CompilerNotFoundFaultContract" />
   </wsdl:message>
   <wsdl:message name="ICompileManager_GetDescription_InputMessage">
     <wsdl:part name="parameters" element="tns:GetDescription" />
@@ -63,14 +73,19 @@
   <wsdl:message name="ICompileManager_GetAgents_OutputMessage">
     <wsdl:part name="parameters" element="tns:GetAgentsResponse" />
   </wsdl:message>
+  <wsdl:message name="ICompiler_Compile_CompilerNotFoundFaultContractFault_FaultMessage">
+    <wsdl:part xmlns:q8="http://schemas.datacontract.org/2004/07/DistCL" name="detail" element="q8:CompilerNotFoundFaultContract" />
+  </wsdl:message>
   <wsdl:portType name="ILocalCompiler">
     <wsdl:operation name="GetPreprocessToken">
       <wsdl:input wsaw:Action="urn:distcl/ILocalCompiler/GetPreprocessToken" message="tns:ILocalCompiler_GetPreprocessToken_InputMessage" />
       <wsdl:output wsaw:Action="urn:distcl/ILocalCompiler/GetPreprocessTokenResponse" message="tns:ILocalCompiler_GetPreprocessToken_OutputMessage" />
+      <wsdl:fault wsaw:Action="urn:distcl/ILocalCompiler/GetPreprocessTokenCompilerNotFoundFaultContractFault" name="CompilerNotFoundFaultContractFault" message="tns:ILocalCompiler_GetPreprocessToken_CompilerNotFoundFaultContractFault_FaultMessage" />
     </wsdl:operation>
     <wsdl:operation name="LocalCompile">
       <wsdl:input wsaw:Action="urn:distcl/ILocalCompiler/LocalCompile" name="LocalCompileInput" message="tns:LocalCompileInput" />
       <wsdl:output wsaw:Action="urn:distcl/ILocalCompiler/LocalCompileResponse" name="LocalCompileOutput" message="tns:LocalCompileOutput" />
+      <wsdl:fault wsaw:Action="urn:distcl/ILocalCompiler/LocalCompileCompilerNotFoundFaultContractFault" name="CompilerNotFoundFaultContractFault" message="tns:ILocalCompiler_LocalCompile_CompilerNotFoundFaultContractFault_FaultMessage" />
     </wsdl:operation>
   </wsdl:portType>
   <wsdl:portType name="ICompileManager">
@@ -81,6 +96,7 @@
     <wsdl:operation name="Compile">
       <wsdl:input wsaw:Action="urn:distcl/ICompiler/Compile" name="CompileInput" message="tns:CompileInput" />
       <wsdl:output wsaw:Action="urn:distcl/ICompiler/CompileResponse" name="CompileOutput" message="tns:CompileOutput" />
+      <wsdl:fault wsaw:Action="urn:distcl/ICompiler/CompileCompilerNotFoundFaultContractFault" name="CompilerNotFoundFaultContractFault" message="tns:ICompileManager_Compile_CompilerNotFoundFaultContractFault_FaultMessage" />
     </wsdl:operation>
     <wsdl:operation name="GetDescription">
       <wsdl:input wsaw:Action="urn:distcl/ICompileCoordinator/GetDescription" message="tns:ICompileManager_GetDescription_InputMessage" />
@@ -124,6 +140,7 @@
     <wsdl:operation name="Compile">
       <wsdl:input wsaw:Action="urn:distcl/ICompiler/Compile" name="CompileInput" message="tns:CompileInput" />
       <wsdl:output wsaw:Action="urn:distcl/ICompiler/CompileResponse" name="CompileOutput" message="tns:CompileOutput" />
+      <wsdl:fault wsaw:Action="urn:distcl/ICompiler/CompileCompilerNotFoundFaultContractFault" name="CompilerNotFoundFaultContractFault" message="tns:ICompiler_Compile_CompilerNotFoundFaultContractFault_FaultMessage" />
     </wsdl:operation>
   </wsdl:portType>
 </wsdl:definitions>

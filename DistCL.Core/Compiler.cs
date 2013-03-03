@@ -104,9 +104,18 @@ namespace DistCL
 
 		#region ILocalCompiler Operations
 
-		Guid ILocalCompiler.GetPreprocessToken(string name)
+		Guid ILocalCompiler.GetPreprocessToken(string name, string compilerVersion)
 		{
 			LocalLogger.DebugFormat("Preprocess token requested ({0})", name);
+
+			if (! CompilerVersions.ContainsKey(compilerVersion))
+			{
+				LocalLogger.WarnFormat("Compiler version '{0}' not found", compilerVersion);
+				throw new FaultException<CompilerNotFoundFaultContract>(new CompilerNotFoundFaultContract
+					{
+						CompilerVersion = compilerVersion
+					});
+			}
 
 			AcquireWorkers(PreprocessWorkerCount);
 
@@ -141,6 +150,15 @@ namespace DistCL
 			else
 			{
 				LocalLogger.WarnFormat("Preprocess token already expired: {0}", input.SrcName);
+			}
+
+			if (!CompilerVersions.ContainsKey(input.CompilerVersion))
+			{
+				LocalLogger.WarnFormat("Compiler version '{0}' not found", input.CompilerVersion);
+				throw new FaultException<CompilerNotFoundFaultContract>(new CompilerNotFoundFaultContract
+					{
+						CompilerVersion = input.CompilerVersion
+					});
 			}
 
 			using (var inputStream = File.OpenRead(input.Src))
@@ -226,7 +244,18 @@ namespace DistCL
 		CompileOutput ICompiler.Compile(CompileInput input)
 		{
 			CompilerLogger.DebugFormat("Received compile request '{0}'", input.SrcName);
+
+			if (!CompilerVersions.ContainsKey(input.CompilerVersion))
+			{
+				CompilerLogger.WarnFormat("Compiler version '{0}' not found", input.CompilerVersion);
+				throw new FaultException<CompilerNotFoundFaultContract>(new CompilerNotFoundFaultContract
+				{
+					CompilerVersion = input.CompilerVersion
+				});
+			}
+
 			AcquireWorkers(CompileWorkerCount);
+
 			CompilerLogger.InfoFormat("Processing '{0}'...", input.SrcName);
 
 			try

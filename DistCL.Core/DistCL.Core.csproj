@@ -98,6 +98,9 @@
     <None Include="Service References\RemoteCompilerService\distcl.xsd">
       <SubType>Designer</SubType>
     </None>
+    <None Include="Service References\RemoteCompilerService\DistCL1.xsd">
+      <SubType>Designer</SubType>
+    </None>
     <None Include="Service References\RemoteCompilerService\Message.xsd">
       <SubType>Designer</SubType>
     </None>

@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.ServiceModel;
 using DistCL.Client.CompileService;
 using DistCL.Utils;
 
@@ -42,19 +42,22 @@ namespace DistCL.Client
 			{
 				ILocalCompiler compiler = new LocalCompilerClient("basicHttpEndpoint_LocalCompiler");
 
-				var preprocessToken = compiler.GetPreprocessToken(driver.SourceFiles[0]);
+				var preprocessToken = compiler.GetPreprocessToken(driver.SourceFiles[0], CompilerVersion);
 
 				using (var preprocOutput = new FileStream(ppFileName, FileMode.Create, FileAccess.Write, FileShare.Read))
 				using (var stdOut = new StreamWriter(preprocOutput))
 				using (var stdErr = new StringWriter())
 				{
-					var errCode = ProcessRunner.Run(CompilerSettings.CLExeFilename, driver.LocalCommandLine, stdOut, stdErr, Environment.CurrentDirectory);
-					if (errCode != 0)
-						throw new Win32Exception(
-							errCode,
-							String.Format("{0} error: {1}", CompilerSettings.CLExeFilename, stdErr));
-				}
+					var errCode = ProcessRunner.Run(
+						CompilerSettings.CLExeFilename,
+						driver.LocalCommandLine,
+						stdOut,
+						stdErr,
+						Environment.CurrentDirectory);
 
+					if (errCode != 0)
+						throw new ApplicationException(string.Format("{0} error: {1}", CompilerSettings.CLExeFilename, stdErr));
+				}
 
 				var output = compiler.LocalCompile(new LocalCompileInput
 					{
@@ -106,6 +109,17 @@ namespace DistCL.Client
 				}
 
 				return output.Status.ExitCode;
+			}
+			catch (FaultException<CompilerNotFoundFaultContract> ex)
+			{
+				Logger.WarnFormat("DistCL service can't find specified compiler ({0})", ex.Detail.CompilerVersion);
+
+				return ProcessRunner.Run(
+					CompilerSettings.CLExeFilename,
+					string.Join(" ", arguments.Select(s => s.Contains(" ") ? s.QuoteString() : s).ToArray()),
+					Console.Out,
+					Console.Error,
+					Environment.CurrentDirectory);
 			}
 			catch (Exception ex)
 			{

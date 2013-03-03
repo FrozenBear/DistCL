@@ -75,6 +75,9 @@
     <None Include="Service References\CompileService\distcl.xsd">
       <SubType>Designer</SubType>
     </None>
+    <None Include="Service References\CompileService\DistCL1.xsd">
+      <SubType>Designer</SubType>
+    </None>
     <None Include="Service References\CompileService\Message.xsd">
       <SubType>Designer</SubType>
     </None>

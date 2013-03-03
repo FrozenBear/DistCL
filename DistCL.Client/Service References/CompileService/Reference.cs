@@ -15,6 +15,51 @@ namespace DistCL.Client.CompileService {
     
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Runtime.Serialization", "4.0.0.0")]
+    [System.Runtime.Serialization.DataContractAttribute(Name="CompilerNotFoundFaultContract", Namespace="http://schemas.datacontract.org/2004/07/DistCL")]
+    [System.SerializableAttribute()]
+    public partial class CompilerNotFoundFaultContract : object, System.Runtime.Serialization.IExtensibleDataObject, System.ComponentModel.INotifyPropertyChanged {
+        
+        [System.NonSerializedAttribute()]
+        private System.Runtime.Serialization.ExtensionDataObject extensionDataField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private string CompilerVersionField;
+        
+        [global::System.ComponentModel.BrowsableAttribute(false)]
+        public System.Runtime.Serialization.ExtensionDataObject ExtensionData {
+            get {
+                return this.extensionDataField;
+            }
+            set {
+                this.extensionDataField = value;
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public string CompilerVersion {
+            get {
+                return this.CompilerVersionField;
+            }
+            set {
+                if ((object.ReferenceEquals(this.CompilerVersionField, value) != true)) {
+                    this.CompilerVersionField = value;
+                    this.RaisePropertyChanged("CompilerVersion");
+                }
+            }
+        }
+        
+        public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
+        
+        protected void RaisePropertyChanged(string propertyName) {
+            System.ComponentModel.PropertyChangedEventHandler propertyChanged = this.PropertyChanged;
+            if ((propertyChanged != null)) {
+                propertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
+            }
+        }
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Runtime.Serialization", "4.0.0.0")]
     [System.Runtime.Serialization.DataContractAttribute(Name="CompileStatus", Namespace="urn:distcl:compiler:messages")]
     [System.SerializableAttribute()]
     public partial class CompileStatus : object, System.Runtime.Serialization.IExtensibleDataObject, System.ComponentModel.INotifyPropertyChanged {
@@ -236,13 +281,15 @@ namespace DistCL.Client.CompileService {
     public interface ILocalCompiler {
         
         [System.ServiceModel.OperationContractAttribute(Action="urn:distcl/ILocalCompiler/GetPreprocessToken", ReplyAction="urn:distcl/ILocalCompiler/GetPreprocessTokenResponse")]
-        System.Guid GetPreprocessToken(string name);
+        [System.ServiceModel.FaultContractAttribute(typeof(DistCL.Client.CompileService.CompilerNotFoundFaultContract), Action="urn:distcl/ILocalCompiler/GetPreprocessTokenCompilerNotFoundFaultContractFault", Name="CompilerNotFoundFaultContract", Namespace="http://schemas.datacontract.org/2004/07/DistCL")]
+        System.Guid GetPreprocessToken(string name, string compilerVersion);
         
         [System.ServiceModel.OperationContractAttribute(Action="urn:distcl/ILocalCompiler/GetPreprocessToken", ReplyAction="urn:distcl/ILocalCompiler/GetPreprocessTokenResponse")]
-        System.Threading.Tasks.Task<System.Guid> GetPreprocessTokenAsync(string name);
+        System.Threading.Tasks.Task<System.Guid> GetPreprocessTokenAsync(string name, string compilerVersion);
         
         // CODEGEN: Generating message contract since the wrapper namespace (urn:distcl:compiler:local:messages) of message LocalCompileInput does not match the default value (urn:distcl)
         [System.ServiceModel.OperationContractAttribute(Action="urn:distcl/ILocalCompiler/LocalCompile", ReplyAction="urn:distcl/ILocalCompiler/LocalCompileResponse")]
+        [System.ServiceModel.FaultContractAttribute(typeof(DistCL.Client.CompileService.CompilerNotFoundFaultContract), Action="urn:distcl/ILocalCompiler/LocalCompileCompilerNotFoundFaultContractFault", Name="CompilerNotFoundFaultContract", Namespace="http://schemas.datacontract.org/2004/07/DistCL")]
         DistCL.Client.CompileService.LocalCompileOutput LocalCompile(DistCL.Client.CompileService.LocalCompileInput request);
         
         [System.ServiceModel.OperationContractAttribute(Action="urn:distcl/ILocalCompiler/LocalCompile", ReplyAction="urn:distcl/ILocalCompiler/LocalCompileResponse")]
@@ -330,12 +377,12 @@ namespace DistCL.Client.CompileService {
                 base(binding, remoteAddress) {
         }
         
-        public System.Guid GetPreprocessToken(string name) {
-            return base.Channel.GetPreprocessToken(name);
+        public System.Guid GetPreprocessToken(string name, string compilerVersion) {
+            return base.Channel.GetPreprocessToken(name, compilerVersion);
         }
         
-        public System.Threading.Tasks.Task<System.Guid> GetPreprocessTokenAsync(string name) {
-            return base.Channel.GetPreprocessTokenAsync(name);
+        public System.Threading.Tasks.Task<System.Guid> GetPreprocessTokenAsync(string name, string compilerVersion) {
+            return base.Channel.GetPreprocessTokenAsync(name, compilerVersion);
         }
         
         [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
@@ -383,6 +430,7 @@ namespace DistCL.Client.CompileService {
         
         // CODEGEN: Generating message contract since the wrapper namespace (urn:distcl:compiler:messages) of message CompileInput does not match the default value (urn:distcl)
         [System.ServiceModel.OperationContractAttribute(Action="urn:distcl/ICompiler/Compile", ReplyAction="urn:distcl/ICompiler/CompileResponse")]
+        [System.ServiceModel.FaultContractAttribute(typeof(DistCL.Client.CompileService.CompilerNotFoundFaultContract), Action="urn:distcl/ICompiler/CompileCompilerNotFoundFaultContractFault", Name="CompilerNotFoundFaultContract", Namespace="http://schemas.datacontract.org/2004/07/DistCL")]
         DistCL.Client.CompileService.CompileOutput Compile(DistCL.Client.CompileService.CompileInput request);
         
         [System.ServiceModel.OperationContractAttribute(Action="urn:distcl/ICompiler/Compile", ReplyAction="urn:distcl/ICompiler/CompileResponse")]
@@ -701,6 +749,7 @@ namespace DistCL.Client.CompileService {
         
         // CODEGEN: Generating message contract since the wrapper namespace (urn:distcl:compiler:messages) of message CompileInput does not match the default value (urn:distcl)
         [System.ServiceModel.OperationContractAttribute(Action="urn:distcl/ICompiler/Compile", ReplyAction="urn:distcl/ICompiler/CompileResponse")]
+        [System.ServiceModel.FaultContractAttribute(typeof(DistCL.Client.CompileService.CompilerNotFoundFaultContract), Action="urn:distcl/ICompiler/CompileCompilerNotFoundFaultContractFault", Name="CompilerNotFoundFaultContract", Namespace="http://schemas.datacontract.org/2004/07/DistCL")]
         DistCL.Client.CompileService.CompileOutput Compile(DistCL.Client.CompileService.CompileInput request);
         
         [System.ServiceModel.OperationContractAttribute(Action="urn:distcl/ICompiler/Compile", ReplyAction="urn:distcl/ICompiler/CompileResponse")]

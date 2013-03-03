@@ -189,6 +189,9 @@
       <wsdl:output>
         <soap12:body use="literal" />
       </wsdl:output>
+      <wsdl:fault name="CompilerNotFoundFaultContractFault">
+        <soap12:fault use="literal" name="CompilerNotFoundFaultContractFault" namespace="" />
+      </wsdl:fault>
     </wsdl:operation>
     <wsdl:operation name="LocalCompile">
       <soap12:operation soapAction="urn:distcl/ILocalCompiler/LocalCompile" style="document" />
@@ -199,6 +202,9 @@
         <soap12:header message="i0:LocalCompileOutput_Headers" part="Status" use="literal" />
         <soap12:body use="literal" />
       </wsdl:output>
+      <wsdl:fault name="CompilerNotFoundFaultContractFault">
+        <soap12:fault use="literal" name="CompilerNotFoundFaultContractFault" namespace="" />
+      </wsdl:fault>
     </wsdl:operation>
   </wsdl:binding>
   <wsdl:binding name="managerEndpoint" type="i0:ICompileManager">
@@ -227,6 +233,9 @@
         <soap12:header message="i0:CompileOutput_Headers" part="Status" use="literal" />
         <soap12:body use="literal" />
       </wsdl:output>
+      <wsdl:fault name="CompilerNotFoundFaultContractFault">
+        <soap12:fault use="literal" name="CompilerNotFoundFaultContractFault" namespace="" />
+      </wsdl:fault>
     </wsdl:operation>
     <wsdl:operation name="GetDescription">
       <soap12:operation soapAction="urn:distcl/ICompileCoordinator/GetDescription" style="document" />
@@ -328,6 +337,9 @@
         <soap12:header message="i0:CompileOutput_Headers" part="Status" use="literal" />
         <soap12:body use="literal" />
       </wsdl:output>
+      <wsdl:fault name="CompilerNotFoundFaultContractFault">
+        <soap12:fault use="literal" name="CompilerNotFoundFaultContractFault" namespace="" />
+      </wsdl:fault>
     </wsdl:operation>
   </wsdl:binding>
 </wsdl:definitions>

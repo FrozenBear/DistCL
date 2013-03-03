@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Runtime.Serialization;
 using System.ServiceModel;
 using DistCL.Utils;
 
@@ -10,9 +11,11 @@ namespace DistCL
 	public interface ILocalCompiler
 	{
 		[OperationContract]
-		Guid GetPreprocessToken(string name);
+		[FaultContract(typeof(CompilerNotFoundFaultContract), Namespace = GeneralSettings.LocalCompilerMessageNamespace)]
+		Guid GetPreprocessToken(string name, string compilerVersion);
 
 		[OperationContract]
+		[FaultContract(typeof(CompilerNotFoundFaultContract), Namespace = GeneralSettings.LocalCompilerMessageNamespace)]
 		LocalCompileOutput LocalCompile(LocalCompileInput input);
 	}
 
@@ -50,5 +53,12 @@ namespace DistCL
 			: base(success, exitCode, streams, artifacts)
 		{
 		}
+	}
+
+	[DataContract]
+	public class CompilerNotFoundFaultContract
+	{
+		[DataMember]
+		public string CompilerVersion { get; set; }
 	}
 }

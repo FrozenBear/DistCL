@@ -16,6 +16,7 @@ namespace DistCL
 		bool IsReady();
 
 		[OperationContract]
+		[FaultContract(typeof(CompilerNotFoundFaultContract), Namespace = GeneralSettings.CompilerMessageNamespace)]
 		CompileOutput Compile(CompileInput input);
 	}
 
