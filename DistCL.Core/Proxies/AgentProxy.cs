@@ -33,7 +33,7 @@ namespace DistCL.Proxies
 		{
 			bool? isReady = null;
 
-			LazyInitializer.EnsureInitialized(ref _compiler, delegate
+			var result = LazyInitializer.EnsureInitialized(ref _compiler, delegate
 				{
 					bool isReadyLocal;
 					var compiler = GetCompilerInternal(out isReadyLocal);
@@ -43,20 +43,19 @@ namespace DistCL.Proxies
 
 			if (! isReady.HasValue)
 			{
-				isReady = _compiler.IsReady();
+				isReady = result.IsReady();
 			}
 
-			return isReady.Value ? _compiler : null;
+			return isReady.Value ? result : null;
 		}
 
 		public ICompileCoordinatorProxy GetCoordinator()
 		{
-			LazyInitializer.EnsureInitialized(ref _compileCoordinatorProxy,
+			return LazyInitializer.EnsureInitialized(ref _compileCoordinatorProxy,
 											() =>
 											Description.AgentPoolUrls != null && Description.AgentPoolUrls.Length > 0
 												? (ICompileCoordinatorProxy)GetAgentPool()
 												: new CompileCoordinatorProxy(this));
-			return _compileCoordinatorProxy;
 		}
 
 		public IAgentPoolProxy GetAgentPool()
@@ -282,14 +281,12 @@ namespace DistCL.Proxies
 
 			public IAgent GetDescription()
 			{
-				LazyInitializer.EnsureInitialized(ref _remoteDescription, () =>
+				return LazyInitializer.EnsureInitialized(ref _remoteDescription, () =>
 				{
 					IAgent agent = null;
 					ConnectToAgent(client => agent = client.GetDescription());
 					return agent;
 				});
-
-				return _remoteDescription;
 			}
 			public Task<IAgent> GetDescriptionAsync()
 			{
