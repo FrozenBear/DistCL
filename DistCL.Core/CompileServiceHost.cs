@@ -7,27 +7,106 @@ using System.Net;
 using System.ServiceModel;
 using System.ServiceModel.Channels;
 using System.ServiceModel.Configuration;
+using System.Threading;
 using DistCL.Utils;
 
 namespace DistCL
 {
-	internal interface IBindingsProvider
+	internal interface IBindingsCollection
 	{
 		Binding GetBinding(Uri url);
 	}
 
-	public class CompileServiceHost : ServiceHost, IBindingsProvider
+	internal interface ICompilerServicesCollection
+	{
+		ServiceModelSectionGroup ServiceModelSectionGroup { get; }
+		LocalAgentManager LocalAgentManager { get; }
+		AgentPool AgentPool { get; }
+		NetworkBuilder NetworkBuilder { get; }
+		Compiler Compiler { get; }
+		IBindingsCollection Bindings { get; }
+	}
+
+	internal class CompilerServicesCollection : ICompilerServicesCollection
+	{
+		private readonly ServiceModelSectionGroup _serviceModelSectionGroup;
+		private Compiler _compiler;
+		private IBindingsCollection _bindings;
+		private LocalAgentManager _localAgentManager;
+		private AgentPool _agentPool;
+		private NetworkBuilder _networkBuilder;
+
+		public CompilerServicesCollection(ServiceModelSectionGroup serviceModelSectionGroup)
+		{
+			_serviceModelSectionGroup = serviceModelSectionGroup;
+		}
+
+		public ServiceModelSectionGroup ServiceModelSectionGroup
+		{
+			get { return _serviceModelSectionGroup; }
+		}
+
+		public AgentPool AgentPool
+		{
+			get { return LazyInitializer.EnsureInitialized(ref _agentPool, () => new AgentPool(this)); }
+		}
+
+		public NetworkBuilder NetworkBuilder
+		{
+			get { return LazyInitializer.EnsureInitialized(ref _networkBuilder, () => new NetworkBuilder(this)); }
+		}
+
+		public Compiler Compiler
+		{
+			get { return _compiler; }
+			set
+			{
+				if (Interlocked.CompareExchange(ref _compiler, value, null) != null)
+				{
+					throw new InvalidOperationException("Compiler already initialized");
+				}
+			}
+		}
+
+		public IBindingsCollection Bindings
+		{
+			get { return _bindings; }
+			set
+			{
+				if (Interlocked.CompareExchange(ref _bindings, value, null) != null)
+				{
+					throw new InvalidOperationException("Bindings collection already initialized");
+				}
+			}
+		}
+
+		public LocalAgentManager LocalAgentManager
+		{
+			get { return _localAgentManager; }
+			set
+			{
+				if (Interlocked.CompareExchange(ref _localAgentManager, value, null) != null)
+				{
+					throw new InvalidOperationException("Local agent manager already initialized");
+				}
+			}
+		}
+	}
+
+	public class CompileServiceHost : ServiceHost, IBindingsCollection
 	{
 		private readonly Logger _logger = new Logger("SERVICE");
 
 		private static ServiceModelSectionGroup _serviceModelSectionGroup;
 		private static Dictionary<string, Binding> _bindings;
 		private string _physicalPath;
-		private readonly NetworkBuilder _networkBuilder;
+		private readonly CompilerServicesCollection _compilerServices;
 
-		public CompileServiceHost(params Uri[] baseAddresses) : base(new Compiler(), baseAddresses)
+		public CompileServiceHost(params Uri[] baseAddresses)
+			: base(new Compiler(new CompilerServicesCollection(ServiceModelSectionGroup)), baseAddresses)
 		{
-			CompilerInstance.BindingsProvider = this;
+			_compilerServices = ((CompilerServicesCollection) CompilerInstance.CompilerServices);
+			_compilerServices.Bindings = this;
 
 			var hostName = Dns.GetHostName();
 			var ipHostEntry = Dns.GetHostEntry(hostName);
@@ -35,18 +114,14 @@ namespace DistCL
 			var agentPoolUrls = new List<Uri>();
 			var compilerUrls = new List<Uri>();
 
-			var agentPoolType = typeof(IAgentPool);
-			var compilerType = typeof(ICompiler);
-			var compileManagerType = typeof(ICompileManager);
+			var agentPoolType = typeof (IAgentPool);
+			var compilerType = typeof (ICompiler);
+			var compileManagerType = typeof (ICompileManager);
 
-			foreach (var endpoint in Description.Endpoints)
+			if (Description.Endpoints.Any(endpoint => compileManagerType.IsAssignableFrom(endpoint.Contract.ContractType)))
 			{
-				if (compileManagerType.IsAssignableFrom(endpoint.Contract.ContractType))
-				{
-					agentPoolType = compileManagerType;
-					compilerType = compileManagerType;
-					break;
-				}
+				agentPoolType = compileManagerType;
+				compilerType = compileManagerType;
 			}
 
 			foreach (var endpoint in Description.Endpoints)
@@ -96,11 +171,9 @@ namespace DistCL
 				}
 			}
 
-			_networkBuilder = new NetworkBuilder(
-				ServiceModelSectionGroup,
-				this,
-				new LocalAgentManager(CompilerInstance.AgentPool, CompilerInstance, agentPoolUrls.ToArray(), compilerUrls.ToArray()),
-				CompilerInstance.AgentPool);
+			_compilerServices.LocalAgentManager = new LocalAgentManager(
+				_compilerServices, 
+				agentPoolUrls.ToArray(), compilerUrls.ToArray());
 		}
 
 		public Logger Logger
@@ -200,11 +273,6 @@ namespace DistCL
 			get { return (Compiler) SingletonInstance; }
 		}
 
-		private NetworkBuilder NetworkBuilder
-		{
-			get { return _networkBuilder; }
-		}
-
 		protected override void ApplyConfiguration()
 		{
 			var servicesSection = ConfigurationManager.GetSection("system.serviceModel/services") as ServicesSection;
@@ -241,14 +309,14 @@ namespace DistCL
 		{
 			base.OnOpened();
 
-			NetworkBuilder.Open();
+			_compilerServices.NetworkBuilder.Open();
 		}
 
 		protected override void OnClosing()
 		{
 			base.OnClosing();
 
-			NetworkBuilder.Close();
+			_compilerServices.NetworkBuilder.Close();
 		}
 
 		public Binding GetBinding(Uri url)

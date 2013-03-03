@@ -23,14 +23,17 @@ namespace DistCL
 		private readonly Semaphore _semaphore;
 		private readonly int _maxWorkersCount;
 
-		private readonly AgentPool _agentPool = new AgentPool();
+		private readonly ICompilerServicesCollection _compilerServices;
 		private readonly Logger _compilerLogger = new Logger("COMPILER");
 		private readonly Logger _localLogger = new Logger("LOCAL");
 		readonly ConcurrentDictionary<Guid, string> _preprocessTokens = new ConcurrentDictionary<Guid, string>();
 		private readonly Dictionary<string, string> _compilerVersions;
 
-		public Compiler()
+		internal Compiler(CompilerServicesCollection compilerServices)
 		{
+			_compilerServices = compilerServices;
+			compilerServices.Compiler = this;
+
 			_maxWorkersCount = Math.Max(1, Environment.ProcessorCount-1);
 			var semaphoreMaximumCount = _maxWorkersCount*CompileWorkerCount;
 			_semaphore = new Semaphore(semaphoreMaximumCount, semaphoreMaximumCount);
@@ -75,6 +78,11 @@ namespace DistCL
 			_compilerVersions = compilerVersions;
 		}
 
+		internal ICompilerServicesCollection CompilerServices
+		{
+			get { return _compilerServices; }
+		}
+
 		internal int MaxWorkersCount
 		{
 			get { return _maxWorkersCount; }
@@ -83,13 +91,6 @@ namespace DistCL
 		internal Dictionary<string, string> CompilerVersions
 		{
 			get { return _compilerVersions; }
-		}
-
-		internal IBindingsProvider BindingsProvider { get; set; }
-
-		internal AgentPool AgentPool
-		{
-			get { return _agentPool; }
 		}
 
 		private Logger CompilerLogger
@@ -172,7 +173,7 @@ namespace DistCL
 					SrcName = input.SrcName
 				};
 
-				using (var remoteOutput = AgentPool.GetRandomCompiler(input.CompilerVersion).Compile(remoteInput))
+				using (var remoteOutput = CompilerServices.AgentPool.GetRandomCompiler(input.CompilerVersion).Compile(remoteInput))
 				{
 					var remoteStreams = new Dictionary<CompileArtifactType, Stream>();
 					var cookies = new List<CompileArtifactCookie>();
@@ -393,13 +394,12 @@ namespace DistCL
 
 		Agent ICompileCoordinator.GetDescription()
 		{
-			//  TODO get off new object creation
-			return new Agent(AgentPool.Manager.AgentProxy.Description);
+			return CompilerServices.LocalAgentManager.Description;
 		}
 
 		void ICompileCoordinator.RegisterAgent(Agent request)
 		{
-			_agentPool.RegisterAgent(new RemoteAgentProxy(BindingsProvider, request));
+			CompilerServices.AgentPool.RegisterAgent(new RemoteAgentProxy(CompilerServices.Bindings, request));
 		}
 
 		#endregion
@@ -408,7 +408,7 @@ namespace DistCL
 
 		Agent[] IAgentPool.GetAgents()
 		{
-			return _agentPool.GetAgents();
+			return CompilerServices.AgentPool.GetAgents();
 		}
 
 		#endregion

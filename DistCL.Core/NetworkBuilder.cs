@@ -16,24 +16,14 @@ namespace DistCL
 	{
 		private readonly Logger _logger = new Logger("BUILDER");
 
-		private readonly ServiceModelSectionGroup _serviceModelSectionGroup;
-		private readonly IBindingsProvider _bindingsProvider;
-		private readonly LocalAgentManager _localAgentManager;
-		private readonly AgentPool _agentPool1;
+		private readonly ICompilerServicesCollection _compilerServices;
 
 		private readonly object _syncRoot = new object();
 		private bool _closed;
 
-		public NetworkBuilder(
-			ServiceModelSectionGroup serviceModelSectionGroup,
-			IBindingsProvider bindingsProvider,
-			LocalAgentManager localAgentManager,
-			AgentPool agentPool1)
+		public NetworkBuilder(ICompilerServicesCollection compilerServices)
 		{
-			_localAgentManager = localAgentManager;
-			_agentPool1 = agentPool1;
-			_serviceModelSectionGroup = serviceModelSectionGroup;
-			_bindingsProvider = bindingsProvider;
+			_compilerServices = compilerServices;
 		}
 
 		public Logger Logger
@@ -41,24 +31,9 @@ namespace DistCL
 			get { return _logger; }
 		}
 
-		public AgentPool AgentPool1
+		public ICompilerServicesCollection CompilerServices
 		{
-			get { return _agentPool1; }
-		}
-
-		private ServiceModelSectionGroup ServiceModelSectionGroup
-		{
-			get { return _serviceModelSectionGroup; }
-		}
-
-		private LocalAgentManager LocalAgentManager
-		{
-			get { return _localAgentManager; }
-		}
-
-		public IBindingsProvider BindingsProvider
-		{
-			get { return _bindingsProvider; }
+			get { return _compilerServices; }
 		}
 
 		public void Open()
@@ -84,14 +59,20 @@ namespace DistCL
 			var nextBuild = DateTime.MinValue;  
 			var nextInitialAgentsCheck = DateTime.MinValue;  
 
-			var configPools = GetAgentPools(ServiceModelSectionGroup);
+			var configPools = GetAgentPools(CompilerServices.ServiceModelSectionGroup);
 
 			var pools = new ConcurrentDictionary<Guid, ICompileCoordinatorProxy>();
-			pools.TryAdd(LocalAgentManager.AgentProxy.Description.Guid, LocalAgentManager.AgentProxy.GetCoordinator());
+			pools.TryAdd(
+				CompilerServices.LocalAgentManager.AgentProxy.Description.Guid,
+				CompilerServices.LocalAgentManager.AgentProxy.GetCoordinator());
 
-			Logger.LogAgent("Init", LocalAgentManager.RegistrationMessage.Name);
+			Logger.LogAgent("Init", CompilerServices.LocalAgentManager.RegistrationMessage.Name);
 
-			AgentPool1.AgentRegistered += (sender, args) => ConvertAgents2PoolsProcessAgent(pools, LocalAgentManager, args.Agent.Description, () => args.Agent);
+			CompilerServices.AgentPool.AgentRegistered +=
+				(sender, args) =>
+				ConvertAgents2PoolsProcessAgent(
+					pools,
+					CompilerServices.LocalAgentManager, args.Agent.Description, () => args.Agent);
 
 			lock (_syncRoot)
 			{
@@ -102,7 +83,7 @@ namespace DistCL
 					var iterationStarted = DateTime.Now;
 
 					var ts = new CancellationTokenSource();
-					var localAgent = LocalAgentManager.AgentProxy;
+					var localAgent = CompilerServices.LocalAgentManager.AgentProxy;
 
 					if (DateTime.Now > nextInitialAgentsCheck)
 					{
@@ -119,7 +100,7 @@ namespace DistCL
 										pool.Guid = task.Result.Guid;
 										if (task.Result.AgentPoolUrls != null && task.Result.AgentPoolUrls.Length > 0)
 										{
-											var coordinator = new RemoteAgentProxy(BindingsProvider, task.Result).GetCoordinator();
+											var coordinator = new RemoteAgentProxy(CompilerServices.Bindings, task.Result).GetCoordinator();
 											if (coordinator != null)
 											{
 												AddCoordinator(pools, coordinator);
@@ -159,14 +140,14 @@ namespace DistCL
 								}); // without CancellationToken - final result check shouldn't be cancelled
 					}
 
-					AgentPool1.Clean(DateTime.Now.Subtract(CompilerSettings.Default.AgentsSilenceLimit));
+					CompilerServices.AgentPool.Clean(DateTime.Now.Subtract(CompilerSettings.Default.AgentsSilenceLimit));
 
-					var agents = LocalAgentManager.AgentProxy.GetAgentPool().GetAgents();
+					var agents = CompilerServices.LocalAgentManager.AgentProxy.GetAgentPool().GetAgents();
 					if (!ReferenceEquals(agents, _agentsSnapshot) || nextBuild < DateTime.Now)
 					{
 						ConvertAgents2PoolsRequestAgents(
-							pools.Values.OfType<IAgentPoolProxy>(), 
-							LocalAgentManager, 
+							pools.Values.OfType<IAgentPoolProxy>(),
+							CompilerServices.LocalAgentManager, 
 							pools,
 							ts,
 							true);
@@ -259,12 +240,17 @@ namespace DistCL
 //					continue;
 //				}
 
-				if (!cookie.TryKnownAgents && AgentPool1.HasAgent(agent.Guid))
+				if (!cookie.TryKnownAgents && CompilerServices.AgentPool.HasAgent(agent.Guid))
 				{
 					continue;
 				}
 
-				var task = ConvertAgents2PoolsProcessAgent(cookie.Pools, cookie.LocalAgent, agent, () => new RemoteAgentProxy(BindingsProvider, agent));
+				IAgent localAgent = agent;
+				var task = ConvertAgents2PoolsProcessAgent(
+					cookie.Pools,
+					cookie.LocalAgent,
+					agent,
+					() => new RemoteAgentProxy(CompilerServices.Bindings, localAgent));
 				if (task != null)
 				{
 					tasks.Add(task);

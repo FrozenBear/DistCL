@@ -9,31 +9,27 @@ namespace DistCL
 	internal class LocalAgentManager
 	{
 		private readonly Logger _logger = new Logger("AGENT");
-		private readonly AgentPool _agentPool;
-		private readonly ICompiler _compiler;
+		private readonly ICompilerServicesCollection _compilerServices;
 		private readonly Agent _stub;
 		private RemoteCompilerService.Agent _registrationMessage;
+		private Agent _description;
 		private IAgentProxy _agentProxy;
 
 		private readonly PerformanceCounter _cpuCounter;
 		DateTime _nextSample = DateTime.MinValue;
 		private int _cpuUsage;
 
-		public LocalAgentManager(AgentPool agentPool, Compiler compiler, Uri[] agentPoolUrls, Uri[] compilerUrls)
+		public LocalAgentManager(ICompilerServicesCollection compilerServices, Uri[] agentPoolUrls, Uri[] compilerUrls)
 		{
-			// TODO rework
-			agentPool.Manager = this;
-
-			_agentPool = agentPool;
-			_compiler = compiler;
+			_compilerServices = compilerServices;
 			_stub = new Agent(
 				Guid.NewGuid(),
 				string.Format("{0}@{1}", CompilerSettings.Default.InstanceName, Environment.MachineName),
-				compiler.MaxWorkersCount,
+				_compilerServices.Compiler.MaxWorkersCount,
 				-1,
 				agentPoolUrls,
 				compilerUrls,
-				compiler.CompilerVersions.Keys.ToArray());
+				_compilerServices.Compiler.CompilerVersions.Keys.ToArray());
 
 			_cpuCounter = new PerformanceCounter
 				{
@@ -54,9 +50,22 @@ namespace DistCL
 				{
 					_registrationMessage = new RemoteCompilerService.Agent(
 						_stub.Guid, _stub.Name, _stub.Cores, CPUUsage, _stub.AgentPoolUrls, _stub.CompilerUrls, _stub.CompilerVersions);
+					_description = null;
 					_logger.DebugFormat("Registration message updated (cpu = {0})", _registrationMessage.CPUUsage);
 				}
 				return _registrationMessage;
+			}
+		}
+
+		public Agent Description
+		{
+			get
+			{
+				if (_description == null)
+				{
+					_description = new Agent(RegistrationMessage);
+				}
+				return _description;
 			}
 		}
 
@@ -66,7 +75,7 @@ namespace DistCL
 			{
 				if (_agentProxy == null || _agentProxy.Description.CPUUsage != CPUUsage)
 				{
-					_agentProxy = new LocalAgentProxy(RegistrationMessage, _compiler, _agentPool);
+					_agentProxy = new LocalAgentProxy(RegistrationMessage, _compilerServices.Compiler, _compilerServices.AgentPool);
 				}
 				return _agentProxy;
 			}

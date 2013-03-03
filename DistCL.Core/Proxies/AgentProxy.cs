@@ -11,16 +11,16 @@ namespace DistCL.Proxies
 {
 	internal class RemoteAgentProxy : IAgentProxy
 	{
-		private readonly IBindingsProvider _bindingsProvider;
+		private readonly IBindingsCollection _bindingsCollection;
 		private readonly IAgent _description;
 
 		private CompilerProxy _compiler;
 		private ICompileCoordinatorProxy _compileCoordinatorProxy;
 		private AgentPoolProxy _agentPool;
 
-		public RemoteAgentProxy(IBindingsProvider bindingsProvider, IAgent description)
+		public RemoteAgentProxy(IBindingsCollection bindingsCollection, IAgent description)
 		{
-			_bindingsProvider = bindingsProvider;
+			_bindingsCollection = bindingsCollection;
 			_description = description;
 		}
 
@@ -71,7 +71,7 @@ namespace DistCL.Proxies
 				try
 				{
 					RemoteCompilerService.ICompiler compiler = new CompilerClient(
-						_bindingsProvider.GetBinding(url),
+						_bindingsCollection.GetBinding(url),
 						new EndpointAddress(url));
 					{
 						isReady = compiler.IsReady();
@@ -175,7 +175,7 @@ namespace DistCL.Proxies
 				{
 					try
 					{
-						var client = creation(_bindingsProvider.GetBinding(url), new EndpointAddress(url));
+						var client = creation(_bindingsCollection.GetBinding(url), new EndpointAddress(url));
 						var result = func(client).Result;
 						setClient(client);
 						return result;

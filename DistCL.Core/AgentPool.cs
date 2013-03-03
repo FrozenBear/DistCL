@@ -32,12 +32,22 @@ namespace DistCL
 		private Dictionary<string, List<MeasuredAgent>> _weightsSnapshot;
 		private Agent[] _agentsSnapshot;
 
+		private readonly ICompilerServicesCollection _compilerServices;
+
+		public AgentPool(ICompilerServicesCollection compilerServices)
+		{
+			_compilerServices = compilerServices;
+		}
+
+		public ICompilerServicesCollection CompilerServices
+		{
+			get { return _compilerServices; }
+		}
+
 		public Logger Logger
 		{
 			get { return _logger; }
 		}
-
-		// TODO total optimization
 
 		public event EventHandler<AgentAddEventArgs> AgentRegistered;
 
@@ -264,6 +274,11 @@ namespace DistCL
 
 		#region IAgentPoolProxy
 
+		public IAgentProxy Proxy
+		{
+			get { return CompilerServices.LocalAgentManager.AgentProxy; }
+		}
+
 		string ICompileCoordinatorProxy.Name { get { return "<local agent pool>"; } }
 
 		IEnumerable<IAgent> IAgentPoolProxy.GetAgents()
@@ -292,19 +307,12 @@ namespace DistCL
 
 		public IAgent GetDescription()
 		{
-			return Manager.RegistrationMessage;
+			return CompilerServices.LocalAgentManager.RegistrationMessage;
 		}
 
 		public Task<IAgent> GetDescriptionAsync()
 		{
 			return Task.FromResult(GetDescription());
-		}
-
-		// TODO rework
-		internal LocalAgentManager Manager { get; set; }
-		public IAgentProxy Proxy
-		{
-			get { return Manager.AgentProxy; }
 		}
 
 		#endregion
