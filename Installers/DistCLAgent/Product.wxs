@@ -32,7 +32,8 @@
       <![CDATA[Installed OR NETFRAMEWORK45]]>
     </Condition>
 
-    <Property Id="DISTCL_AGENT_BINDING_PORT" Value="48480" />
+    <Property Id="DISTCL_AGENT_LOCAL_PORT" Value="48480" />
+    <Property Id="DISTCL_AGENT_REMOTE_PORT" Value="48481" />
 
     <Directory Id="TARGETDIR" Name="SourceDir">
       <Directory Id="ProgramFilesFolder" Name="PFiles">
@@ -48,13 +49,8 @@
             <Component Id="DistCL.Service.exe.config" Guid="1C39F938-AEE4-4C9E-BF07-7496679A58B3">
               <File Id="DistCL.Service.exe.config" KeyPath="yes" Source="$(var.OUT_DIR)\DistCL.Service.exe.config" />
               <util:XmlFile Id="SetLogsPath" Action="setValue" ElementPath="configuration/log4net/appender[\[]@name='RollingLogFileAppender'[\]]/file" File="[#DistCL.Service.exe.config]" Value="${ALLUSERSPROFILE}/FrozenBear/!(var.ProductName)/Logs/DistCL.log" Name="value" SelectionLanguage="XPath" />
-            </Component>
-
-            <Component Id="DistCL.config" Guid="5CD70B2F-4035-4FE1-9D41-8793694FE0FF">
-              <File Id="DistCL.config" KeyPath="yes" Source="$(var.OUT_DIR)\DistCL.config" />
-              <util:XmlFile Id="DeleteEndpoints" Action="deleteValue" ElementPath="configuration/system.serviceModel/services/service[\[]@behaviorConfiguration='DefaultCompileServiceBehavior'[\]] and service[\[]@name='DistCL.Compiler'[\]]/host/baseAddresses/*" File="[#DistCL.config]" SelectionLanguage="XPath" Sequence="100" />
-              <util:XmlFile Id="CreateEndpoint" Action="createElement" ElementPath="configuration/system.serviceModel/services/service[\[]@behaviorConfiguration='DefaultCompileServiceBehavior'[\]] and service[\[]@name='DistCL.Compiler'[\]]/host/baseAddresses" File="[#DistCL.config]" Name="add" SelectionLanguage="XPath" Sequence="101" />
-              <util:XmlFile Id="SetEndpoint" Action="setValue" ElementPath="configuration/system.serviceModel/services/service[\[]@behaviorConfiguration='DefaultCompileServiceBehavior'[\]] and service[\[]@name='DistCL.Compiler'[\]]/host/baseAddresses/add" File="[#DistCL.config]" Value="[DISTCL_AGENT_BINDING_PORT]" Name="baseAddress" SelectionLanguage="XPath" Sequence="102" />
+              <util:XmlFile Id="SetLocalEndpoint" Action="setValue" ElementPath="configuration/system.serviceModel/services/service[\[]@behaviorConfiguration='DefaultCompileServiceBehavior'[\]] and service[\[]@name='DistCL.Compiler'[\]]/endpoint[\[]@name='localEndpoint'[\]]" File="[#DistCL.Service.exe.config]" Value="net.tcp://localhost:[DISTCL_AGENT_LOCAL_PORT]/Local" Name="baseAddress" SelectionLanguage="XPath" Sequence="102" />
+              <util:XmlFile Id="SetRemoteEndpoint" Action="setValue" ElementPath="configuration/system.serviceModel/services/service[\[]@behaviorConfiguration='DefaultCompileServiceBehavior'[\]] and service[\[]@name='DistCL.Compiler'[\]]/host/baseAddresses/add" File="[#DistCL.Service.exe.config]" Value="net.tcp://localhost:[DISTCL_AGENT_REMOTE_PORT]/Compile" Name="baseAddress" SelectionLanguage="XPath" Sequence="102" />
             </Component>
 
             <Component Id="DistCL.Core.dll" Guid="30D638B0-97B0-4F7A-B9F3-1047EB59C243">
@@ -65,9 +61,6 @@
             </Component>
             <Component Id="DistCL.Utils.dll" Guid="F18162DD-D525-4099-8DCD-A28BAE40C39B">
               <File Id="DistCL.Utils.dll" KeyPath="yes" Source="$(var.OUT_DIR)\DistCL.Utils.dll" />
-            </Component>
-            <Component Id="HttpNamespaceManagerLib.dll" Guid="72EEDAAE-272E-48BC-A4E3-2C62DCAE6ADF">
-              <File Id="HttpNamespaceManagerLib.dll" KeyPath="yes" Source="$(var.OUT_DIR)\HttpNamespaceManagerLib.dll" />
             </Component>
             <Component Id="log4net.dll" Guid="C34F6E12-CF75-4FE4-A49B-DD8F082D65A4">
               <File Id="log4net.dll" KeyPath="yes" Source="$(var.OUT_DIR)\log4net.dll" />
@@ -81,11 +74,9 @@
     <Feature Id="Complete" Level="1">
       <ComponentRef Id="DistCL.Service.exe.config_backup"/>
       <ComponentRef Id="DistCL.Service.exe.config"/>
-      <ComponentRef Id="DistCL.config"/>
       <ComponentRef Id="DistCL.Core.dll"/>
       <ComponentRef Id="DistCL.Service.exe"/>
       <ComponentRef Id="DistCL.Utils.dll"/>
-      <ComponentRef Id="HttpNamespaceManagerLib.dll" />
       <ComponentRef Id="log4net.dll"/>
     </Feature>
   </Product>

@@ -34,7 +34,6 @@
         SourceFile="$(var.DistCLAgent.TargetPath)"
         Vital="yes">
         <MsiProperty Name="INSTALLLOCATION" Value="[InstallFolder]\Agent" />
-        <MsiProperty Name="XX" Value="YY" />
       </MsiPackage>   
 
     </Chain>
