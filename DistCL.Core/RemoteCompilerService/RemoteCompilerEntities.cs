@@ -39,24 +39,6 @@ namespace DistCL.RemoteCompilerService
 		}
 	}
 
-/*
-	partial class AgentPoolClient //: IAgentPoolProxy
-	{
-		public string Name { get { return Endpoint.ListenUri.ToString(); } }
-
-//		IEnumerable<IAgent> IAgentPoolProxy.GetAgents()
-//		{
-//			return GetAgents();
-//		}
-//
-//		Task<IEnumerable<IAgent>> IAgentPoolProxy.GetAgentsAsync()
-//		{
-//			return GetAgentsAsync().ContinueWith(task => (IEnumerable<IAgent>) task.Result);
-//		}
-
-	}
-*/
-
 	partial class Agent : IAgent
 	{
 		public Agent(){}

@@ -18,7 +18,7 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x86'">
     <DebugSymbols>true</DebugSymbols>
-    <OutputPath>bin\x86\Debug\</OutputPath>
+    <OutputPath>bin\Debug\</OutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <DebugType>full</DebugType>
     <PlatformTarget>x86</PlatformTarget>
@@ -26,7 +26,7 @@
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x86'">
-    <OutputPath>bin\x86\Release\</OutputPath>
+    <OutputPath>bin\Release\</OutputPath>
     <DefineConstants>TRACE</DefineConstants>
     <Optimize>true</Optimize>
     <DebugType>pdbonly</DebugType>
@@ -49,6 +49,7 @@
   <ItemGroup>
     <Compile Include="AgentPool.cs" />
     <Compile Include="Compiler.cs" />
+    <Compile Include="CompilerSettings.cs" />
     <Compile Include="CompilerSettings.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
@@ -76,42 +77,18 @@
     <Compile Include="TempFileStreamWrapper.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="app.config" />
+    <None Include="App.config" />
     <None Include="CompilerSettings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>CompilerSettings.Designer.cs</LastGenOutput>
     </None>
     <None Include="DistCL.config">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <SubType>Designer</SubType>
     </None>
-    <None Include="Service References\RemoteCompilerService\Compile.wsdl" />
-    <None Include="Service References\RemoteCompilerService\Compile.xsd">
+    <None Include="Service References\RemoteCompilerService\Arrays.xsd">
       <SubType>Designer</SubType>
     </None>
-    <None Include="Service References\RemoteCompilerService\Compile1.wsdl" />
-    <None Include="Service References\RemoteCompilerService\Compile1.xsd">
-      <SubType>Designer</SubType>
-    </None>
-    <None Include="Service References\RemoteCompilerService\Compile2.xsd">
-      <SubType>Designer</SubType>
-    </None>
-    <None Include="Service References\RemoteCompilerService\Compile21.xsd">
-      <SubType>Designer</SubType>
-    </None>
-    <None Include="Service References\RemoteCompilerService\Compile5.xsd">
-      <SubType>Designer</SubType>
-    </None>
-    <None Include="Service References\RemoteCompilerService\Compile6.xsd">
-      <SubType>Designer</SubType>
-    </None>
-    <None Include="Service References\RemoteCompilerService\Compile7.xsd">
-      <SubType>Designer</SubType>
-    </None>
-    <None Include="Service References\RemoteCompilerService\Compile8.xsd">
-      <SubType>Designer</SubType>
-    </None>
-    <None Include="Service References\RemoteCompilerService\Compiler.wsdl" />
+    <None Include="Service References\RemoteCompilerService\bindings.wsdl" />
     <None Include="Service References\RemoteCompilerService\DistCL.RemoteCompilerService.Agent.datasource">
       <DependentUpon>Reference.svcmap</DependentUpon>
     </None>
@@ -120,6 +97,28 @@
     </None>
     <None Include="Service References\RemoteCompilerService\DistCL.RemoteCompilerService.CompileStatus.datasource">
       <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\RemoteCompilerService\distcl.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Service References\RemoteCompilerService\Message.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Service References\RemoteCompilerService\messages.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Service References\RemoteCompilerService\messages1.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Service References\RemoteCompilerService\messages2.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Service References\RemoteCompilerService\service.wsdl" />
+    <None Include="Service References\RemoteCompilerService\service.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Service References\RemoteCompilerService\utils.xsd">
+      <SubType>Designer</SubType>
     </None>
   </ItemGroup>
   <ItemGroup>
@@ -135,9 +134,6 @@
     <WCFMetadataStorage Include="Service References\RemoteCompilerService\" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Service References\RemoteCompilerService\Compile.disco" />
-  </ItemGroup>
-  <ItemGroup>
     <None Include="Service References\RemoteCompilerService\configuration91.svcinfo" />
   </ItemGroup>
   <ItemGroup>
@@ -147,6 +143,7 @@
     <None Include="Service References\RemoteCompilerService\DistCL.RemoteCompilerService.LocalCompileOutput.datasource">
       <DependentUpon>Reference.svcmap</DependentUpon>
     </None>
+    <None Include="Service References\RemoteCompilerService\distcl.wsdl" />
     <None Include="Service References\RemoteCompilerService\Reference.svcmap">
       <Generator>WCF Proxy Generator</Generator>
       <LastGenOutput>Reference.cs</LastGenOutput>

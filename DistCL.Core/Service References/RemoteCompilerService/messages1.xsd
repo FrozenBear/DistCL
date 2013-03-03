@@ -1,7 +1,7 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <xs:schema xmlns:tns="urn:distcl:compiler:messages" elementFormDefault="qualified" targetNamespace="urn:distcl:compiler:messages" xmlns:xs="http://www.w3.org/2001/XMLSchema">
-  <xs:import schemaLocation="http://localhost:8733/Compile?xsd=xsd5" namespace="urn:distcl:utils" />
-  <xs:import schemaLocation="http://localhost:8733/Compile?xsd=xsd3" namespace="urn:distcl" />
+  <xs:import namespace="urn:distcl:utils" />
+  <xs:import namespace="urn:distcl" />
   <xs:complexType name="CompileStatus">
     <xs:sequence>
       <xs:element xmlns:q1="urn:distcl:utils" minOccurs="0" name="Cookies" nillable="true" type="q1:ArrayOfCompileArtifactCookie" />

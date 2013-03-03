@@ -96,7 +96,10 @@
     <PreBuildEvent>IF "%25DISTCL_SERVICE_START_ON_BUILD%25"=="true" (IF EXIST $(TargetPath) $(MSBuildBinPath)\InstallUtil.exe /u $(TargetPath) &gt;NUL || cmd /c echo InstallUtil failed, was the last compilation failed?)</PreBuildEvent>
   </PropertyGroup>
   <PropertyGroup>
-    <PostBuildEvent>IF "%25DISTCL_SERVICE_START_ON_BUILD%25"=="true" ($(MSBuildBinPath)\InstallUtil.exe /username=%25DISTCL_SERVICE_USERNAME%25 /password=%25DISTCL_SERVICE_PASSWORD%25 $(TargetPath) &amp;&amp; net start "DistCL Service")</PostBuildEvent>
+    <PostBuildEvent>IF "%25DISTCL_SERVICE_START_ON_BUILD%25"=="true" (
+    ($(MSBuildBinPath)\InstallUtil.exe /username=%25DISTCL_SERVICE_USERNAME%25 /password=%25DISTCL_SERVICE_PASSWORD%25 $(TargetPath) || $(MSBuildBinPath)\InstallUtil.exe /u $(TargetPath)
+        ) &amp;&amp; net start "DistCL Service"
+    )</PostBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

@@ -2,14 +2,14 @@
 <SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="DistCL" GeneratedClassName="CompilerSettings">
   <Profiles />
   <Settings>
+    <Setting Name="InstanceName" Type="System.String" Scope="User">
+      <Value Profile="(Default)">Default</Value>
+    </Setting>
     <Setting Name="AgentsUpdatePeriod" Type="System.TimeSpan" Scope="User">
       <Value Profile="(Default)">00:01:00</Value>
     </Setting>
     <Setting Name="AgentsSilenceLimit" Type="System.TimeSpan" Scope="User">
       <Value Profile="(Default)">00:03:00</Value>
-    </Setting>
-    <Setting Name="InstanceName" Type="System.String" Scope="User">
-      <Value Profile="(Default)">Default</Value>
     </Setting>
     <Setting Name="NetworkBuildPeriod" Type="System.TimeSpan" Scope="User">
       <Value Profile="(Default)">00:03:00</Value>

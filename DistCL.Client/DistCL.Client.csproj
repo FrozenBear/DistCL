@@ -14,7 +14,7 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x86'">
     <DebugSymbols>true</DebugSymbols>
-    <OutputPath>bin\x86\Debug\</OutputPath>
+    <OutputPath>bin\Debug\</OutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <DebugType>full</DebugType>
     <PlatformTarget>x86</PlatformTarget>
@@ -23,7 +23,7 @@
     <Prefer32Bit>true</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x86'">
-    <OutputPath>bin\x86\Release\</OutputPath>
+    <OutputPath>bin\Release\</OutputPath>
     <DefineConstants>TRACE</DefineConstants>
     <Optimize>true</Optimize>
     <DebugType>pdbonly</DebugType>
@@ -56,33 +56,10 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
-    <None Include="Service References\CompileService\Compile.wsdl" />
-    <None Include="Service References\CompileService\Compile.xsd">
+    <None Include="Service References\CompileService\Arrays.xsd">
       <SubType>Designer</SubType>
     </None>
-    <None Include="Service References\CompileService\Compile1.wsdl" />
-    <None Include="Service References\CompileService\Compile1.xsd">
-      <SubType>Designer</SubType>
-    </None>
-    <None Include="Service References\CompileService\Compile11.xsd">
-      <SubType>Designer</SubType>
-    </None>
-    <None Include="Service References\CompileService\Compile2.wsdl" />
-    <None Include="Service References\CompileService\Compile2.xsd">
-      <SubType>Designer</SubType>
-    </None>
-    <None Include="Service References\CompileService\Compile3.xsd">
-      <SubType>Designer</SubType>
-    </None>
-    <None Include="Service References\CompileService\Compile4.xsd">
-      <SubType>Designer</SubType>
-    </None>
-    <None Include="Service References\CompileService\Compile5.xsd">
-      <SubType>Designer</SubType>
-    </None>
-    <None Include="Service References\CompileService\Compile6.xsd">
-      <SubType>Designer</SubType>
-    </None>
+    <None Include="Service References\CompileService\bindings.wsdl" />
     <None Include="Service References\CompileService\DistCL.Client.CompileService.Agent.datasource">
       <DependentUpon>Reference.svcmap</DependentUpon>
     </None>
@@ -95,15 +72,34 @@
     <None Include="Service References\CompileService\DistCL.Client.CompileService.CompileStatus.datasource">
       <DependentUpon>Reference.svcmap</DependentUpon>
     </None>
+    <None Include="Service References\CompileService\distcl.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Service References\CompileService\Message.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Service References\CompileService\messages.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Service References\CompileService\messages1.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Service References\CompileService\messages2.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Service References\CompileService\service.wsdl" />
+    <None Include="Service References\CompileService\service.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Service References\CompileService\utils.xsd">
+      <SubType>Designer</SubType>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <WCFMetadata Include="Service References\" />
   </ItemGroup>
   <ItemGroup>
     <WCFMetadataStorage Include="Service References\CompileService\" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Service References\CompileService\Compile.disco" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Service References\CompileService\configuration91.svcinfo" />
@@ -115,6 +111,7 @@
     <None Include="Service References\CompileService\DistCL.Client.CompileService.LocalCompileOutput.datasource">
       <DependentUpon>Reference.svcmap</DependentUpon>
     </None>
+    <None Include="Service References\CompileService\distcl.wsdl" />
     <None Include="Service References\CompileService\Reference.svcmap">
       <Generator>WCF Proxy Generator</Generator>
       <LastGenOutput>Reference.cs</LastGenOutput>
