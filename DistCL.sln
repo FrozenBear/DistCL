@@ -22,6 +22,13 @@ Project("{930C7802-8A8C-48F9-8165-68863BCCD9DD}") = "DistCLClient", "Installers\
 EndProject
 Project("{930C7802-8A8C-48F9-8165-68863BCCD9DD}") = "DistCLAgent", "Installers\DistCLAgent\DistCLAgent.wixproj", "{9D3C7FB7-62D1-4E9A-B793-B7E43A0E99D3}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{E245B05E-CB6D-46EC-A411-CBE704A6574E}"
+	ProjectSection(SolutionItems) = preProject
+		.nuget\NuGet.Config = .nuget\NuGet.Config
+		.nuget\NuGet.exe = .nuget\NuGet.exe
+		.nuget\NuGet.targets = .nuget\NuGet.targets
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x86 = Debug|x86

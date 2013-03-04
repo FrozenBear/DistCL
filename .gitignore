@@ -151,3 +151,4 @@ $RECYCLE.BIN/
 /vsstart.bat
 /InstallUtil.InstallLog
 *.DotSettings
+/packages
