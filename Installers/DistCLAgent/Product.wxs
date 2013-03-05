@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi"
-     xmlns:util="http://schemas.microsoft.com/wix/UtilExtension">
+     xmlns:util="http://schemas.microsoft.com/wix/UtilExtension"
+     xmlns:netfx="http://schemas.microsoft.com/wix/NetFxExtension">
 
   <?ifndef Version?>
   <?define Version = "1.0.0" ?>
@@ -32,6 +33,8 @@
       <![CDATA[Installed OR NETFRAMEWORK45]]>
     </Condition>
 
+    <WixVariable Id="ProductName" Value="$(var.ProductName)"/>
+
     <Property Id="DISTCL_AGENT_LOCAL_PORT" Value="48480" />
     <Property Id="DISTCL_AGENT_REMOTE_PORT" Value="48481" />
 
@@ -48,16 +51,20 @@
 
             <Component Id="DistCL.Service.exe.config" Guid="1C39F938-AEE4-4C9E-BF07-7496679A58B3">
               <File Id="DistCL.Service.exe.config" KeyPath="yes" Source="$(var.OUT_DIR)\DistCL.Service.exe.config" />
-              <util:XmlFile Id="SetLogsPath" Action="setValue" ElementPath="configuration/log4net/appender[\[]@name='RollingLogFileAppender'[\]]/file" File="[#DistCL.Service.exe.config]" Value="${ALLUSERSPROFILE}/FrozenBear/!(var.ProductName)/Logs/DistCL.log" Name="value" SelectionLanguage="XPath" />
+              <util:XmlFile Id="SetLogsPath" Action="setValue" ElementPath="configuration/log4net/appender[\[]@name='RollingLogFileAppender'[\]]/file" File="[#DistCL.Service.exe.config]" Value="${ALLUSERSPROFILE}/FrozenBear/$(var.ProductName)/Logs/DistCL.log" Name="value" SelectionLanguage="XPath" />
               <util:XmlFile Id="SetLocalEndpoint" Action="setValue" ElementPath="configuration/system.serviceModel/services/service[\[]@behaviorConfiguration='DefaultCompileServiceBehavior'[\]] and service[\[]@name='DistCL.Compiler'[\]]/endpoint[\[]@name='localEndpoint'[\]]" File="[#DistCL.Service.exe.config]" Value="net.tcp://localhost:[DISTCL_AGENT_LOCAL_PORT]/LocalCompile" Name="baseAddress" SelectionLanguage="XPath" Sequence="102" />
-              <util:XmlFile Id="SetRemoteEndpoint" Action="setValue" ElementPath="configuration/system.serviceModel/services/service[\[]@behaviorConfiguration='DefaultCompileServiceBehavior'[\]] and service[\[]@name='DistCL.Compiler'[\]]/host/baseAddresses/add" File="[#DistCL.Service.exe.config]" Value="net.tcp://localhost:[DISTCL_AGENT_REMOTE_PORT]/Compile" Name="baseAddress" SelectionLanguage="XPath" Sequence="102" />
+              <util:XmlFile Id="SetRemoteEndpoint" Action="setValue" ElementPath="configuration/system.serviceModel/services/service[\[]@behaviorConfiguration='DefaultCompileServiceBehavior'[\]] and service[\[]@name='DistCL.Compiler'[\]]/host/baseAddresses/add" File="[#DistCL.Service.exe.config]" Value="net.tcp://localhost:[DISTCL_AGENT_REMOTE_PORT]/Compile" Name="baseAddress" SelectionLanguage="XPath" Sequence="103" />
             </Component>
 
             <Component Id="DistCL.Core.dll" Guid="30D638B0-97B0-4F7A-B9F3-1047EB59C243">
               <File Id="DistCL.Core.dll" KeyPath="yes" Source="$(var.OUT_DIR)\DistCL.Core.dll" />
             </Component>
             <Component Id="DistCL.Service.exe" Guid="354CA3DA-2D22-42A0-AA30-E7343F09871B">
-              <File Id="DistCL.Service.exe" KeyPath="yes" Source="$(var.OUT_DIR)\DistCL.Service.exe" />
+              <File Id="DistCL.Service.exe" KeyPath="yes" Source="$(var.OUT_DIR)\DistCL.Service.exe">
+                <netfx:NativeImage Id="DistCL.Core.dll" Platform="all" Priority="0" AppBaseDirectory="INSTALLDIR"/>
+              </File>
+              <ServiceInstall Id="DistCLService" Name="DistCLService" DisplayName="$(var.ProductName) Service" Account="NT Authority\Network Service" Type="ownProcess" Start="auto" ErrorControl="normal" Description="$(var.ProductName) Service"  />
+              <ServiceControl Id="StartStop" Name="DistCLService" Start="install" Stop="both" Remove="uninstall" />
             </Component>
             <Component Id="DistCL.Utils.dll" Guid="F18162DD-D525-4099-8DCD-A28BAE40C39B">
               <File Id="DistCL.Utils.dll" KeyPath="yes" Source="$(var.OUT_DIR)\DistCL.Utils.dll" />
