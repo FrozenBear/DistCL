@@ -321,7 +321,8 @@ namespace DistCL
 
 		public Binding GetBinding(Uri url)
 		{
-			return Bindings[url.Scheme.ToLower()];
+			Binding binding;
+			return Bindings.TryGetValue(url.Scheme.ToLower(), out binding) ? binding : null;
 		}
 	}
 }

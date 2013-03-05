@@ -105,9 +105,11 @@ namespace DistCL
 
 		#region ILocalCompiler Operations
 
-		Guid ILocalCompiler.GetPreprocessToken(string name, string compilerVersion)
+		Guid ILocalCompiler.GetPreprocessToken(string name, string compilerVersion, out string accountName)
 		{
 			LocalLogger.DebugFormat("Preprocess token requested ({0})", name);
+
+			accountName = System.Security.Principal.WindowsIdentity.GetCurrent().Name;
 
 			if (! CompilerVersions.ContainsKey(compilerVersion))
 			{

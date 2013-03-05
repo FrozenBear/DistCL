@@ -12,7 +12,7 @@ namespace DistCL
 	{
 		[OperationContract]
 		[FaultContract(typeof(CompilerNotFoundFaultContract), Namespace = GeneralSettings.LocalCompilerMessageNamespace)]
-		Guid GetPreprocessToken(string name, string compilerVersion);
+		Guid GetPreprocessToken(string name, string compilerVersion, out string accountName);
 
 		[OperationContract]
 		[FaultContract(typeof(CompilerNotFoundFaultContract), Namespace = GeneralSettings.LocalCompilerMessageNamespace)]

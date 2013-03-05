@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Security.AccessControl;
 using System.ServiceModel;
 using DistCL.Client.CompileService;
 using DistCL.Utils;
@@ -37,14 +38,14 @@ namespace DistCL.Client
 			var driver = new CLDriver(arguments);
 
 			// Run preprocessor
-			var ppFileName = Path.GetTempFileName();
+			var ppFileName = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Windows), "Temp", Guid.NewGuid().ToString());
 			try
 			{
-				ILocalCompiler compiler = new LocalCompilerClient("basicHttpEndpoint_LocalCompiler");
+				ILocalCompiler compiler = new LocalCompilerClient();
 
 				Logger.Info("Send preprocess token request...");
 
-				var preprocessToken = compiler.GetPreprocessToken(driver.SourceFiles[0], CompilerVersion);
+				var preprocessTokenResponse = compiler.GetPreprocessToken(new GetPreprocessTokenRequest(driver.SourceFiles[0], CompilerVersion));
 
 				Logger.Info("Token obtained, starting preprocess...");
 
@@ -65,13 +66,18 @@ namespace DistCL.Client
 
 				Logger.Info("Preprocess finished, send compilation request...");
 
+				var rule = new FileSystemAccessRule(preprocessTokenResponse.accountName, FileSystemRights.Read, AccessControlType.Allow);
+				var security = File.GetAccessControl(ppFileName);
+				security.SetAccessRule(rule);
+				File.SetAccessControl(ppFileName, security);
+
 				var output = compiler.LocalCompile(new LocalCompileInput
 					{
 						CompilerVersion = CompilerVersion,
 						Arguments = driver.RemoteCommandLine,
 						SrcName = driver.SourceFiles[0],
 						Src = ppFileName,
-						PreprocessToken = preprocessToken
+						PreprocessToken = preprocessTokenResponse.GetPreprocessTokenResult
 					});
 
 				Logger.InfoFormat("Compilation finished with exit code {0}, processing result...", output.Status.ExitCode);
