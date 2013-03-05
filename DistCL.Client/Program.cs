@@ -32,7 +32,7 @@ namespace DistCL.Client
 
 		public static int Compile(string[] arguments)
 		{
-			Logger.Info("Start compilation...");
+			Logger.InfoFormat("Start compilation: {0}...", string.Join(" ", arguments.Select(s => string.Format("[{0}]", s))));
 
 			var driver = new CLDriver(arguments);
 
@@ -42,7 +42,11 @@ namespace DistCL.Client
 			{
 				ILocalCompiler compiler = new LocalCompilerClient("basicHttpEndpoint_LocalCompiler");
 
+				Logger.Info("Send preprocess token request...");
+
 				var preprocessToken = compiler.GetPreprocessToken(driver.SourceFiles[0], CompilerVersion);
+
+				Logger.Info("Token obtained, starting preprocess...");
 
 				using (var preprocOutput = new FileStream(ppFileName, FileMode.Create, FileAccess.Write, FileShare.Read))
 				using (var stdOut = new StreamWriter(preprocOutput))
@@ -59,6 +63,8 @@ namespace DistCL.Client
 						throw new ApplicationException(string.Format("{0} error: {1}", CompilerSettings.CLExeFilename, stdErr));
 				}
 
+				Logger.Info("Preprocess finished, send compilation request...");
+
 				var output = compiler.LocalCompile(new LocalCompileInput
 					{
 						CompilerVersion = CompilerVersion,
@@ -67,6 +73,8 @@ namespace DistCL.Client
 						Src = ppFileName,
 						PreprocessToken = preprocessToken
 					});
+
+				Logger.InfoFormat("Compilation finished with exit code {0}, processing result...", output.Status.ExitCode);
 
 				var streams = new Dictionary<CompileArtifactType, Stream>();
 
@@ -108,6 +116,8 @@ namespace DistCL.Client
 					}
 				}
 
+				Logger.Info("Result processing finished");
+
 				return output.Status.ExitCode;
 			}
 			catch (FaultException<CompilerNotFoundFaultContract> ex)
@@ -123,13 +133,13 @@ namespace DistCL.Client
 			}
 			catch (Exception ex)
 			{
-				// TODO rework
-				Console.WriteLine(ex);
+				Logger.LogException("Unexpected error", ex);
 				throw;
 			}
 			finally
 			{
 				File.Delete(ppFileName);
+				Logger.Info("End");
 			}
 		}
 
