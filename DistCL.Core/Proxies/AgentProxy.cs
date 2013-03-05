@@ -6,6 +6,7 @@ using System.ServiceModel.Channels;
 using System.Threading;
 using System.Threading.Tasks;
 using DistCL.RemoteCompilerService;
+using DistCL.Utils;
 
 namespace DistCL.Proxies
 {
@@ -14,7 +15,11 @@ namespace DistCL.Proxies
 		private readonly IBindingsCollection _bindingsCollection;
 		private readonly IAgent _description;
 
-		private CompilerProxy _compiler;
+		private static Logger _logger;
+
+		private readonly object _compilerSyncRoot = new object();
+		private DateTime _nextCompilerGetTry = DateTime.MinValue;
+		private volatile CompilerProxy _compiler;
 		private ICompileCoordinatorProxy _compileCoordinatorProxy;
 		private AgentPoolProxy _agentPool;
 
@@ -22,6 +27,11 @@ namespace DistCL.Proxies
 		{
 			_bindingsCollection = bindingsCollection;
 			_description = description;
+		}
+
+		public static Logger Logger
+		{
+			get { return LazyInitializer.EnsureInitialized(ref _logger, () => new Logger("PROXY")); }
 		}
 
 		public IAgent Description
@@ -33,34 +43,26 @@ namespace DistCL.Proxies
 		{
 			bool? isReady = null;
 
-			var result = LazyInitializer.EnsureInitialized(ref _compiler, delegate
-				{
-					bool isReadyLocal;
-					var compiler = GetCompilerInternal(out isReadyLocal);
-					isReady = isReadyLocal;
-					return compiler;
-				});
-
-			if (! isReady.HasValue)
+			if (_compiler == null)
 			{
-				isReady = result.IsReady();
+				lock (_compilerSyncRoot)
+				{
+					if (_compiler == null && DateTime.Now > _nextCompilerGetTry)
+					{
+						bool isReadyLocal;
+						_compiler = GetCompilerInternal(out isReadyLocal);
+						isReady = isReadyLocal;
+						_nextCompilerGetTry = DateTime.Now.AddMinutes(1);
+					}
+				}
 			}
 
-			return isReady.Value ? result : null;
-		}
+			if (! isReady.HasValue && _compiler != null)
+			{
+				isReady = _compiler.IsReady();
+			}
 
-		public ICompileCoordinatorProxy GetCoordinator()
-		{
-			return LazyInitializer.EnsureInitialized(ref _compileCoordinatorProxy,
-											() =>
-											Description.AgentPoolUrls != null && Description.AgentPoolUrls.Length > 0
-												? (ICompileCoordinatorProxy)GetAgentPool()
-												: new CompileCoordinatorProxy(this));
-		}
-
-		public IAgentPoolProxy GetAgentPool()
-		{
-			return LazyInitializer.EnsureInitialized(ref _agentPool, () => new AgentPoolProxy(this));
+			return isReady.HasValue && isReady.Value ? _compiler : null;
 		}
 
 		private CompilerProxy GetCompilerInternal(out bool isReady)
@@ -77,14 +79,28 @@ namespace DistCL.Proxies
 						return new CompilerProxy(compiler);
 					}
 				}
-				catch (Exception)
+				catch (Exception ex)
 				{
-					// TODO logger?
+					Logger.WarnException(string.Format("Get compiler proxy for {0} by {1}", _description.Name, url), ex);
 				}
 			}
 
 			isReady = false;
 			return null;
+		}
+
+		public ICompileCoordinatorProxy GetCoordinator()
+		{
+			return LazyInitializer.EnsureInitialized(ref _compileCoordinatorProxy,
+											() =>
+											Description.AgentPoolUrls != null && Description.AgentPoolUrls.Length > 0
+												? (ICompileCoordinatorProxy)GetAgentPool()
+												: new CompileCoordinatorProxy(this));
+		}
+
+		public IAgentPoolProxy GetAgentPool()
+		{
+			return LazyInitializer.EnsureInitialized(ref _agentPool, () => new AgentPoolProxy(this));
 		}
 
 		protected void ConnectToAgent<TClient>(
@@ -100,7 +116,7 @@ namespace DistCL.Proxies
 			{
 				throw new InvalidOperationException("empty uris array");
 			}
-			
+
 			lock (syncRoot)
 			{
 				try
@@ -111,16 +127,16 @@ namespace DistCL.Proxies
 						func(client);
 					}
 				}
-				catch (Exception)
+				catch (Exception ex)
 				{
-					// TODO logging
+					Logger.WarnException(string.Format("Agent {0} call error", _description.Name), ex);
 				}
 
-				SearchGoodClientEndpoint<TClient, object>(syncRoot, setClient, creation, uris, (clnt) =>
-				{
-					func(clnt);
-					return Task.FromResult<object>(null);
-				});
+				SearchGoodClientEndpoint(syncRoot, setClient, creation, uris, clnt =>
+					{
+						func(clnt);
+						return Task.FromResult<object>(null);
+					});
 			}
 		}
 
@@ -142,10 +158,16 @@ namespace DistCL.Proxies
 					if (client != null)
 					{
 						return func(client).ContinueWith(
-							// TODO logging
-							task => task.IsFaulted
-										? SearchGoodClientEndpoint(syncRoot, setClient, creation, uris, func)
-										: task.Result);
+							delegate(Task<TTaskResult> task)
+								{
+									if (task.IsFaulted)
+									{
+										Logger.WarnException(string.Format("Agent {0} call error", _description.Name), task.Exception);
+									}
+									return task.IsFaulted
+												? SearchGoodClientEndpoint(syncRoot, setClient, creation, uris, func)
+												: task.Result;
+								});
 					}
 
 					return
@@ -182,10 +204,17 @@ namespace DistCL.Proxies
 					catch (AggregateException e)
 					{
 						exceptions.AddRange(e.InnerExceptions);
+
+						foreach (var exception in e.InnerExceptions)
+						{
+							Logger.WarnException(string.Format("Connect to agent {0} by {1}", _description.Name, url), exception);
+						}
 					}
 					catch (Exception e)
 					{
 						exceptions.Add(e);
+
+						Logger.WarnException(string.Format("Connect to agent {0} by {1}", _description.Name, url), e);
 					}
 				}
 
@@ -247,10 +276,12 @@ namespace DistCL.Proxies
 			private int _errorCount;
 
 			private readonly RemoteAgentProxy _proxy;
+
 			private IAgent _remoteDescription;
+			private bool _remoteDescriptionInitialized;
+			private object _remoteDescriptionSyncRoot;
 
 			private readonly object _syncRoot = new object();
-			private readonly object _descriptionSyncRoot = new object();
 			protected TClient Client;
 
 			protected CompileCoordinatorProxyBase(RemoteAgentProxy proxy)
@@ -281,22 +312,25 @@ namespace DistCL.Proxies
 
 			public IAgent GetDescription()
 			{
-				return LazyInitializer.EnsureInitialized(ref _remoteDescription, () =>
-				{
-					IAgent agent = null;
-					ConnectToAgent(client => agent = client.GetDescription());
-					return agent;
-				});
+				return LazyInitializer.EnsureInitialized(
+					ref _remoteDescription,
+					ref _remoteDescriptionInitialized,
+					ref _remoteDescriptionSyncRoot,
+					delegate
+						{
+							IAgent agent = null;
+							ConnectToAgent(client => agent = client.GetDescription());
+							return agent;
+						});
 			}
 			public Task<IAgent> GetDescriptionAsync()
 			{
 				return ConnectToAgent(client => client.GetDescriptionAsync()).ContinueWith(
-					delegate(Task<IAgent> task)
-						{
-							// TODO lock
-							_remoteDescription = task.Result;
-							return task.Result;
-						},
+					task => LazyInitializer.EnsureInitialized(
+						ref _remoteDescription,
+						ref _remoteDescriptionInitialized,
+						ref _remoteDescriptionSyncRoot,
+						() => task.Result),
 					TaskContinuationOptions.OnlyOnRanToCompletion);
 			}
 
@@ -353,7 +387,7 @@ namespace DistCL.Proxies
 				RemoteProxy.ConnectToAgent(
 					SyncRoot,
 					() => Client,
-					(client) => Client = client,
+					client => Client = client,
 					(binding, endpoint) => new CompileCoordinatorClient(binding, endpoint),
 					RemoteProxy.Description.AgentPoolUrls, 
 					func);
@@ -363,7 +397,7 @@ namespace DistCL.Proxies
 				return RemoteProxy.ConnectToAgent(
 					SyncRoot,
 					() => Client,
-					(client) => Client = client,
+					client => Client = client,
 					(binding, endpoint) => new CompileCoordinatorClient(binding, endpoint),
 					RemoteProxy.Description.AgentPoolUrls, 
 					func);
@@ -393,7 +427,7 @@ namespace DistCL.Proxies
 				RemoteProxy.ConnectToAgent(
 					SyncRoot,
 					() => Client,
-					(client) => Client = client,
+					client => Client = client,
 					(binding, endpoint) => new AgentPoolClient(binding, endpoint),
 					RemoteProxy.Description.AgentPoolUrls,
 					func);
@@ -403,7 +437,7 @@ namespace DistCL.Proxies
 				return RemoteProxy.ConnectToAgent(
 					SyncRoot,
 					() => Client,
-					(client) => Client = client,
+					client => Client = client,
 					(binding, endpoint) => new AgentPoolClient(binding, endpoint),
 					RemoteProxy.Description.AgentPoolUrls,
 					func);

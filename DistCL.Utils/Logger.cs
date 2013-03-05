@@ -12,11 +12,6 @@ namespace DistCL.Utils
 			_logger = log4net.LogManager.GetLogger(name);
 		}
 
-		public void LogAgent(string message, string agentName)
-		{
-			Info(string.Format("{0}: Name='{1}'", message, agentName));
-		}
-
 		public void Debug(string message)
 		{
 			_logger.Debug(message);
@@ -45,6 +40,11 @@ namespace DistCL.Utils
 		public void WarnFormat(string message, params object[] args)
 		{
 			_logger.WarnFormat(message, args);
+		}
+
+		public void WarnException(string message, Exception e)
+		{
+			_logger.Warn(message, e);
 		}
 
 		public void LogException(string message, Exception e)

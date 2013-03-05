@@ -63,7 +63,7 @@ namespace DistCL
 					_agents.Add(request.Description.Guid, agent);
 					_weightsSnapshot = null;
 					_agentsSnapshot = null;
-					Logger.LogAgent("Add agent", request.Description.Name);
+					Logger.InfoFormat("Add agent '{0}'", request.Description.Name);
 					
 					var handler = AgentRegistered;
 					if (handler != null)
@@ -78,7 +78,7 @@ namespace DistCL
 						_agents[request.Description.Guid] = new RegisteredAgent(request);
 						_weightsSnapshot = null;
 						_agentsSnapshot = null;
-						Logger.LogAgent("Update agent", request.Description.Name);
+						Logger.DebugFormat("Update agent '{0}'", request.Description.Name);
 					}
 					else
 					{
@@ -253,7 +253,7 @@ namespace DistCL
 					{
 						foreach (var item in expired)
 						{
-							Logger.LogAgent("Remove agent", _agents[item].Proxy.Description.Name);
+							Logger.InfoFormat("Remove agent '{0}'", _agents[item].Proxy.Description.Name);
 							_agents.Remove(item);
 						}
 

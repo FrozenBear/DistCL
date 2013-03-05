@@ -55,7 +55,7 @@ namespace DistCL
 
 		private void UpdateAgents(object o)
 		{
-			IEnumerable<IAgent> _agentsSnapshot = null;
+			IEnumerable<IAgent> agentsSnapshot = null;
 			var nextBuild = DateTime.MinValue;  
 			var nextInitialAgentsCheck = DateTime.MinValue;  
 
@@ -66,7 +66,7 @@ namespace DistCL
 				CompilerServices.LocalAgentManager.AgentProxy.Description.Guid,
 				CompilerServices.LocalAgentManager.AgentProxy.GetCoordinator());
 
-			Logger.LogAgent("Init", CompilerServices.LocalAgentManager.RegistrationMessage.Name);
+			Logger.DebugFormat("Init '{0}'", CompilerServices.LocalAgentManager.RegistrationMessage.Name);
 
 			CompilerServices.AgentPool.AgentRegistered +=
 				(sender, args) =>
@@ -143,7 +143,7 @@ namespace DistCL
 					CompilerServices.AgentPool.Clean(DateTime.Now.Subtract(CompilerSettings.Default.AgentsSilenceLimit));
 
 					var agents = CompilerServices.LocalAgentManager.AgentProxy.GetAgentPool().GetAgents();
-					if (!ReferenceEquals(agents, _agentsSnapshot) || nextBuild < DateTime.Now)
+					if (!ReferenceEquals(agents, agentsSnapshot) || nextBuild < DateTime.Now)
 					{
 						ConvertAgents2PoolsRequestAgents(
 							pools.Values.OfType<IAgentPoolProxy>(),
@@ -153,7 +153,7 @@ namespace DistCL
 							true);
 
 						nextBuild = DateTime.Now.Add(CompilerSettings.Default.NetworkBuildPeriod);
-						_agentsSnapshot = agents;
+						agentsSnapshot = agents;
 					}
 
 					var iterationEnded = DateTime.Now;
@@ -380,7 +380,7 @@ namespace DistCL
 			}
 			else
 			{
-				Logger.InfoFormat("Added coordinator '{0}' {1} {2}", pool.Proxy.Description.Name, pool.Proxy.Description.Guid, pool);
+				Logger.InfoFormat("Added coordinator '{0}'", pool.Proxy.Description.Name);
 			}
 		}
 
