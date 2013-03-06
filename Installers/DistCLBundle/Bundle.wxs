@@ -7,7 +7,7 @@
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi"
      xmlns:bal="http://schemas.microsoft.com/wix/BalExtension">
   
-  <Bundle Name="DistCL" Version="$(var.Version)" Manufacturer="Frozen Bear" UpgradeCode="e2e0b529-2ba7-48b0-bf33-27a7d97158fe">
+  <Bundle Name="Dist CL" Version="$(var.Version)" Manufacturer="Frozen Bear" UpgradeCode="e2e0b529-2ba7-48b0-bf33-27a7d97158fe">
     <BootstrapperApplicationRef Id="WixStandardBootstrapperApplication.HyperlinkLicense">
       <bal:WixStandardBootstrapperApplication
             LicenseUrl="http://example.com/license.html"
