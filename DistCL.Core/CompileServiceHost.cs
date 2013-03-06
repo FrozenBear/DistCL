@@ -202,25 +202,25 @@ namespace DistCL
 				{
 					_bindings = new Dictionary<string, Binding>();
 
-					foreach (Binding binding in Description.Endpoints.Select(endpoint => endpoint.Binding))
+					var clientBindings = new HashSet<string>();
+					foreach (ChannelEndpointElement endpoint in ServiceModelSectionGroup.Client.Endpoints)
 					{
-						string schema = GetSchemaByBindingType(binding.GetType());
-
-						if (schema != null && ! _bindings.ContainsKey(schema))
-						{
-							_bindings.Add(schema, binding);
-						}
+						clientBindings.Add(endpoint.BindingConfiguration);
 					}
 
-					foreach (BindingCollectionElement binding in ServiceModelSectionGroup.Bindings.BindingCollections)
+					// TODO preferred binding name in config
+
+					foreach (var binding in ServiceModelSectionGroup.Bindings.BindingCollections)
 					{
-						string schema = GetSchemaByBindingType(binding.BindingType);
+						var schema = GetSchemaByBindingType(binding.BindingType);
 
 						if (schema != null && ! _bindings.ContainsKey(schema))
 						{
-							foreach (var configuredBinding in binding.ConfiguredBindings)
+							foreach (var configuredBinding in binding.ConfiguredBindings
+																	.OrderByDescending(b => clientBindings.Contains(b.Name)))
 							{
 								_bindings.Add(schema, (Binding)Activator.CreateInstance(binding.BindingType, configuredBinding.Name));
+								break;
 							}
 						}
 					}
