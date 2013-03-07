@@ -1,37 +1,61 @@
-﻿using System.ServiceProcess;
+﻿using System;
+using System.ServiceProcess;
+using DistCL.Utils;
 
 namespace DistCL.Service
 {
 	partial class CompileService : ServiceBase
 	{
 		private CompileServiceHost _serviceHost;
+		private readonly Logger _logger = new Logger("SERVICE");
 
 		public CompileService()
 		{
 			InitializeComponent();
 		}
 
+		public Logger Logger
+		{
+			get { return _logger; }
+		}
+
 		protected override void OnStart(string[] args)
 		{
-			if (_serviceHost != null)
+			try
 			{
-				_serviceHost.Close();
+				if (_serviceHost != null)
+				{
+					_serviceHost.Close();
+				}
+
+				_serviceHost = new CompileServiceHost();
+
+
+				_serviceHost.Open();
+				Logger.Info("WCF service started");
 			}
-
-			_serviceHost = new CompileServiceHost();
-
-
-			_serviceHost.Open();
-
-			EventLog.WriteEntry("WCF service started");
+			catch (Exception e)
+			{
+				Logger.LogException("OnStart error", e);
+				throw;
+			}
 		}
 
 		protected override void OnStop()
 		{
-			if (_serviceHost != null)
+			try
 			{
-				_serviceHost.Close();
-				_serviceHost = null;
+				if (_serviceHost != null)
+				{
+					_serviceHost.Close();
+					_serviceHost = null;
+				}
+				Logger.Info("WCF service stopped");
+			}
+			catch (Exception e)
+			{
+				Logger.LogException("OnStop error", e);
+				throw;
 			}
 		}
 	}

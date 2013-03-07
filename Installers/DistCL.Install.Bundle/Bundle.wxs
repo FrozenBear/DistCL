@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?ifndef Version?>
-<?define Version = "1.0.0.0" ?>
+<?define Version = "0.0.1" ?>
 <?endif ?>
 
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi"
@@ -23,7 +23,7 @@
       <MsiPackage
         Id="ClientSetup"
         Compressed="yes"
-        SourceFile="$(var.DistCLClient.TargetPath)"
+        SourceFile="$(var.DistCL.Install.Client.TargetPath)"
         Vital="yes">
         <MsiProperty Name="INSTALLLOCATION" Value="[InstallFolder]\Client" />
       </MsiPackage>    
@@ -31,7 +31,7 @@
       <MsiPackage
         Id="AgentSetup"
         Compressed="yes"
-        SourceFile="$(var.DistCLAgent.TargetPath)"
+        SourceFile="$(var.DistCL.Install.Agent.TargetPath)"
         Vital="yes">
         <MsiProperty Name="INSTALLLOCATION" Value="[InstallFolder]\Agent" />
       </MsiPackage>   

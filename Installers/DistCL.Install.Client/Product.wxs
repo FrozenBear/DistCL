@@ -2,10 +2,12 @@
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
 
   <?ifndef Version?>
-  <?define Version = "1.0.0" ?>
+  <?define Version = "0.0.1" ?>
   <?endif ?>
-  
-  <Product Name="DistCL Client" Id="C1831CD2-6293-4F85-A6F6-85A0F3BBFE9A" UpgradeCode="22A2ED8B-9C15-4740-8E7F-52E71EA3A04D"
+
+  <?define ProductName="DistCL Client" ?>
+
+  <Product Name="$(var.ProductName)" Id="C1831CD2-6293-4F85-A6F6-85A0F3BBFE9A" UpgradeCode="22A2ED8B-9C15-4740-8E7F-52E71EA3A04D"
     Language="1033" Codepage="1252" Version="$(var.Version)" Manufacturer="Frozen Bear">
 
     <Package Id="*" Keywords="Installer" Description="DistCL Client Installer" InstallScope="perMachine"
@@ -22,7 +24,7 @@
     <Directory Id="TARGETDIR" Name="SourceDir">
       <Directory Id="ProgramFilesFolder" Name="PFiles">
         <Directory Id="Frozen_Bear" Name="Frozen Bear">
-          <Directory Id="INSTALLDIR" Name="DistCL 0.1">
+          <Directory Id="INSTALLDIR" Name="$(var.ProductName)">
             <Component Id="DistCL.Client.exe" Guid="613D291D-0312-465D-A73A-959BAD151F19">
               <File Id="DistCL.Client.exe" Name="DistCL.Client.exe" DiskId="1" Source="$(var.DistCL.Client.TargetPath)" KeyPath="yes">
               </File>
