@@ -28,9 +28,8 @@ namespace DistCL.Service
 					_serviceHost.Close();
 				}
 
+				Logger.Debug("WCF service starting...");
 				_serviceHost = new CompileServiceHost();
-
-
 				_serviceHost.Open();
 				Logger.Info("WCF service started");
 			}
@@ -45,6 +44,7 @@ namespace DistCL.Service
 		{
 			try
 			{
+				Logger.Debug("WCF service stopping...");
 				if (_serviceHost != null)
 				{
 					_serviceHost.Close();

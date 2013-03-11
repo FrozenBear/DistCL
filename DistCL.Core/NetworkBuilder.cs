@@ -15,11 +15,12 @@ namespace DistCL
 	internal class NetworkBuilder
 	{
 		private readonly Logger _logger = new Logger("BUILDER");
+		private Thread _updateAgentsThread;
 
 		private readonly ICompilerServicesCollection _compilerServices;
 
 		private readonly object _syncRoot = new object();
-		private bool _closed;
+		private bool _started;
 
 		public NetworkBuilder(ICompilerServicesCollection compilerServices)
 		{
@@ -36,21 +37,36 @@ namespace DistCL
 			get { return _compilerServices; }
 		}
 
-		public void Open()
-		{
-			_closed = false;
-
-			var updateAgentsThread = new Thread(UpdateAgents) { IsBackground = true };
-			updateAgentsThread.Start();
-		}
-
-		public void Close()
+		public void Start()
 		{
 			lock (_syncRoot)
 			{
-				_closed = true;
+				if (Volatile.Read(ref _started))
+				{
+					throw new InvalidOperationException("Builder is already started");
+				}
+
+				_started = true;
+
+				_updateAgentsThread = new Thread(UpdateAgents) {IsBackground = true};
+				_updateAgentsThread.Start();
+			}
+		}
+
+		public void Stop()
+		{
+			lock (_syncRoot)
+			{
+				if (!Volatile.Read(ref _started))
+				{
+					throw new InvalidOperationException("Builder doesn't started");
+				}
+
+				_started = false;
 				Monitor.PulseAll(_syncRoot);
 			}
+
+			_updateAgentsThread.Join();
 		}
 
 		private void UpdateAgents(object o)
@@ -78,7 +94,7 @@ namespace DistCL
 			{
 				var problemPools = new ConcurrentQueue<ICompileCoordinatorProxy>();
 
-				while (!_closed)
+				while (Volatile.Read(ref _started))
 				{
 					var iterationStarted = DateTime.Now;
 

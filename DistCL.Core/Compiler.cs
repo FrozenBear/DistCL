@@ -144,6 +144,7 @@ namespace DistCL
 		LocalCompileOutput ILocalCompiler.LocalCompile(LocalCompileInput input)
 		{
 			LocalLogger.InfoFormat("Received local compile request '{0}'", input.SrcName);
+			var stopwatch = Stopwatch.StartNew();
 
 			string preprocessName;
 			if (_preprocessTokens.TryRemove(input.PreprocessToken, out preprocessName))
@@ -222,7 +223,8 @@ namespace DistCL
 						}
 					}
 
-					LocalLogger.InfoFormat("Completed local compile '{0}'", input.SrcName);
+					stopwatch.Stop();
+					LocalLogger.InfoFormat("Completed local compile '{0}' ({1})", input.SrcName, stopwatch.Elapsed);
 					return new LocalCompileOutput(true, remoteOutput.Status.ExitCode, localStreams, localFiles);
 				}
 			}
@@ -247,6 +249,7 @@ namespace DistCL
 		CompileOutput ICompiler.Compile(CompileInput input)
 		{
 			CompilerLogger.DebugFormat("Received compile request '{0}'", input.SrcName);
+			var stopwatch = Stopwatch.StartNew();
 
 			if (!CompilerVersions.ContainsKey(input.CompilerVersion))
 			{
@@ -304,7 +307,8 @@ namespace DistCL
 			finally
 			{
 				ReleaseWorkers(CompileWorkerCount);
-				CompilerLogger.InfoFormat("Processing of '{0}' completed", input.SrcName);
+				stopwatch.Stop();
+				CompilerLogger.InfoFormat("Processing of '{0}' completed ({1})", input.SrcName, stopwatch.Elapsed);
 			}
 		}
 

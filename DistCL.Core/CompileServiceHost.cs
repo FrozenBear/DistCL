@@ -309,14 +309,14 @@ namespace DistCL
 		{
 			base.OnOpened();
 
-			_compilerServices.NetworkBuilder.Open();
+			_compilerServices.NetworkBuilder.Start();
 		}
 
 		protected override void OnClosing()
 		{
 			base.OnClosing();
 
-			_compilerServices.NetworkBuilder.Close();
+			_compilerServices.NetworkBuilder.Stop();
 		}
 
 		public Binding GetBinding(Uri url)
