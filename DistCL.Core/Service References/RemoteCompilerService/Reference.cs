@@ -15,7 +15,100 @@ namespace DistCL.RemoteCompilerService {
     
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Runtime.Serialization", "4.0.0.0")]
-    [System.Runtime.Serialization.DataContractAttribute(Name="CompilerNotFoundFaultContract", Namespace="http://schemas.datacontract.org/2004/07/DistCL")]
+    [System.Runtime.Serialization.DataContractAttribute(Name="PreprocessToken", Namespace="urn:distcl:compiler:local:messages")]
+    [System.SerializableAttribute()]
+    public partial class PreprocessToken : object, System.Runtime.Serialization.IExtensibleDataObject, System.ComponentModel.INotifyPropertyChanged {
+        
+        [System.NonSerializedAttribute()]
+        private System.Runtime.Serialization.ExtensionDataObject extensionDataField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private string AccountNameField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private System.DateTime CreatedField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private System.Guid GuidField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private System.DateTime RequestedField;
+        
+        [global::System.ComponentModel.BrowsableAttribute(false)]
+        public System.Runtime.Serialization.ExtensionDataObject ExtensionData {
+            get {
+                return this.extensionDataField;
+            }
+            set {
+                this.extensionDataField = value;
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public string AccountName {
+            get {
+                return this.AccountNameField;
+            }
+            set {
+                if ((object.ReferenceEquals(this.AccountNameField, value) != true)) {
+                    this.AccountNameField = value;
+                    this.RaisePropertyChanged("AccountName");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public System.DateTime Created {
+            get {
+                return this.CreatedField;
+            }
+            set {
+                if ((this.CreatedField.Equals(value) != true)) {
+                    this.CreatedField = value;
+                    this.RaisePropertyChanged("Created");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public System.Guid Guid {
+            get {
+                return this.GuidField;
+            }
+            set {
+                if ((this.GuidField.Equals(value) != true)) {
+                    this.GuidField = value;
+                    this.RaisePropertyChanged("Guid");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public System.DateTime Requested {
+            get {
+                return this.RequestedField;
+            }
+            set {
+                if ((this.RequestedField.Equals(value) != true)) {
+                    this.RequestedField = value;
+                    this.RaisePropertyChanged("Requested");
+                }
+            }
+        }
+        
+        public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
+        
+        protected void RaisePropertyChanged(string propertyName) {
+            System.ComponentModel.PropertyChangedEventHandler propertyChanged = this.PropertyChanged;
+            if ((propertyChanged != null)) {
+                propertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
+            }
+        }
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Runtime.Serialization", "4.0.0.0")]
+    [System.Runtime.Serialization.DataContractAttribute(Name="CompilerNotFoundFaultContract", Namespace="urn:distcl:compiler:local:messages")]
     [System.SerializableAttribute()]
     public partial class CompilerNotFoundFaultContract : object, System.Runtime.Serialization.IExtensibleDataObject, System.ComponentModel.INotifyPropertyChanged {
         
@@ -281,60 +374,19 @@ namespace DistCL.RemoteCompilerService {
     public interface ILocalCompiler {
         
         [System.ServiceModel.OperationContractAttribute(Action="urn:distcl/ILocalCompiler/GetPreprocessToken", ReplyAction="urn:distcl/ILocalCompiler/GetPreprocessTokenResponse")]
-        [System.ServiceModel.FaultContractAttribute(typeof(DistCL.RemoteCompilerService.CompilerNotFoundFaultContract), Action="urn:distcl/ILocalCompiler/GetPreprocessTokenCompilerNotFoundFaultContractFault", Name="CompilerNotFoundFaultContract", Namespace="http://schemas.datacontract.org/2004/07/DistCL")]
-        DistCL.RemoteCompilerService.GetPreprocessTokenResponse GetPreprocessToken(DistCL.RemoteCompilerService.GetPreprocessTokenRequest request);
+        [System.ServiceModel.FaultContractAttribute(typeof(DistCL.RemoteCompilerService.CompilerNotFoundFaultContract), Action="urn:distcl/ILocalCompiler/GetPreprocessTokenCompilerNotFoundFaultContractFault", Name="CompilerNotFoundFaultContract", Namespace="urn:distcl:compiler:local:messages")]
+        DistCL.RemoteCompilerService.PreprocessToken GetPreprocessToken(string name, string compilerVersion);
         
-        // CODEGEN: Generating message contract since the operation has multiple return values.
         [System.ServiceModel.OperationContractAttribute(Action="urn:distcl/ILocalCompiler/GetPreprocessToken", ReplyAction="urn:distcl/ILocalCompiler/GetPreprocessTokenResponse")]
-        System.Threading.Tasks.Task<DistCL.RemoteCompilerService.GetPreprocessTokenResponse> GetPreprocessTokenAsync(DistCL.RemoteCompilerService.GetPreprocessTokenRequest request);
+        System.Threading.Tasks.Task<DistCL.RemoteCompilerService.PreprocessToken> GetPreprocessTokenAsync(string name, string compilerVersion);
         
         // CODEGEN: Generating message contract since the wrapper namespace (urn:distcl:compiler:local:messages) of message LocalCompileInput does not match the default value (urn:distcl)
         [System.ServiceModel.OperationContractAttribute(Action="urn:distcl/ILocalCompiler/LocalCompile", ReplyAction="urn:distcl/ILocalCompiler/LocalCompileResponse")]
-        [System.ServiceModel.FaultContractAttribute(typeof(DistCL.RemoteCompilerService.CompilerNotFoundFaultContract), Action="urn:distcl/ILocalCompiler/LocalCompileCompilerNotFoundFaultContractFault", Name="CompilerNotFoundFaultContract", Namespace="http://schemas.datacontract.org/2004/07/DistCL")]
+        [System.ServiceModel.FaultContractAttribute(typeof(DistCL.RemoteCompilerService.CompilerNotFoundFaultContract), Action="urn:distcl/ILocalCompiler/LocalCompileCompilerNotFoundFaultContractFault", Name="CompilerNotFoundFaultContract", Namespace="urn:distcl:compiler:local:messages")]
         DistCL.RemoteCompilerService.LocalCompileOutput LocalCompile(DistCL.RemoteCompilerService.LocalCompileInput request);
         
         [System.ServiceModel.OperationContractAttribute(Action="urn:distcl/ILocalCompiler/LocalCompile", ReplyAction="urn:distcl/ILocalCompiler/LocalCompileResponse")]
         System.Threading.Tasks.Task<DistCL.RemoteCompilerService.LocalCompileOutput> LocalCompileAsync(DistCL.RemoteCompilerService.LocalCompileInput request);
-    }
-    
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
-    [System.ServiceModel.MessageContractAttribute(WrapperName="GetPreprocessToken", WrapperNamespace="urn:distcl", IsWrapped=true)]
-    public partial class GetPreprocessTokenRequest {
-        
-        [System.ServiceModel.MessageBodyMemberAttribute(Namespace="urn:distcl", Order=0)]
-        public string name;
-        
-        [System.ServiceModel.MessageBodyMemberAttribute(Namespace="urn:distcl", Order=1)]
-        public string compilerVersion;
-        
-        public GetPreprocessTokenRequest() {
-        }
-        
-        public GetPreprocessTokenRequest(string name, string compilerVersion) {
-            this.name = name;
-            this.compilerVersion = compilerVersion;
-        }
-    }
-    
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
-    [System.ServiceModel.MessageContractAttribute(WrapperName="GetPreprocessTokenResponse", WrapperNamespace="urn:distcl", IsWrapped=true)]
-    public partial class GetPreprocessTokenResponse {
-        
-        [System.ServiceModel.MessageBodyMemberAttribute(Namespace="urn:distcl", Order=0)]
-        public System.Guid GetPreprocessTokenResult;
-        
-        [System.ServiceModel.MessageBodyMemberAttribute(Namespace="urn:distcl", Order=1)]
-        public string accountName;
-        
-        public GetPreprocessTokenResponse() {
-        }
-        
-        public GetPreprocessTokenResponse(System.Guid GetPreprocessTokenResult, string accountName) {
-            this.GetPreprocessTokenResult = GetPreprocessTokenResult;
-            this.accountName = accountName;
-        }
     }
     
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -350,7 +402,7 @@ namespace DistCL.RemoteCompilerService {
         public string CompilerVersion;
         
         [System.ServiceModel.MessageBodyMemberAttribute(Namespace="urn:distcl:compiler:local:messages", Order=2)]
-        public System.Guid PreprocessToken;
+        public DistCL.RemoteCompilerService.PreprocessToken PreprocessToken;
         
         [System.ServiceModel.MessageBodyMemberAttribute(Namespace="urn:distcl:compiler:local:messages", Order=3)]
         public string Src;
@@ -361,7 +413,7 @@ namespace DistCL.RemoteCompilerService {
         public LocalCompileInput() {
         }
         
-        public LocalCompileInput(string Arguments, string CompilerVersion, System.Guid PreprocessToken, string Src, string SrcName) {
+        public LocalCompileInput(string Arguments, string CompilerVersion, DistCL.RemoteCompilerService.PreprocessToken PreprocessToken, string Src, string SrcName) {
             this.Arguments = Arguments;
             this.CompilerVersion = CompilerVersion;
             this.PreprocessToken = PreprocessToken;
@@ -418,22 +470,12 @@ namespace DistCL.RemoteCompilerService {
                 base(binding, remoteAddress) {
         }
         
-        [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
-        DistCL.RemoteCompilerService.GetPreprocessTokenResponse DistCL.RemoteCompilerService.ILocalCompiler.GetPreprocessToken(DistCL.RemoteCompilerService.GetPreprocessTokenRequest request) {
-            return base.Channel.GetPreprocessToken(request);
+        public DistCL.RemoteCompilerService.PreprocessToken GetPreprocessToken(string name, string compilerVersion) {
+            return base.Channel.GetPreprocessToken(name, compilerVersion);
         }
         
-        public System.Guid GetPreprocessToken(string name, string compilerVersion, out string accountName) {
-            DistCL.RemoteCompilerService.GetPreprocessTokenRequest inValue = new DistCL.RemoteCompilerService.GetPreprocessTokenRequest();
-            inValue.name = name;
-            inValue.compilerVersion = compilerVersion;
-            DistCL.RemoteCompilerService.GetPreprocessTokenResponse retVal = ((DistCL.RemoteCompilerService.ILocalCompiler)(this)).GetPreprocessToken(inValue);
-            accountName = retVal.accountName;
-            return retVal.GetPreprocessTokenResult;
-        }
-        
-        public System.Threading.Tasks.Task<DistCL.RemoteCompilerService.GetPreprocessTokenResponse> GetPreprocessTokenAsync(DistCL.RemoteCompilerService.GetPreprocessTokenRequest request) {
-            return base.Channel.GetPreprocessTokenAsync(request);
+        public System.Threading.Tasks.Task<DistCL.RemoteCompilerService.PreprocessToken> GetPreprocessTokenAsync(string name, string compilerVersion) {
+            return base.Channel.GetPreprocessTokenAsync(name, compilerVersion);
         }
         
         [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
@@ -441,7 +483,7 @@ namespace DistCL.RemoteCompilerService {
             return base.Channel.LocalCompile(request);
         }
         
-        public DistCL.RemoteCompilerService.CompileStatus LocalCompile(string Arguments, string CompilerVersion, System.Guid PreprocessToken, string Src, string SrcName, out System.IO.Stream ResultData) {
+        public DistCL.RemoteCompilerService.CompileStatus LocalCompile(string Arguments, string CompilerVersion, DistCL.RemoteCompilerService.PreprocessToken PreprocessToken, string Src, string SrcName, out System.IO.Stream ResultData) {
             DistCL.RemoteCompilerService.LocalCompileInput inValue = new DistCL.RemoteCompilerService.LocalCompileInput();
             inValue.Arguments = Arguments;
             inValue.CompilerVersion = CompilerVersion;
@@ -458,7 +500,7 @@ namespace DistCL.RemoteCompilerService {
             return base.Channel.LocalCompileAsync(request);
         }
         
-        public System.Threading.Tasks.Task<DistCL.RemoteCompilerService.LocalCompileOutput> LocalCompileAsync(string Arguments, string CompilerVersion, System.Guid PreprocessToken, string Src, string SrcName) {
+        public System.Threading.Tasks.Task<DistCL.RemoteCompilerService.LocalCompileOutput> LocalCompileAsync(string Arguments, string CompilerVersion, DistCL.RemoteCompilerService.PreprocessToken PreprocessToken, string Src, string SrcName) {
             DistCL.RemoteCompilerService.LocalCompileInput inValue = new DistCL.RemoteCompilerService.LocalCompileInput();
             inValue.Arguments = Arguments;
             inValue.CompilerVersion = CompilerVersion;
@@ -481,7 +523,7 @@ namespace DistCL.RemoteCompilerService {
         
         // CODEGEN: Generating message contract since the wrapper namespace (urn:distcl:compiler:messages) of message CompileInput does not match the default value (urn:distcl)
         [System.ServiceModel.OperationContractAttribute(Action="urn:distcl/ICompiler/Compile", ReplyAction="urn:distcl/ICompiler/CompileResponse")]
-        [System.ServiceModel.FaultContractAttribute(typeof(DistCL.RemoteCompilerService.CompilerNotFoundFaultContract), Action="urn:distcl/ICompiler/CompileCompilerNotFoundFaultContractFault", Name="CompilerNotFoundFaultContract", Namespace="http://schemas.datacontract.org/2004/07/DistCL")]
+        [System.ServiceModel.FaultContractAttribute(typeof(DistCL.RemoteCompilerService.CompilerNotFoundFaultContract), Action="urn:distcl/ICompiler/CompileCompilerNotFoundFaultContractFault", Name="CompilerNotFoundFaultContract", Namespace="urn:distcl:compiler:local:messages")]
         DistCL.RemoteCompilerService.CompileOutput Compile(DistCL.RemoteCompilerService.CompileInput request);
         
         [System.ServiceModel.OperationContractAttribute(Action="urn:distcl/ICompiler/Compile", ReplyAction="urn:distcl/ICompiler/CompileResponse")]
@@ -800,7 +842,7 @@ namespace DistCL.RemoteCompilerService {
         
         // CODEGEN: Generating message contract since the wrapper namespace (urn:distcl:compiler:messages) of message CompileInput does not match the default value (urn:distcl)
         [System.ServiceModel.OperationContractAttribute(Action="urn:distcl/ICompiler/Compile", ReplyAction="urn:distcl/ICompiler/CompileResponse")]
-        [System.ServiceModel.FaultContractAttribute(typeof(DistCL.RemoteCompilerService.CompilerNotFoundFaultContract), Action="urn:distcl/ICompiler/CompileCompilerNotFoundFaultContractFault", Name="CompilerNotFoundFaultContract", Namespace="http://schemas.datacontract.org/2004/07/DistCL")]
+        [System.ServiceModel.FaultContractAttribute(typeof(DistCL.RemoteCompilerService.CompilerNotFoundFaultContract), Action="urn:distcl/ICompiler/CompileCompilerNotFoundFaultContractFault", Name="CompilerNotFoundFaultContract", Namespace="urn:distcl:compiler:local:messages")]
         DistCL.RemoteCompilerService.CompileOutput Compile(DistCL.RemoteCompilerService.CompileInput request);
         
         [System.ServiceModel.OperationContractAttribute(Action="urn:distcl/ICompiler/Compile", ReplyAction="urn:distcl/ICompiler/CompileResponse")]

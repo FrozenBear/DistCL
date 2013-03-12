@@ -8,6 +8,7 @@ namespace DistCL.Service
 	{
 		private CompileServiceHost _serviceHost;
 		private readonly Logger _logger = new Logger("SERVICE");
+		readonly object _syncRoot = new object();
 
 		public CompileService()
 		{
@@ -21,41 +22,47 @@ namespace DistCL.Service
 
 		protected override void OnStart(string[] args)
 		{
-			try
+			lock (_syncRoot)
 			{
-				if (_serviceHost != null)
+				try
 				{
-					_serviceHost.Close();
-				}
+					if (_serviceHost != null)
+					{
+						_serviceHost.Close();
+					}
 
-				Logger.Debug("WCF service starting...");
-				_serviceHost = new CompileServiceHost();
-				_serviceHost.Open();
-				Logger.Info("WCF service started");
-			}
-			catch (Exception e)
-			{
-				Logger.LogException("OnStart error", e);
-				throw;
+					Logger.Debug("WCF service starting...");
+					_serviceHost = new CompileServiceHost();
+					_serviceHost.Open();
+					Logger.Info("WCF service started");
+				}
+				catch (Exception e)
+				{
+					Logger.LogException("OnStart error", e);
+					throw;
+				}
 			}
 		}
 
 		protected override void OnStop()
 		{
-			try
+			lock (_syncRoot)
 			{
-				Logger.Debug("WCF service stopping...");
-				if (_serviceHost != null)
+				try
 				{
-					_serviceHost.Close();
-					_serviceHost = null;
+					Logger.Debug("WCF service stopping...");
+					if (_serviceHost != null)
+					{
+						_serviceHost.Close();
+						_serviceHost = null;
+					}
+					Logger.Info("WCF service stopped");
 				}
-				Logger.Info("WCF service stopped");
-			}
-			catch (Exception e)
-			{
-				Logger.LogException("OnStop error", e);
-				throw;
+				catch (Exception e)
+				{
+					Logger.LogException("OnStop error", e);
+					throw;
+				}
 			}
 		}
 	}

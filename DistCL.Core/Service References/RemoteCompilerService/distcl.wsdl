@@ -3,9 +3,8 @@
   <wsdl:types>
     <xsd:schema targetNamespace="urn:distcl/Imports">
       <xsd:import namespace="urn:distcl" />
-      <xsd:import namespace="http://schemas.datacontract.org/2004/07/DistCL" />
-      <xsd:import namespace="http://schemas.microsoft.com/2003/10/Serialization/" />
       <xsd:import namespace="urn:distcl:compiler:local:messages" />
+      <xsd:import namespace="http://schemas.microsoft.com/2003/10/Serialization/" />
       <xsd:import namespace="http://schemas.microsoft.com/Message" />
       <xsd:import namespace="urn:distcl:compiler:messages" />
       <xsd:import namespace="urn:distcl:utils" />
@@ -20,7 +19,7 @@
     <wsdl:part name="parameters" element="tns:GetPreprocessTokenResponse" />
   </wsdl:message>
   <wsdl:message name="ILocalCompiler_GetPreprocessToken_CompilerNotFoundFaultContractFault_FaultMessage">
-    <wsdl:part xmlns:q1="http://schemas.datacontract.org/2004/07/DistCL" name="detail" element="q1:CompilerNotFoundFaultContract" />
+    <wsdl:part xmlns:q1="urn:distcl:compiler:local:messages" name="detail" element="q1:CompilerNotFoundFaultContract" />
   </wsdl:message>
   <wsdl:message name="LocalCompileInput">
     <wsdl:part xmlns:q2="urn:distcl:compiler:local:messages" name="parameters" element="q2:LocalCompileInput" />
@@ -32,7 +31,7 @@
     <wsdl:part name="Status" element="tns:Status" />
   </wsdl:message>
   <wsdl:message name="ILocalCompiler_LocalCompile_CompilerNotFoundFaultContractFault_FaultMessage">
-    <wsdl:part xmlns:q4="http://schemas.datacontract.org/2004/07/DistCL" name="detail" element="q4:CompilerNotFoundFaultContract" />
+    <wsdl:part xmlns:q4="urn:distcl:compiler:local:messages" name="detail" element="q4:CompilerNotFoundFaultContract" />
   </wsdl:message>
   <wsdl:message name="ICompileManager_IsReady_InputMessage">
     <wsdl:part name="parameters" element="tns:IsReady" />
@@ -56,7 +55,7 @@
     <wsdl:part name="Status" element="tns:Status" />
   </wsdl:message>
   <wsdl:message name="ICompileManager_Compile_CompilerNotFoundFaultContractFault_FaultMessage">
-    <wsdl:part xmlns:q7="http://schemas.datacontract.org/2004/07/DistCL" name="detail" element="q7:CompilerNotFoundFaultContract" />
+    <wsdl:part xmlns:q7="urn:distcl:compiler:local:messages" name="detail" element="q7:CompilerNotFoundFaultContract" />
   </wsdl:message>
   <wsdl:message name="ICompileManager_GetDescription_InputMessage">
     <wsdl:part name="parameters" element="tns:GetDescription" />
@@ -74,7 +73,7 @@
     <wsdl:part name="parameters" element="tns:GetAgentsResponse" />
   </wsdl:message>
   <wsdl:message name="ICompiler_Compile_CompilerNotFoundFaultContractFault_FaultMessage">
-    <wsdl:part xmlns:q8="http://schemas.datacontract.org/2004/07/DistCL" name="detail" element="q8:CompilerNotFoundFaultContract" />
+    <wsdl:part xmlns:q8="urn:distcl:compiler:local:messages" name="detail" element="q8:CompilerNotFoundFaultContract" />
   </wsdl:message>
   <wsdl:portType name="ILocalCompiler">
     <wsdl:operation name="GetPreprocessToken">

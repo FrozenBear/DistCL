@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <xs:schema xmlns:tns="urn:distcl" elementFormDefault="qualified" targetNamespace="urn:distcl" xmlns:xs="http://www.w3.org/2001/XMLSchema">
-  <xs:import namespace="http://schemas.microsoft.com/2003/10/Serialization/" />
+  <xs:import namespace="urn:distcl:compiler:local:messages" />
   <xs:import namespace="http://schemas.microsoft.com/Message" />
   <xs:import namespace="urn:distcl:compiler:messages" />
   <xs:import namespace="urn:distcl:agents:messages" />
@@ -15,8 +15,7 @@
   <xs:element name="GetPreprocessTokenResponse">
     <xs:complexType>
       <xs:sequence>
-        <xs:element xmlns:q1="http://schemas.microsoft.com/2003/10/Serialization/" minOccurs="0" name="GetPreprocessTokenResult" type="q1:guid" />
-        <xs:element minOccurs="0" name="accountName" nillable="true" type="xs:string" />
+        <xs:element xmlns:q1="urn:distcl:compiler:local:messages" minOccurs="0" name="GetPreprocessTokenResult" nillable="true" type="q1:PreprocessToken" />
       </xs:sequence>
     </xs:complexType>
   </xs:element>

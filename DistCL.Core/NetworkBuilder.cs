@@ -39,6 +39,7 @@ namespace DistCL
 
 		public void Start()
 		{
+			Logger.Debug("Network builder starting...");
 			lock (_syncRoot)
 			{
 				if (Volatile.Read(ref _started))
@@ -50,11 +51,13 @@ namespace DistCL
 
 				_updateAgentsThread = new Thread(UpdateAgents) {IsBackground = true};
 				_updateAgentsThread.Start();
+				Logger.Debug("Network builder started");
 			}
 		}
 
 		public void Stop()
 		{
+			Logger.Debug("Network builder stopping...");
 			lock (_syncRoot)
 			{
 				if (!Volatile.Read(ref _started))
@@ -67,6 +70,7 @@ namespace DistCL
 			}
 
 			_updateAgentsThread.Join();
+			Logger.Debug("Network builder stopped");
 		}
 
 		private void UpdateAgents(object o)

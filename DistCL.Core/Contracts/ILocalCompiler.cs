@@ -12,7 +12,7 @@ namespace DistCL
 	{
 		[OperationContract]
 		[FaultContract(typeof(CompilerNotFoundFaultContract), Namespace = GeneralSettings.LocalCompilerMessageNamespace)]
-		Guid GetPreprocessToken(string name, string compilerVersion, out string accountName);
+		PreprocessToken GetPreprocessToken(string name, string compilerVersion);
 
 		[OperationContract]
 		[FaultContract(typeof(CompilerNotFoundFaultContract), Namespace = GeneralSettings.LocalCompilerMessageNamespace)]
@@ -35,7 +35,31 @@ namespace DistCL
 		public string SrcName { get; set; }
 
 		[MessageBodyMember(Namespace = GeneralSettings.LocalCompilerMessageNamespace)]
-		public Guid PreprocessToken { get; set; }
+		public PreprocessToken PreprocessToken { get; set; }
+	}
+
+	[DataContract(Namespace = GeneralSettings.LocalCompilerMessageNamespace)]
+	public class PreprocessToken
+	{
+		public PreprocessToken(Guid guid, string accountName, DateTime requested, DateTime created)
+		{
+			Guid = guid;
+			AccountName = accountName;
+			Requested = requested;
+			Created = created;
+		}
+
+		[DataMember]
+		public DateTime Requested { get; set; }
+
+		[DataMember]
+		public DateTime Created { get; set; }
+
+		[DataMember]
+		public Guid Guid { get; set; }
+
+		[DataMember]
+		public string AccountName { get; set; }
 	}
 
 	[MessageContract(WrapperNamespace = GeneralSettings.LocalCompilerMessageNamespace)]
@@ -55,7 +79,7 @@ namespace DistCL
 		}
 	}
 
-	[DataContract]
+	[DataContract(Namespace = GeneralSettings.LocalCompilerMessageNamespace)]
 	public class CompilerNotFoundFaultContract
 	{
 		[DataMember]

@@ -1,13 +1,28 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<xs:schema xmlns:tns="urn:distcl:compiler:local:messages" elementFormDefault="qualified" targetNamespace="urn:distcl:compiler:local:messages" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+<xs:schema xmlns:ser="http://schemas.microsoft.com/2003/10/Serialization/" xmlns:tns="urn:distcl:compiler:local:messages" elementFormDefault="qualified" targetNamespace="urn:distcl:compiler:local:messages" xmlns:xs="http://www.w3.org/2001/XMLSchema">
   <xs:import namespace="http://schemas.microsoft.com/2003/10/Serialization/" />
   <xs:import namespace="urn:distcl" />
+  <xs:complexType name="PreprocessToken">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="AccountName" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="Created" type="xs:dateTime" />
+      <xs:element minOccurs="0" name="Guid" type="ser:guid" />
+      <xs:element minOccurs="0" name="Requested" type="xs:dateTime" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="PreprocessToken" nillable="true" type="tns:PreprocessToken" />
+  <xs:complexType name="CompilerNotFoundFaultContract">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="CompilerVersion" nillable="true" type="xs:string" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="CompilerNotFoundFaultContract" nillable="true" type="tns:CompilerNotFoundFaultContract" />
   <xs:element name="LocalCompileInput">
     <xs:complexType>
       <xs:sequence>
         <xs:element minOccurs="0" name="Arguments" nillable="true" type="xs:string" />
         <xs:element minOccurs="0" name="CompilerVersion" nillable="true" type="xs:string" />
-        <xs:element xmlns:q1="http://schemas.microsoft.com/2003/10/Serialization/" minOccurs="0" name="PreprocessToken" type="q1:guid" />
+        <xs:element minOccurs="0" name="PreprocessToken" nillable="true" type="tns:PreprocessToken" />
         <xs:element minOccurs="0" name="Src" nillable="true" type="xs:string" />
         <xs:element minOccurs="0" name="SrcName" nillable="true" type="xs:string" />
       </xs:sequence>
@@ -16,7 +31,7 @@
   <xs:element name="LocalCompileOutput">
     <xs:complexType>
       <xs:sequence>
-        <xs:element xmlns:q2="urn:distcl" ref="q2:ResultData" />
+        <xs:element xmlns:q1="urn:distcl" ref="q1:ResultData" />
       </xs:sequence>
     </xs:complexType>
   </xs:element>

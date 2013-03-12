@@ -317,6 +317,7 @@ namespace DistCL
 			base.OnClosing();
 
 			_compilerServices.NetworkBuilder.Stop();
+			_compilerServices.Compiler.Close();
 		}
 
 		public Binding GetBinding(Uri url)

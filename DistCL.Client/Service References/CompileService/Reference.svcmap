@@ -27,7 +27,6 @@
     <MetadataFile FileName="service.wsdl" MetadataType="Wsdl" ID="fdccfdaa-f767-4946-8f9c-94400547f875" SourceId="1" SourceUrl="net.tcp://localhost:8734/Compile/mex" />
     <MetadataFile FileName="distcl.xsd" MetadataType="Schema" ID="f246ea61-04cd-42d4-aa4b-c0e74662e4a8" SourceId="1" SourceUrl="net.tcp://localhost:8734/Compile/mex" />
     <MetadataFile FileName="service.xsd" MetadataType="Schema" ID="2ac68b7a-0f6d-45d2-bce0-cf1d870d792d" SourceId="1" SourceUrl="net.tcp://localhost:8734/Compile/mex" />
-    <MetadataFile FileName="DistCL1.xsd" MetadataType="Schema" ID="2134eeb1-fd4c-4fec-a227-f54c41403e1a" SourceId="1" SourceUrl="net.tcp://localhost:8734/Compile/mex" />
     <MetadataFile FileName="messages.xsd" MetadataType="Schema" ID="89b3a055-78d9-43ca-845d-8053ce583413" SourceId="1" SourceUrl="net.tcp://localhost:8734/Compile/mex" />
     <MetadataFile FileName="Message.xsd" MetadataType="Schema" ID="fe2cb055-f47b-4649-996f-2fbe6036df10" SourceId="1" SourceUrl="net.tcp://localhost:8734/Compile/mex" />
     <MetadataFile FileName="messages1.xsd" MetadataType="Schema" ID="ead1da7a-0367-45f7-af3f-64f906c115ff" SourceId="1" SourceUrl="net.tcp://localhost:8734/Compile/mex" />

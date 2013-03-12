@@ -45,7 +45,7 @@ namespace DistCL.Client
 
 				Logger.Info("Send preprocess token request...");
 
-				var preprocessTokenResponse = compiler.GetPreprocessToken(new GetPreprocessTokenRequest(driver.SourceFiles[0], CompilerVersion));
+				var preprocessToken = compiler.GetPreprocessToken(driver.SourceFiles[0], CompilerVersion);
 
 				Logger.Info("Token obtained, starting preprocess...");
 
@@ -66,7 +66,7 @@ namespace DistCL.Client
 
 				Logger.Info("Preprocess finished, send compilation request...");
 
-				var rule = new FileSystemAccessRule(preprocessTokenResponse.accountName, FileSystemRights.Read, AccessControlType.Allow);
+				var rule = new FileSystemAccessRule(preprocessToken.AccountName, FileSystemRights.Read, AccessControlType.Allow);
 				var security = File.GetAccessControl(ppFileName);
 				security.SetAccessRule(rule);
 				File.SetAccessControl(ppFileName, security);
@@ -77,7 +77,7 @@ namespace DistCL.Client
 						Arguments = driver.RemoteCommandLine,
 						SrcName = driver.SourceFiles[0],
 						Src = ppFileName,
-						PreprocessToken = preprocessTokenResponse.GetPreprocessTokenResult
+						PreprocessToken = preprocessToken
 					});
 
 				Logger.InfoFormat("Compilation finished with exit code {0}, processing result...", output.Status.ExitCode);

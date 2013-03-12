@@ -72,13 +72,10 @@
     <None Include="Service References\CompileService\DistCL.Client.CompileService.CompileStatus.datasource">
       <DependentUpon>Reference.svcmap</DependentUpon>
     </None>
-    <None Include="Service References\CompileService\DistCL.Client.CompileService.GetPreprocessTokenResponse.datasource">
+    <None Include="Service References\CompileService\DistCL.Client.CompileService.PreprocessToken.datasource">
       <DependentUpon>Reference.svcmap</DependentUpon>
     </None>
     <None Include="Service References\CompileService\distcl.xsd">
-      <SubType>Designer</SubType>
-    </None>
-    <None Include="Service References\CompileService\DistCL1.xsd">
       <SubType>Designer</SubType>
     </None>
     <None Include="Service References\CompileService\Message.xsd">

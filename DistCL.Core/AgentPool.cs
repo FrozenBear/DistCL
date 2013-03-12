@@ -195,24 +195,27 @@ namespace DistCL
 			}
 		}
 
-		public ICompiler GetRandomCompiler(string compilerVersion)
+		public ICompiler GetRandomCompiler(string compilerVersion, out string agentName)
 		{
 			if (string.IsNullOrEmpty(compilerVersion))
 				throw new ArgumentNullException("compilerVersion");
 
 			ICompiler compiler = null;
+			string name = null;
 
 			SpinWait.SpinUntil(delegate
 				{
-					compiler = GetRandomCompilerInternal(compilerVersion);
+					compiler = GetRandomCompilerInternal(compilerVersion, out name);
 					return compiler != null;
 				});
 
+			agentName = name;
 			return compiler;
 		}
 
-		private ICompiler GetRandomCompilerInternal(string compilerVersion)
+		private ICompiler GetRandomCompilerInternal(string compilerVersion, out string agentName)
 		{
+			agentName = null;
 			var weights = GetWeights(compilerVersion);
 
 			if (weights.Count == 0)
@@ -234,6 +237,7 @@ namespace DistCL
 			if (compiler != null)
 			{
 				Logger.DebugFormat("Found ready compiler '{0}'", compilerProvider.Description.Name);
+				agentName = compilerProvider.Description.Name;
 			}
 
 			return compiler;

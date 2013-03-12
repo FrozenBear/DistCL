@@ -95,13 +95,10 @@
     <None Include="Service References\RemoteCompilerService\DistCL.RemoteCompilerService.CompileStatus.datasource">
       <DependentUpon>Reference.svcmap</DependentUpon>
     </None>
-    <None Include="Service References\RemoteCompilerService\DistCL.RemoteCompilerService.GetPreprocessTokenResponse.datasource">
+    <None Include="Service References\RemoteCompilerService\DistCL.RemoteCompilerService.PreprocessToken.datasource">
       <DependentUpon>Reference.svcmap</DependentUpon>
     </None>
     <None Include="Service References\RemoteCompilerService\distcl.xsd">
-      <SubType>Designer</SubType>
-    </None>
-    <None Include="Service References\RemoteCompilerService\DistCL1.xsd">
       <SubType>Designer</SubType>
     </None>
     <None Include="Service References\RemoteCompilerService\Message.xsd">

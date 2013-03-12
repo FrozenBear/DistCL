@@ -18,10 +18,12 @@ namespace DistCL
 	[BindingNamespaceBehavior]
 	public class Compiler : ICompileManager, ILocalCompiler
 	{
-		private const int PreprocessWorkerCount = 1;
-		private const int CompileWorkerCount = 2 * PreprocessWorkerCount;
+		private const int PreprocessWorkerCount = 2;
+		private const int CompileWorkerCount = PreprocessWorkerCount * 3 / 2;
 		private readonly Semaphore _semaphore;
+		private readonly object _acquireWorkersSyncRoot = new object();
 		private readonly int _maxWorkersCount;
+		private ManualResetEventSlim _preprocessWaitEventSlim = new ManualResetEventSlim();
 
 		private readonly ICompilerServicesCollection _compilerServices;
 		private readonly Logger _compilerLogger = new Logger("COMPILER");
@@ -103,13 +105,16 @@ namespace DistCL
 			get { return _localLogger; }
 		}
 
+		public void Close()
+		{
+			_preprocessWaitEventSlim.Set();
+		}
+
 		#region ILocalCompiler Operations
 
-		Guid ILocalCompiler.GetPreprocessToken(string name, string compilerVersion, out string accountName)
+		PreprocessToken ILocalCompiler.GetPreprocessToken(string name, string compilerVersion)
 		{
 			LocalLogger.DebugFormat("Preprocess token requested ({0})", name);
-
-			accountName = System.Security.Principal.WindowsIdentity.GetCurrent().Name;
 
 			if (! CompilerVersions.ContainsKey(compilerVersion))
 			{
@@ -120,15 +125,22 @@ namespace DistCL
 					});
 			}
 
+			var requested = DateTime.Now;
 			AcquireWorkers(PreprocessWorkerCount);
+			var created = DateTime.Now;
 
 			var token = Guid.NewGuid();
-			Task.Delay(TimeSpan.FromMinutes(1)).ContinueWith(PreprocessTokenRemove, token);
+			Task.Run((Action) PreprocessTokenWait).ContinueWith(PreprocessTokenRemove, token);
 			_preprocessTokens[token] = name;
 			LocalLogger.DebugFormat("Preprocess token created ({0})", name);
-			return token;
+
+			return new PreprocessToken(token, System.Security.Principal.WindowsIdentity.GetCurrent().Name, requested, created);
 		}
 
+		private void PreprocessTokenWait()
+		{
+			_preprocessWaitEventSlim.Wait(TimeSpan.FromMinutes(1));
+		}
 		private void PreprocessTokenRemove(Task task, object state)
 		{
 			var token = (Guid)state;
@@ -144,10 +156,11 @@ namespace DistCL
 		LocalCompileOutput ILocalCompiler.LocalCompile(LocalCompileInput input)
 		{
 			LocalLogger.InfoFormat("Received local compile request '{0}'", input.SrcName);
+			var preprocessDuration = DateTime.Now.Subtract(input.PreprocessToken.Created);
 			var stopwatch = Stopwatch.StartNew();
 
 			string preprocessName;
-			if (_preprocessTokens.TryRemove(input.PreprocessToken, out preprocessName))
+			if (_preprocessTokens.TryRemove(input.PreprocessToken.Guid, out preprocessName))
 			{
 				ReleaseWorkers(PreprocessWorkerCount);
 			}
@@ -176,7 +189,10 @@ namespace DistCL
 					SrcName = input.SrcName
 				};
 
-				using (var remoteOutput = CompilerServices.AgentPool.GetRandomCompiler(input.CompilerVersion).Compile(remoteInput))
+				string agentName;
+				var remoteCompiler = CompilerServices.AgentPool.GetRandomCompiler(input.CompilerVersion, out agentName);
+				var compilerSearchDuration = stopwatch.Elapsed;
+				using (var remoteOutput = remoteCompiler.Compile(remoteInput))
 				{
 					var remoteStreams = new Dictionary<CompileArtifactType, Stream>();
 					var cookies = new List<CompileArtifactCookie>();
@@ -223,8 +239,19 @@ namespace DistCL
 						}
 					}
 
+					LocalLogger.InfoFormat("Completed local compile '{0}'", input.SrcName);
 					stopwatch.Stop();
-					LocalLogger.InfoFormat("Completed local compile '{0}' ({1})", input.SrcName, stopwatch.Elapsed);
+					LocalLogger.DebugFormat(@"Stats for '{0}':
+	agent             {1},
+	preprocess        {2},
+	compiler search   {3}
+	compile           {4}",
+						input.SrcName,
+						agentName,
+						preprocessDuration,
+						compilerSearchDuration,
+						stopwatch.Elapsed);
+
 					return new LocalCompileOutput(true, remoteOutput.Status.ExitCode, localStreams, localFiles);
 				}
 			}
@@ -368,12 +395,12 @@ namespace DistCL
 
 					if (!string.IsNullOrWhiteSpace(outText))
 					{
-						CompilerLogger.DebugFormat("Output message: {0}", outText);
+						CompilerLogger.DebugFormat("Output message: {0}", outText.Trim());
 					}
 
 					if (!string.IsNullOrWhiteSpace(errText))
 					{
-						CompilerLogger.WarnFormat("Error message: {0}", outText);
+						CompilerLogger.WarnFormat("Error message: {0}", outText.Trim());
 					}
 				}
 			}
@@ -423,9 +450,12 @@ namespace DistCL
 
 		private void AcquireWorkers(int count)
 		{
-			for (var i = 0; i < count; i++)
+			lock (_acquireWorkersSyncRoot)	// only one thread should be in increase loop
 			{
-				_semaphore.WaitOne();
+				for (var i = 0; i < count; i++)
+				{
+					_semaphore.WaitOne();
+				}
 			}
 		}
 
