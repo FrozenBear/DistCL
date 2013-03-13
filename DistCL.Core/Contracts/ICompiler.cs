@@ -63,7 +63,7 @@ namespace DistCL
 		public Stream Src { get; set; }
 
 		[MessageHeader]
-		public string SrcName { get; set; }
+		public CompileArtifactCookie[] Artifacts { get; set; }
 
 		[MessageHeader]
 		public long SrcLength { get; set; }

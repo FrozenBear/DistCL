@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Diagnostics;
 using System.IO;
 
 namespace DistCL.Utils.Streams
@@ -10,7 +9,7 @@ namespace DistCL.Utils.Streams
 		Stream StreamBody { get; }
 	}
 
-	public class ProxyStream : Stream
+	public class ProxyStream : ReadOnlyStream
 	{
 		private readonly IStreamedMessage _streamedMessage;
 
@@ -41,50 +40,12 @@ namespace DistCL.Utils.Streams
 			}
 		}
 
-		public override bool CanRead
-		{
-			get { return true; }
-		}
-
 		public override bool CanSeek
 		{
 			get { return false; }
 		}
 
-		public override bool CanWrite
-		{
-			get { return false; }
-		}
-
-		internal static void LogError()
-		{
-			using (
-				var writer =
-					new StreamWriter(Path.Combine(Path.GetDirectoryName(typeof (ProxyStream).Assembly.Location), "error.log"), true))
-			{
-				writer.WriteLine(new StackTrace());
-			}
-		}
-
 		public override long Seek(long offset, SeekOrigin origin)
-		{
-			LogError();
-			throw new InvalidOperationException();
-		}
-
-		public override void SetLength(long value)
-		{
-			LogError();
-			throw new InvalidOperationException();
-		}
-
-		public override void Flush()
-		{
-			LogError();
-			throw new InvalidOperationException();
-		}
-
-		public override void Write(byte[] buffer, int offset, int count)
 		{
 			LogError();
 			throw new InvalidOperationException();

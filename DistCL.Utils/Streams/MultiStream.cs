@@ -1,11 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 
 namespace DistCL.Utils.Streams
 {
-	internal class MultiStream : Stream
+	internal class MultiStream : ReadOnlyStream
 	{
 		private readonly List<Stream> _streams;
 		private long _position;
@@ -72,19 +71,9 @@ namespace DistCL.Utils.Streams
 			}
 		}
 
-		public override bool CanRead
-		{
-			get { return true; }
-		}
-
 		public override bool CanSeek
 		{
 			get { return true; }
-		}
-
-		public override bool CanWrite
-		{
-			get { return false; }
 		}
 
 		public override long Length
@@ -131,24 +120,6 @@ namespace DistCL.Utils.Streams
 			}
 
 			return _position;
-		}
-
-		public override void SetLength(long value)
-		{
-			ProxyStream.LogError();
-			throw new InvalidOperationException();
-		}
-
-		public override void Flush()
-		{
-			ProxyStream.LogError();
-			throw new InvalidOperationException();
-		}
-
-		public override void Write(byte[] buffer, int offset, int count)
-		{
-			ProxyStream.LogError();
-			throw new InvalidOperationException();
 		}
 	}
 }

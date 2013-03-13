@@ -52,6 +52,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Streams\MultiStream.cs" />
     <Compile Include="Streams\ProxyStream.cs" />
+    <Compile Include="Streams\ReadOnlyStream.cs" />
     <Compile Include="Streams\StreamSplitter.cs" />
     <Compile Include="StringUtils.cs" />
   </ItemGroup>

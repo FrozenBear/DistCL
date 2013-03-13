@@ -244,7 +244,7 @@ namespace DistCL.Proxies
 						Arguments = localInput.Arguments,
 						Src = localInput.Src,
 						SrcLength = localInput.SrcLength,
-						SrcName = localInput.SrcName
+						Artifacts = localInput.Artifacts
 					};
 
 				RemoteCompilerService.CompileOutput remoteOutput = _compiler.Compile(remoteInput);

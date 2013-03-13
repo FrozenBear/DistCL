@@ -29,6 +29,7 @@
       <xs:enumeration value="Pdb" />
       <xs:enumeration value="Out" />
       <xs:enumeration value="Err" />
+      <xs:enumeration value="Src" />
     </xs:restriction>
   </xs:simpleType>
   <xs:element name="CompileArtifactType" nillable="true" type="tns:CompileArtifactType" />

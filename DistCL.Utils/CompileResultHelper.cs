@@ -15,7 +15,9 @@ namespace DistCL.Utils
 		[EnumMember]
 		Out,
 		[EnumMember]
-		Err
+		Err,
+		[EnumMember]
+		Src
 	}
 
 	public interface ICompileArtifactDescription

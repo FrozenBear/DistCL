@@ -181,13 +181,19 @@ namespace DistCL
 			using (var inputStream = File.OpenRead(input.Src))
 			{
 				var remoteInput = new CompileInput
-				{
-					CompilerVersion = input.CompilerVersion,
-					Arguments = input.Arguments,
-					Src = inputStream,
-					SrcLength = inputStream.Length,
-					SrcName = input.SrcName
-				};
+					{
+						CompilerVersion = input.CompilerVersion,
+						Arguments = input.Arguments,
+						Src = inputStream,
+						SrcLength = inputStream.Length,
+						Artifacts =
+							new[]
+								{
+									new CompileArtifactCookie(
+										new CompileArtifactDescription(CompileArtifactType.Src, input.SrcName),
+										inputStream.Length)
+								}
+					};
 
 				string agentName;
 				var remoteCompiler = CompilerServices.AgentPool.GetRandomCompiler(input.CompilerVersion, out agentName);
@@ -275,7 +281,9 @@ namespace DistCL
 
 		CompileOutput ICompiler.Compile(CompileInput input)
 		{
-			CompilerLogger.DebugFormat("Received compile request '{0}'", input.SrcName);
+			string srcName = input.Artifacts.First(artifact => artifact.Type == CompileArtifactType.Src).Name;
+
+			CompilerLogger.DebugFormat("Received compile request '{0}'", srcName);
 			var stopwatch = Stopwatch.StartNew();
 
 			if (!CompilerVersions.ContainsKey(input.CompilerVersion))
@@ -289,7 +297,7 @@ namespace DistCL
 
 			AcquireWorkers(CompileWorkerCount);
 
-			CompilerLogger.InfoFormat("Processing '{0}'...", input.SrcName);
+			CompilerLogger.InfoFormat("Processing '{0}'...", srcName);
 
 			try
 			{
@@ -308,16 +316,16 @@ namespace DistCL
 
 				try
 				{
-					var srcName = Path.Combine(tmpPath, Path.GetFileName(input.SrcName));
-					using (var src = File.OpenWrite(srcName))
+					var srcPath = Path.Combine(tmpPath, Path.GetFileName(srcName));
+					using (var src = File.OpenWrite(srcPath))
 					{
-						CompilerLogger.DebugFormat("Copying source to {0}...", srcName);
+						CompilerLogger.DebugFormat("Copying source to {0}...", srcPath);
 						input.Src.CopyTo(src);
 						CompilerLogger.Debug("Source copied to local file");
 					}
 
 					Dictionary<CompileArtifactDescription, Stream> streams;
-					var errorCode = RunCompiler(clPath, input.Arguments, srcName, tmpPath, out streams);
+					var errorCode = RunCompiler(clPath, input.Arguments, srcPath, tmpPath, out streams);
 
 					return new CompileOutput(errorCode == 0, errorCode, streams, null);
 				}
@@ -328,14 +336,14 @@ namespace DistCL
 			}
 			catch (Exception e)
 			{
-				CompilerLogger.LogException(string.Format("Exception in CompileInternal({0})", input.SrcName), e);
+				CompilerLogger.LogException(string.Format("Exception in CompileInternal({0})", srcName), e);
 				throw;
 			}
 			finally
 			{
 				ReleaseWorkers(CompileWorkerCount);
 				stopwatch.Stop();
-				CompilerLogger.InfoFormat("Processing of '{0}' completed ({1})", input.SrcName, stopwatch.Elapsed);
+				CompilerLogger.InfoFormat("Processing of '{0}' completed ({1})", srcName, stopwatch.Elapsed);
 			}
 		}
 

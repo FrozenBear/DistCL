@@ -44,9 +44,9 @@
   </wsdl:message>
   <wsdl:message name="CompileInput_Headers">
     <wsdl:part name="Arguments" element="tns:Arguments" />
+    <wsdl:part name="Artifacts" element="tns:Artifacts" />
     <wsdl:part name="CompilerVersion" element="tns:CompilerVersion" />
     <wsdl:part name="SrcLength" element="tns:SrcLength" />
-    <wsdl:part name="SrcName" element="tns:SrcName" />
   </wsdl:message>
   <wsdl:message name="CompileOutput">
     <wsdl:part xmlns:q6="urn:distcl:compiler:messages" name="parameters" element="q6:CompileOutput" />
