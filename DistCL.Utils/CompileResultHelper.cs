@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Diagnostics.Contracts;
 using System.IO;
 using System.Runtime.Serialization;
 using DistCL.Utils.Streams;
@@ -67,6 +68,9 @@ namespace DistCL.Utils
 	{
 		public CompileArtifactCookie(CompileArtifactDescription description, long size)
 		{
+			Contract.Requires(description != null);
+			Contract.Requires(size >= 0);
+
 			Name = description.Name;
 			Type = description.Type;
 			Size = size;
@@ -82,6 +86,8 @@ namespace DistCL.Utils
 
 		public static Stream Pack(IDictionary<CompileArtifactDescription, Stream> streams, out CompileArtifactCookie[] cookies)
 		{
+			Contract.Requires(streams != null);
+
 			var cookiesList = new List<CompileArtifactCookie>();
 			var streamsList = new List<Stream>();
 
@@ -97,6 +103,9 @@ namespace DistCL.Utils
 
 		public static void Unpack(Stream multiStream, IEnumerable<ICompileArtifactCookie> cookies, IDictionary<CompileArtifactType, Stream> streams)
 		{
+			Contract.Requires(multiStream != null);
+			Contract.Requires(cookies != null);
+
 			var splitter = new StreamSplitter(multiStream);
 
 			foreach (var cookie in cookies)

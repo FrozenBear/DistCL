@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.Contracts;
 using System.IO;
 using System.Runtime.Serialization;
 using System.ServiceModel;
@@ -22,6 +23,26 @@ namespace DistCL
 	[MessageContract(WrapperNamespace = GeneralSettings.LocalCompilerMessageNamespace)]
 	public class LocalCompileInput
 	{
+		public LocalCompileInput(
+			string compilerVersion,
+			string arguments,
+			string src,
+			string srcName,
+			PreprocessToken preprocessToken)
+		{
+			Contract.Requires(! string.IsNullOrEmpty(compilerVersion));
+			Contract.Requires(! string.IsNullOrEmpty(arguments));
+			Contract.Requires(! string.IsNullOrEmpty(src));
+			Contract.Requires(! string.IsNullOrEmpty(srcName));
+			Contract.Requires(preprocessToken != null);
+
+			CompilerVersion = compilerVersion;
+			Arguments = arguments;
+			Src = src;
+			SrcName = srcName;
+			PreprocessToken = preprocessToken;
+		}
+
 		[MessageBodyMember(Namespace = GeneralSettings.LocalCompilerMessageNamespace)]
 		public string CompilerVersion { get; set; }
 
@@ -36,6 +57,16 @@ namespace DistCL
 
 		[MessageBodyMember(Namespace = GeneralSettings.LocalCompilerMessageNamespace)]
 		public PreprocessToken PreprocessToken { get; set; }
+
+		[ContractInvariantMethod]
+		private void CheckInvariant()
+		{
+			Contract.Invariant(!string.IsNullOrEmpty(CompilerVersion));
+			Contract.Invariant(!string.IsNullOrEmpty(Arguments));
+			Contract.Invariant(!string.IsNullOrEmpty(Src));
+			Contract.Invariant(!string.IsNullOrEmpty(SrcName));
+			Contract.Invariant(PreprocessToken != null);
+		}
 	}
 
 	[DataContract(Namespace = GeneralSettings.LocalCompilerMessageNamespace)]
@@ -76,13 +107,19 @@ namespace DistCL
 			IEnumerable<CompileArtifactDescription> artifacts)
 			: base(success, exitCode, streams, artifacts)
 		{
+			Contract.Requires(streams != null);
 		}
 	}
 
 	[DataContract(Namespace = GeneralSettings.LocalCompilerMessageNamespace)]
 	public class CompilerNotFoundFaultContract
 	{
+		public CompilerNotFoundFaultContract(string compilerVersion)
+		{
+			CompilerVersion = compilerVersion;
+		}
+
 		[DataMember]
-		public string CompilerVersion { get; set; }
+		public string CompilerVersion { get; private set; }
 	}
 }

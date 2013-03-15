@@ -119,10 +119,7 @@ namespace DistCL
 			if (! CompilerVersions.ContainsKey(compilerVersion))
 			{
 				LocalLogger.WarnFormat("Compiler version '{0}' not found", compilerVersion);
-				throw new FaultException<CompilerNotFoundFaultContract>(new CompilerNotFoundFaultContract
-					{
-						CompilerVersion = compilerVersion
-					});
+				throw new FaultException<CompilerNotFoundFaultContract>(new CompilerNotFoundFaultContract(compilerVersion));
 			}
 
 			var requested = DateTime.Now;
@@ -172,10 +169,7 @@ namespace DistCL
 			if (!CompilerVersions.ContainsKey(input.CompilerVersion))
 			{
 				LocalLogger.WarnFormat("Compiler version '{0}' not found", input.CompilerVersion);
-				throw new FaultException<CompilerNotFoundFaultContract>(new CompilerNotFoundFaultContract
-					{
-						CompilerVersion = input.CompilerVersion
-					});
+				throw new FaultException<CompilerNotFoundFaultContract>(new CompilerNotFoundFaultContract(input.CompilerVersion));
 			}
 
 			using (var inputStream = File.OpenRead(input.Src))
@@ -289,10 +283,7 @@ namespace DistCL
 			if (!CompilerVersions.ContainsKey(input.CompilerVersion))
 			{
 				CompilerLogger.WarnFormat("Compiler version '{0}' not found", input.CompilerVersion);
-				throw new FaultException<CompilerNotFoundFaultContract>(new CompilerNotFoundFaultContract
-				{
-					CompilerVersion = input.CompilerVersion
-				});
+				throw new FaultException<CompilerNotFoundFaultContract>(new CompilerNotFoundFaultContract(input.CompilerVersion));
 			}
 
 			AcquireWorkers(CompileWorkerCount);

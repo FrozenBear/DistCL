@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.Contracts;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -170,13 +171,15 @@ namespace DistCL
 										list = new List<MeasuredAgent>();
 										weights.Add(version, list);
 									}
+									else
+									{
+										Contract.Assume(list != null);
+									}
 									list.Add(item);
 
 									weightPositions[version] = weightPosition + item.Weight;
 								}
 							}
-
-							//weights.Sort((a, b) => a.WeightStart.CompareTo(b.WeightStart));
 
 							_weightsSnapshot = weights;
 						}
@@ -200,22 +203,31 @@ namespace DistCL
 			if (string.IsNullOrEmpty(compilerVersion))
 				throw new ArgumentNullException("compilerVersion");
 
-			ICompiler compiler = null;
-			string name = null;
+			Contract.Ensures(Contract.ValueAtReturn(out agentName) != null);
+			Contract.Ensures(Contract.Result<ICompiler>() != null);
+
+			Contract.EndContractBlock();
+
+			Tuple<ICompiler, string> compiler = null;
 
 			SpinWait.SpinUntil(delegate
 				{
-					compiler = GetRandomCompilerInternal(compilerVersion, out name);
+					compiler = GetRandomCompilerInternal(compilerVersion);
 					return compiler != null;
 				});
 
-			agentName = name;
-			return compiler;
+			Contract.Assume(compiler != null);
+
+			agentName = compiler.Item2;
+			return compiler.Item1;
 		}
 
-		private ICompiler GetRandomCompilerInternal(string compilerVersion, out string agentName)
+		private Tuple<ICompiler, string> GetRandomCompilerInternal(string compilerVersion)
 		{
-			agentName = null;
+			Contract.Ensures(Contract.Result<Tuple<ICompiler, string>>() == null ||
+							(Contract.Result<Tuple<ICompiler, string>>().Item1 != null &&
+							!string.IsNullOrEmpty(Contract.Result<Tuple<ICompiler, string>>().Item2)));
+
 			var weights = GetWeights(compilerVersion);
 
 			if (weights.Count == 0)
@@ -231,16 +243,25 @@ namespace DistCL
 							? ~result - 1
 							: result;
 
+			Contract.Assume(index >= 0);
+
 			var compilerProvider = weights[index].Agent;
 			var compiler = compilerProvider.GetCompiler();
 
 			if (compiler != null)
 			{
-				Logger.DebugFormat("Found ready compiler '{0}'", compilerProvider.Description.Name);
-				agentName = compilerProvider.Description.Name;
+				var name = compilerProvider.Description.Name;
+				Contract.Assert(!string.IsNullOrEmpty(name));
+				
+				Logger.DebugFormat("Found ready compiler '{0}'", name);
+				
+				var tuple = new Tuple<ICompiler, string>(compiler, name);
+				Contract.Assume(tuple.Item1 != null);
+				Contract.Assume(!string.IsNullOrEmpty(tuple.Item2));
+				return tuple;
 			}
 
-			return compiler;
+			return null;
 		}
 
 		public void Clean(DateTime limit)

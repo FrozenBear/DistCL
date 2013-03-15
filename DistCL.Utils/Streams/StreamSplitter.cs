@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics.Contracts;
 using System.IO;
 
 namespace DistCL.Utils.Streams
@@ -9,6 +10,8 @@ namespace DistCL.Utils.Streams
 
 		public StreamSplitter(Stream stream)
 		{
+			Contract.Requires<ArgumentNullException>(stream != null);
+			
 			_stream = stream;
 		}
 

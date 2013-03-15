@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics.Contracts;
 using System.IO;
 
 namespace DistCL.Utils.Streams
@@ -15,6 +16,8 @@ namespace DistCL.Utils.Streams
 
 		public ProxyStream(IStreamedMessage streamedMessage)
 		{
+			Contract.Requires<ArgumentNullException>(streamedMessage != null);
+
 			_streamedMessage = streamedMessage;
 		}
 

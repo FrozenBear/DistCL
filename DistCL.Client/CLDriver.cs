@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.Contracts;
 using System.IO;
 using System.Text;
 using DistCL.Utils;
@@ -73,6 +74,8 @@ namespace DistCL.Client
 
 		public CLDriver(string[] args)
 		{
+			Contract.Requires(args != null);
+
 			Parse(args);
 		}
 
