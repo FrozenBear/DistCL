@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Diagnostics.Contracts;
 using System.Linq;
 using System.ServiceModel;
 using System.ServiceModel.Configuration;
@@ -204,6 +205,11 @@ namespace DistCL
 			CancellationTokenSource ts,
 			bool tryKnownAgents)
 		{
+			Contract.Requires(knownAgentPools != null);
+			Contract.Requires(localAgent != null);
+			Contract.Requires(pools != null);
+			Contract.Requires(ts != null);
+
 			Logger.Debug("Converting agents to pools" + (tryKnownAgents ? "..." : " again..."));
 
 			var poolsCount = pools.Count;
@@ -236,6 +242,9 @@ namespace DistCL
 
 		private void ConvertAgents2PoolsProcessAgents(Task<IEnumerable<IAgent>> getAgentsTask, object state)
 		{
+			Contract.Requires(getAgentsTask != null);
+			Contract.Requires(state != null);
+
 			var statePair = (KeyValuePair<IAgentPoolProxy, object>) state;
 
 			if (getAgentsTask.Exception != null)
@@ -265,7 +274,7 @@ namespace DistCL
 					continue;
 				}
 
-				IAgent localAgent = agent;
+				var localAgent = agent;
 				var task = ConvertAgents2PoolsProcessAgent(
 					cookie.Pools,
 					cookie.LocalAgent,
@@ -282,6 +291,11 @@ namespace DistCL
 
 		private Task ConvertAgents2PoolsProcessAgent(ConcurrentDictionary<Guid, ICompileCoordinatorProxy> pools, LocalAgentManager localAgent, IAgent agent, Func<IAgentProxy> getAgent)
 		{
+			Contract.Requires(pools != null);
+			Contract.Requires(localAgent != null);
+			Contract.Requires(agent != null);
+			Contract.Requires(getAgent != null);
+
 			if (!pools.ContainsKey(agent.Guid))
 			{
 				var proxy = getAgent();
@@ -394,6 +408,9 @@ namespace DistCL
 
 		private void AddCoordinator(ConcurrentDictionary<Guid, ICompileCoordinatorProxy> pools, ICompileCoordinatorProxy pool)
 		{
+			Contract.Requires(pools != null);
+			Contract.Requires(pool != null);
+
 			if (!pools.TryAdd(pool.Proxy.Description.Guid, pool))
 			{
 				Logger.WarnFormat("Coordinator {0} already registered", pool.Proxy.Description.Name);
@@ -406,6 +423,9 @@ namespace DistCL
 
 		private void RemoveCoordinator(ConcurrentDictionary<Guid, ICompileCoordinatorProxy> pools, ICompileCoordinatorProxy pool)
 		{
+			Contract.Requires(pools != null);
+			Contract.Requires(pool != null);
+
 			if (pools.TryRemove(pool.Proxy.Description.Guid, out pool))
 			{
 				Logger.InfoFormat("Removed coordinator '{0}'", pool.Proxy.Description.Name);

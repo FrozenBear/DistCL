@@ -300,6 +300,15 @@ namespace DistCL
 
 		private static bool UrlArraysEquals(Uri[] a, Uri[] b)
 		{
+			if (a == null)
+				return b == null;
+			
+			if (b == null)
+				return false;
+
+			if (a.Length != b.Length)
+				return false;
+
 			for (var i = 0; i < a.Length; i++)
 			{
 				if (!a[i].Equals(b[i]) && !Array.Exists(b, url => Equals(url, a[i])))

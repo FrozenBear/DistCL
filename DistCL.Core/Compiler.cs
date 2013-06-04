@@ -2,7 +2,9 @@
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Diagnostics.Contracts;
 using System.IO;
+using System.Security.Principal;
 using System.ServiceModel;
 using System.Text;
 using System.Threading;
@@ -23,7 +25,7 @@ namespace DistCL
 		private readonly Semaphore _semaphore;
 		private readonly object _acquireWorkersSyncRoot = new object();
 		private readonly int _maxWorkersCount;
-		private ManualResetEventSlim _preprocessWaitEventSlim = new ManualResetEventSlim();
+		private readonly ManualResetEventSlim _preprocessWaitEventSlim = new ManualResetEventSlim();
 
 		private readonly ICompilerServicesCollection _compilerServices;
 		private readonly Logger _compilerLogger = new Logger("COMPILER");
@@ -33,6 +35,8 @@ namespace DistCL
 
 		internal Compiler(CompilerServicesCollection compilerServices)
 		{
+			Contract.Requires(compilerServices != null);
+
 			_compilerServices = compilerServices;
 			compilerServices.Compiler = this;
 
@@ -131,7 +135,12 @@ namespace DistCL
 			_preprocessTokens[token] = name;
 			LocalLogger.DebugFormat("Preprocess token created ({0})", name);
 
-			return new PreprocessToken(token, System.Security.Principal.WindowsIdentity.GetCurrent().Name, requested, created);
+			var identity = WindowsIdentity.GetCurrent();
+			if (identity == null)
+			{
+				throw new ApplicationException("WindowsIdentity.Current == null");
+			}
+			return new PreprocessToken(token, identity.Name, requested, created);
 		}
 
 		private void PreprocessTokenWait()
@@ -140,6 +149,8 @@ namespace DistCL
 		}
 		private void PreprocessTokenRemove(Task task, object state)
 		{
+			Contract.Requires(state != null);
+
 			var token = (Guid)state;
 			string name;
 
@@ -345,6 +356,11 @@ namespace DistCL
 			string outputPath,
 			out Dictionary<CompileArtifactDescription, Stream> streams)
 		{
+			Contract.Requires(clPath != null);
+			Contract.Requires(commmandLine != null);
+			Contract.Requires(inputPath != null);
+			Contract.Requires(outputPath != null);
+
 			streams = new Dictionary<CompileArtifactDescription, Stream>();
 
 			var fileName = Guid.NewGuid() + ".obj";
@@ -363,8 +379,8 @@ namespace DistCL
 			using (var errWriter = new StreamWriter(stdErrStream, encoding, bufferSize, true))
 			{
 				// TODO dirty code.
-				commmandLine += " /Fo" + StringUtils.QuoteString(objFilename);
-				commmandLine += " " + StringUtils.QuoteString(inputPath);
+				commmandLine += " /Fo" + objFilename.QuoteString();
+				commmandLine += " " + inputPath.QuoteString();
 
 				CompilerLogger.DebugFormat("Call compiler '{0}' with cmdline '{1}'", Utils.CompilerSettings.CLExeFilename, commmandLine);
 

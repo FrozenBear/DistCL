@@ -37,6 +37,8 @@ namespace DistCL
 
 		public AgentPool(ICompilerServicesCollection compilerServices)
 		{
+			Contract.Requires(compilerServices != null);
+
 			_compilerServices = compilerServices;
 		}
 
@@ -141,6 +143,8 @@ namespace DistCL
 
 		private List<MeasuredAgent> GetWeights(string compilerVersion)
 		{
+			Contract.Requires(compilerVersion != null);
+
 			_agentsLock.AcquireReaderLock(_lockTimeout);
 			try
 			{
@@ -224,6 +228,7 @@ namespace DistCL
 
 		private Tuple<ICompiler, string> GetRandomCompilerInternal(string compilerVersion)
 		{
+			Contract.Requires(compilerVersion != null);
 			Contract.Ensures(Contract.Result<Tuple<ICompiler, string>>() == null ||
 							(Contract.Result<Tuple<ICompiler, string>>().Item1 != null &&
 							!string.IsNullOrEmpty(Contract.Result<Tuple<ICompiler, string>>().Item2)));
@@ -390,6 +395,8 @@ namespace DistCL
 
 			public MeasuredAgent(IAgentProxy agent, int weightStart)
 			{
+				Contract.Requires(agent != null);
+
 				_agentProxy = agent;
 				_weight = Math.Max(0, _agentProxy.Description.Cores * (100 - _agentProxy.Description.CPUUsage));
 				_weightStart = weightStart;

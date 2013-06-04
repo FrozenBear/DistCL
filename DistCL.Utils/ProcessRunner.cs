@@ -21,8 +21,7 @@ namespace DistCL.Utils
 			Contract.Requires(arguments != null);
 			Contract.Requires(workingDirectory != null);
 
-			var process = new Process();
-			using (process)
+			using (var process = new Process())
 			{
 				process.StartInfo.FileName = fileName;
 				process.StartInfo.Arguments = arguments;
