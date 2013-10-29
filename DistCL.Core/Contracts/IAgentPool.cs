@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.Contracts;
 using System.Linq;
 using System.Runtime.Serialization;
 using System.ServiceModel;
@@ -23,6 +24,7 @@ namespace DistCL
 		Agent[] GetAgents();
 	}
 
+	[ContractClass(typeof(AgentContract))]
 	public interface IAgent
 	{
 		Guid Guid { get; }
@@ -33,6 +35,116 @@ namespace DistCL
 		Uri[] CompilerUrls { get; }
 		string[] CompilerVersions { get; }
 	}
+
+	#region AgentContract
+	[ContractClassFor(typeof(IAgent))]
+	abstract class AgentContract : IAgent
+	{
+		private string _name;
+		private int _cores;
+		private int _cpuUsage;
+		private Uri[] _agentPoolUrls;
+		private Uri[] _compilerUrls;
+		private string[] _compilerVersions;
+
+		protected AgentContract(
+			string name,
+			int cores,
+			int cpuUsage,
+			Uri[] agentPoolUrls,
+			Uri[] compilerUrls,
+			string[] compilerVersions)
+		{
+			Contract.Requires(!string.IsNullOrEmpty(name));
+			Contract.Requires(cores > 0);
+			Contract.Requires(cpuUsage >= 0 && cpuUsage <= 100);
+			Contract.Requires(agentPoolUrls != null);
+			Contract.Requires(compilerUrls != null);
+			Contract.Requires(compilerVersions != null);
+			Contract.Requires(compilerVersions.Length >= 0 || compilerUrls.Length == 0);
+
+			_name = name;
+			_cores = cores;
+			_cpuUsage = cpuUsage;
+			_agentPoolUrls = agentPoolUrls;
+			_compilerUrls = compilerUrls;
+			_compilerVersions = compilerVersions;
+		}
+
+		public abstract Guid Guid { get; }
+
+		public string Name
+		{
+			get { return _name; }
+			set
+			{
+				Contract.Requires(!string.IsNullOrEmpty(value));
+				_name = value;
+			}
+		}
+
+		public int Cores
+		{
+			get { return _cores; }
+			set
+			{
+				Contract.Requires(value > 0);
+				_cores = value;
+			}
+		}
+
+		public int CPUUsage
+		{
+			get { return _cpuUsage; }
+			set
+			{
+				Contract.Requires(value >= 0 && value <= 100);
+				_cpuUsage = value;
+			}
+		}
+
+		public Uri[] AgentPoolUrls
+		{
+			get { return _agentPoolUrls; }
+			set
+			{
+				Contract.Requires(value != null);
+				_agentPoolUrls = value;
+			}
+		}
+
+		public Uri[] CompilerUrls
+		{
+			get { return _compilerUrls; }
+			set
+			{
+				Contract.Requires(value != null);
+				Contract.Requires(value.Length == 0 || CompilerVersions == null || CompilerVersions.Length > 0);
+				_compilerUrls = value;
+			}
+		}
+
+		public string[] CompilerVersions
+		{
+			get { return _compilerVersions; }
+			set
+			{
+				Contract.Requires(value != null);
+				Contract.Requires(value.Length >= 0 || CompilerUrls == null || CompilerUrls.Length == 0);
+				_compilerVersions = value;
+			}
+		}
+
+//		[ContractInvariantMethod]
+//		private void ObjectInvariant()
+//		{
+//			Contract.Invariant(Name != null);
+//			Contract.Invariant(AgentPoolUrls != null);
+//			Contract.Invariant(CompilerUrls != null);
+//			Contract.Invariant(CompilerVersions != null);
+//		}
+	}
+	#endregion
 
 	#region Agent
 
@@ -45,6 +157,8 @@ namespace DistCL
 
 		public Agent(IAgent agent)
 		{
+			Contract.Requires(agent != null);
+
 			Guid = agent.Guid;
 			Name = agent.Name;
 			Cores = agent.Cores;
@@ -56,6 +170,11 @@ namespace DistCL
 
 		public Agent(Guid guid, string name, int cores, int cpuUsage, Uri[] agentPoolUrls, Uri[] compilerUrls, string[] compilerVersions)
 		{
+			Contract.Requires(name != null);
+			Contract.Requires(agentPoolUrls != null);
+			Contract.Requires(compilerUrls != null);
+			Contract.Requires(compilerVersions != null);
+
 			Guid = guid;
 			Name = name;
 			Cores = cores;
@@ -181,6 +300,15 @@ namespace DistCL
 
 		private static bool UrlArraysEquals(Uri[] a, Uri[] b)
 		{
+			if (a == null)
+				return b == null;
+			
+			if (b == null)
+				return false;
+
+			if (a.Length != b.Length)
+				return false;
+
 			for (var i = 0; i < a.Length; i++)
 			{
 				if (!a[i].Equals(b[i]) && !Array.Exists(b, url => Equals(url, a[i])))

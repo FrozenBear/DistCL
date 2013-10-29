@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System.Diagnostics.Contracts;
+using System.IO;
 
 namespace DistCL
 {
@@ -9,6 +10,8 @@ namespace DistCL
 
 		public TempFileStreamWrapper(string fileName)
 		{
+			Contract.Requires(! string.IsNullOrEmpty(fileName));
+
 			_fileName = Path.GetTempFileName();
 			if (File.Exists(_fileName))
 				File.Delete(_fileName);

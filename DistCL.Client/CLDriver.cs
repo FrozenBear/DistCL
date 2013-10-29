@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.Contracts;
 using System.IO;
 using System.Text;
 using DistCL.Utils;
@@ -73,6 +74,8 @@ namespace DistCL.Client
 
 		public CLDriver(string[] args)
 		{
+			Contract.Requires(args != null);
+
 			Parse(args);
 		}
 
@@ -120,6 +123,9 @@ namespace DistCL.Client
 
 		private void Parse(string[] args)
 		{
+			Contract.Requires(args != null);
+			Contract.Requires(Contract.ForAll(args, s => s != null));
+
 			var remoteCmdLine = new StringBuilder(" ");
 			var localCmdLine = new StringBuilder(" ");
 
@@ -129,7 +135,7 @@ namespace DistCL.Client
 				if (String.IsNullOrEmpty(args[idx]))
 					continue;
 
-				string arg = args[idx];
+				var arg = args[idx];
 
 				if (arg.IndexOfAny(new[] { '/', '-' }, 0, 1) != -1)
 				{

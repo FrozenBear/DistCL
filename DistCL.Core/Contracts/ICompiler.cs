@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.Contracts;
 using System.IO;
 using System.Linq;
 using System.Runtime.Serialization;
@@ -49,6 +50,8 @@ namespace DistCL
 
 		public CompileInput(IStreamedMessage message)
 		{
+			Contract.Requires(message != null);
+
 			SrcLength = message.StreamLength;
 			Src = new ProxyStream(message);
 		}
@@ -101,6 +104,8 @@ namespace DistCL
 			IDictionary<CompileArtifactDescription, Stream> streams,
 			IEnumerable<CompileArtifactDescription> artifacts)
 		{
+			Contract.Requires(streams != null);
+
 			CompileArtifactCookie[] cookies;
 			_resultData = CompileResultHelper.Pack(streams, out cookies);
 			

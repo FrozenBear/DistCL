@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
+using System.Diagnostics.Contracts;
 using System.Linq;
 using DistCL.Proxies;
 using DistCL.Utils;
@@ -21,6 +22,10 @@ namespace DistCL
 
 		public LocalAgentManager(ICompilerServicesCollection compilerServices, Uri[] agentPoolUrls, Uri[] compilerUrls)
 		{
+			Contract.Requires(compilerServices != null);
+			Contract.Requires(agentPoolUrls != null);
+			Contract.Requires(compilerUrls != null);
+
 			_compilerServices = compilerServices;
 			_stub = new Agent(
 				Guid.NewGuid(),

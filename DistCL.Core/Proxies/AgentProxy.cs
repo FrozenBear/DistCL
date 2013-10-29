@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.Diagnostics.Contracts;
 using System.Linq;
 using System.ServiceModel;
 using System.ServiceModel.Channels;
@@ -25,8 +27,19 @@ namespace DistCL.Proxies
 
 		public RemoteAgentProxy(IBindingsCollection bindingsCollection, IAgent description)
 		{
+			Contract.Requires(bindingsCollection != null);
+			Contract.Requires(description != null);
+
 			_bindingsCollection = bindingsCollection;
 			_description = description;
+		}
+
+		[ContractInvariantMethod]
+		[Conditional("CONTRACTS_FULL")]
+		private void ContractInvariant()
+		{
+			Contract.Invariant(_bindingsCollection != null);
+			Contract.Invariant(_description != null);
 		}
 
 		public static Logger Logger
@@ -112,6 +125,12 @@ namespace DistCL.Proxies
 			Action<TClient> func)
 			where TClient : class
 		{
+			Contract.Requires(getClient != null);
+			Contract.Requires(setClient != null);
+			Contract.Requires(creation != null);
+			Contract.Requires(uris != null);
+			Contract.Requires(func != null);
+
 			if (uris == null || uris.Length == 0)
 			{
 				throw new InvalidOperationException("empty uris array");
@@ -150,6 +169,12 @@ namespace DistCL.Proxies
 			where TClient : class
 			where TTaskResult : class
 		{
+			Contract.Requires(getClient != null);
+			Contract.Requires(setClient != null);
+			Contract.Requires(creation != null);
+			Contract.Requires(uris != null);
+			Contract.Requires(func != null);
+
 			if (uris != null && uris.Length > 0)
 			{
 				lock (syncRoot)
@@ -188,6 +213,11 @@ namespace DistCL.Proxies
 			where TClient : class
 			where TTaskResult : class
 		{
+			Contract.Requires(setClient != null);
+			Contract.Requires(creation != null);
+			Contract.Requires(uris != null);
+			Contract.Requires(func != null);
+
 			lock (syncRoot)
 			{
 				var exceptions = new List<Exception>();
@@ -336,6 +366,8 @@ namespace DistCL.Proxies
 
 			public void RegisterAgent(IAgentProxy proxy)
 			{
+				Contract.Requires(proxy != null);
+
 				var message = proxy.Description as RemoteCompilerService.Agent
 							?? new RemoteCompilerService.Agent(proxy.Description);
 
@@ -343,6 +375,8 @@ namespace DistCL.Proxies
 			}
 			public Task RegisterAgentAsync(IAgentProxy proxy)
 			{
+				Contract.Requires(proxy != null);
+
 				var message = proxy.Description as RemoteCompilerService.Agent
 							?? new RemoteCompilerService.Agent(proxy.Description);
 

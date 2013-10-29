@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
+using System.Diagnostics.Contracts;
 using System.IO;
 using System.Security.Permissions;
 
@@ -16,8 +17,11 @@ namespace DistCL.Utils
 			TextWriter stdErr,
 			string workingDirectory)
 		{
-			var process = new Process();
-			using (process)
+			Contract.Requires(fileName != null);
+			Contract.Requires(arguments != null);
+			Contract.Requires(workingDirectory != null);
+
+			using (var process = new Process())
 			{
 				process.StartInfo.FileName = fileName;
 				process.StartInfo.Arguments = arguments;
