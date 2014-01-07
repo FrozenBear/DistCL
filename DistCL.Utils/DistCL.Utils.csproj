@@ -45,6 +45,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="McppWrapper.cs" />
     <Compile Include="CompileResultHelper.cs" />
     <Compile Include="CompilerSettings.cs" />
     <Compile Include="Logger.cs" />
