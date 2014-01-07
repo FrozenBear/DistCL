@@ -13,7 +13,6 @@ namespace DistCL.Client
 	internal class Program
 	{
 		private static readonly Logger Logger = new Logger("CLIENT");
-		private static string _compilerVersion;
 
 		private static int Main(string[] args)
 		{
@@ -33,6 +32,10 @@ namespace DistCL.Client
 
 		public static int Compile(string[] arguments)
 		{
+			Logger.InfoFormat(CompilerVersion.VersionStringForDefine);
+			Logger.InfoFormat(CompilerVersion.VersionString);
+			
+
 			Logger.InfoFormat("Start compilation: {0}...", string.Join(" ", arguments.Select(s => string.Format("[{0}]", s))));
 
 			var driver = new CLDriver(arguments);
@@ -45,7 +48,7 @@ namespace DistCL.Client
 
 				Logger.Info("Send preprocess token request...");
 
-				var preprocessToken = compiler.GetPreprocessToken(driver.SourceFiles[0], CompilerVersion);
+				var preprocessToken = compiler.GetPreprocessToken(driver.SourceFiles[0], CompilerVersion.VersionString);
 
 				Logger.Info("Token obtained, starting preprocess...");
 
@@ -73,7 +76,7 @@ namespace DistCL.Client
 
 				var output = compiler.LocalCompile(new LocalCompileInput
 					{
-						CompilerVersion = CompilerVersion,
+						CompilerVersion = CompilerVersion.VersionString,
 						Arguments = driver.RemoteCommandLine,
 						SrcName = driver.SourceFiles[0],
 						Src = ppFileName,
@@ -146,30 +149,6 @@ namespace DistCL.Client
 			{
 				File.Delete(ppFileName);
 				Logger.Info("End");
-			}
-		}
-
-		public static string CompilerVersion
-		{
-			get
-			{
-				if (_compilerVersion == null)
-				{
-					string envPathValue = Environment.GetEnvironmentVariable("PATH") ?? "";
-					foreach (var folder in new[] {"."}.Concat(envPathValue.Split(new[] {';'}, StringSplitOptions.RemoveEmptyEntries)))
-					{
-						var clPath = Path.Combine(folder, Utils.CompilerSettings.CLExeFilename);
-						if (!File.Exists(clPath))
-							continue;
-
-						_compilerVersion = FileVersionInfo.GetVersionInfo(clPath).FileVersion;
-						break;
-					}
-
-					if (_compilerVersion == null)
-					throw new Exception("Compiler not found");
-				}
-				return _compilerVersion;
 			}
 		}
 	}
