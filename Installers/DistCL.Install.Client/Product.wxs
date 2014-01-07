@@ -2,7 +2,7 @@
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
 
   <?ifndef Version?>
-  <?define Version = "0.0.1" ?>
+  <?define Version = "0.0.2" ?>
   <?endif ?>
 
   <?define ProductName="DistCL Client" ?>
@@ -26,8 +26,9 @@
         <Directory Id="Frozen_Bear" Name="Frozen Bear">
           <Directory Id="INSTALLDIR" Name="$(var.ProductName)">
             <Component Id="DistCL.Client.exe" Guid="613D291D-0312-465D-A73A-959BAD151F19">
-              <File Id="DistCL.Client.exe" Name="DistCL.Client.exe" DiskId="1" Source="$(var.DistCL.Client.TargetPath)" KeyPath="yes">
-              </File>
+              <File Id="DistCL.Client.exe" Name="DistCL.Client.exe" DiskId="1" Source="$(var.DistCL.Client.TargetPath)" KeyPath="yes" />
+              <File Id="MCPP_DLLx64.dll" Name="MCPP_DLLx64.dll" DiskId="1" Source="$(var.ProjectDir)\..\..\3rdParty\MCPP_DLLx64.dll" />
+              <File Id="MCPP_DLLx86.dll" Name="MCPP_DLLx86.dll" DiskId="1" Source="$(var.ProjectDir)\..\..\3rdParty\MCPP_DLLx86.dll" />
             </Component>
           </Directory>
         </Directory>
