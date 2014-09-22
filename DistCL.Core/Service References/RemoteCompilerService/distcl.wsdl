@@ -28,7 +28,7 @@
     <wsdl:part xmlns:q3="urn:distcl:compiler:local:messages" name="parameters" element="q3:LocalCompileOutput" />
   </wsdl:message>
   <wsdl:message name="LocalCompileOutput_Headers">
-    <wsdl:part name="Status" element="tns:Status" />
+    <wsdl:part name="Result" element="tns:Result" />
   </wsdl:message>
   <wsdl:message name="ILocalCompiler_LocalCompile_CompilerNotFoundFaultContractFault_FaultMessage">
     <wsdl:part xmlns:q4="urn:distcl:compiler:local:messages" name="detail" element="q4:CompilerNotFoundFaultContract" />
@@ -44,6 +44,7 @@
   </wsdl:message>
   <wsdl:message name="CompileInput_Headers">
     <wsdl:part name="Arguments" element="tns:Arguments" />
+    <wsdl:part name="CompilationToken" element="tns:CompilationToken" />
     <wsdl:part name="CompilerVersion" element="tns:CompilerVersion" />
     <wsdl:part name="SrcLength" element="tns:SrcLength" />
     <wsdl:part name="SrcName" element="tns:SrcName" />
@@ -52,7 +53,7 @@
     <wsdl:part xmlns:q6="urn:distcl:compiler:messages" name="parameters" element="q6:CompileOutput" />
   </wsdl:message>
   <wsdl:message name="CompileOutput_Headers">
-    <wsdl:part name="Status" element="tns:Status" />
+    <wsdl:part name="Result" element="tns:Result" />
   </wsdl:message>
   <wsdl:message name="ICompileManager_Compile_CompilerNotFoundFaultContractFault_FaultMessage">
     <wsdl:part xmlns:q7="urn:distcl:compiler:local:messages" name="detail" element="q7:CompilerNotFoundFaultContract" />

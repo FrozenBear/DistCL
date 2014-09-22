@@ -249,13 +249,20 @@ namespace DistCL.Proxies
 
 				RemoteCompilerService.CompileOutput remoteOutput = _compiler.Compile(remoteInput);
 
-				return
-					new CompileOutput(
-						new CompileStatus(
-							remoteOutput.Status.Success,
-							remoteOutput.Status.ExitCode,
-							remoteOutput.Status.Cookies),
+				if (remoteOutput.Result.Finished)
+				{
+					var finishedCompileResult = ((RemoteCompilerService.FinishedCompileResult) remoteOutput.Result);
+					return new CompileOutput(
+						new FinishedCompileResult(
+							finishedCompileResult.ExitCode,
+							finishedCompileResult.Cookies),
 						remoteOutput.ResultData);
+				}
+				
+				var sourceFileRequest = ((RemoteCompilerService.SourceFileRequest) remoteOutput.Result);
+				return new CompileOutput(
+					new SourceFileRequest(sourceFileRequest.CompilationToken, sourceFileRequest.FileName),
+					remoteOutput.ResultData);
 			}
 
 			public void Dispose()

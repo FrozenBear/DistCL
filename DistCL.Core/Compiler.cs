@@ -178,81 +178,97 @@ namespace DistCL
 					});
 			}
 
-			using (var inputStream = File.OpenRead(input.Src))
+			string compilationToken = null;
+			var inputFileName = input.Src;
+
+			string agentName;
+			var remoteCompiler = CompilerServices.AgentPool.GetRandomCompiler(input.CompilerVersion, out agentName);
+			var compilerSearchDuration = stopwatch.Elapsed;
+
+			while (true)
 			{
-				var remoteInput = new CompileInput
+				using (var inputStream = File.OpenRead(inputFileName))
 				{
-					CompilerVersion = input.CompilerVersion,
-					Arguments = input.Arguments,
-					Src = inputStream,
-					SrcLength = inputStream.Length,
-					SrcName = input.SrcName
-				};
-
-				string agentName;
-				var remoteCompiler = CompilerServices.AgentPool.GetRandomCompiler(input.CompilerVersion, out agentName);
-				var compilerSearchDuration = stopwatch.Elapsed;
-				using (var remoteOutput = remoteCompiler.Compile(remoteInput))
-				{
-					var remoteStreams = new Dictionary<CompileArtifactType, Stream>();
-					var cookies = new List<CompileArtifactCookie>();
-					foreach (var artifact in remoteOutput.Status.Cookies)
-					{
-						switch (artifact.Type)
+					var remoteInput = new CompileInput
 						{
-							case CompileArtifactType.Out:
-							case CompileArtifactType.Err:
-								var artifactStream = new MemoryStream();
-								remoteStreams.Add(artifact.Type, artifactStream);
-								cookies.Add(artifact);
-								break;
+							CompilerVersion = input.CompilerVersion,
+							Arguments = input.Arguments,
+							Src = inputStream,
+							SrcLength = inputStream.Length,
+							SrcName = input.SrcName,
+							CompilationToken = compilationToken
+						};
 
-							default:
-								var fileStream = File.Open(
-									Path.Combine(Path.GetDirectoryName(input.Src), artifact.Name),
-									FileMode.Create,
-									FileAccess.Write,
-									FileShare.None);
-								remoteStreams.Add(artifact.Type, fileStream);
-								break;
-						}
-					}
-					CompileResultHelper.Unpack(remoteOutput.ResultData, remoteOutput.Status.Cookies, remoteStreams);
-
-					var localStreams = new Dictionary<CompileArtifactDescription, Stream>();
-					var localFiles = new List<CompileArtifactDescription>();
-					foreach (var artifact in remoteOutput.Status.Cookies)
+					using (var remoteOutput = remoteCompiler.Compile(remoteInput))
 					{
-						var stream = remoteStreams[artifact.Type];
-						switch (artifact.Type)
+						if (remoteOutput.Result.Finished)
 						{
-							case CompileArtifactType.Out:
-							case CompileArtifactType.Err:
-								stream.Position = 0;
-								localStreams.Add(artifact, stream);
-								break;
+							var compileResult = (FinishedCompileResult) remoteOutput.Result;
+							var remoteStreams = new Dictionary<CompileArtifactType, Stream>();
+							var cookies = new List<CompileArtifactCookie>();
+							foreach (var artifact in compileResult.Cookies)
+							{
+								switch (artifact.Type)
+								{
+									case CompileArtifactType.Out:
+									case CompileArtifactType.Err:
+										var artifactStream = new MemoryStream();
+										remoteStreams.Add(artifact.Type, artifactStream);
+										cookies.Add(artifact);
+										break;
 
-							default:
-								stream.Close();
-								localFiles.Add(artifact);
-								break;
-						}
-					}
+									default:
+										var fileStream = File.Open(
+											Path.Combine(Path.GetDirectoryName(input.Src), artifact.Name),
+											FileMode.Create,
+											FileAccess.Write,
+											FileShare.None);
+										remoteStreams.Add(artifact.Type, fileStream);
+										break;
+								}
+							}
+							CompileResultHelper.Unpack(remoteOutput.ResultData, compileResult.Cookies, remoteStreams);
 
-					LocalLogger.InfoFormat("Completed local compile '{0}'", input.SrcName);
-					stopwatch.Stop();
-					LocalLogger.DebugFormat(@"Stats for '{0}':
+							var localStreams = new Dictionary<CompileArtifactDescription, Stream>();
+							var localFiles = new List<CompileArtifactDescription>();
+							foreach (var artifact in compileResult.Cookies)
+							{
+								var stream = remoteStreams[artifact.Type];
+								switch (artifact.Type)
+								{
+									case CompileArtifactType.Out:
+									case CompileArtifactType.Err:
+										stream.Position = 0;
+										localStreams.Add(artifact, stream);
+										break;
+
+									default:
+										stream.Close();
+										localFiles.Add(artifact);
+										break;
+								}
+							}
+
+							LocalLogger.InfoFormat("Completed local compile '{0}'", input.SrcName);
+							stopwatch.Stop();
+							LocalLogger.DebugFormat(@"Stats for '{0}':
 	agent             {1},
 	preprocess        {2},
 	compiler search   {3}
 	compile           {4}",
-						input.SrcName,
-						agentName,
-						preprocessDuration,
-						compilerSearchDuration,
-						stopwatch.Elapsed);
+													input.SrcName,
+													agentName,
+													preprocessDuration,
+													compilerSearchDuration,
+													stopwatch.Elapsed);
 
-					return new LocalCompileOutput(true, remoteOutput.Status.ExitCode, localStreams, localFiles);
+							return new LocalCompileOutput(true, compileResult.ExitCode, localStreams, localFiles);
+						}
+
+						var sourceFileRequest = (SourceFileRequest) remoteOutput.Result;
+						compilationToken = sourceFileRequest.CompilationToken;
+						inputFileName = sourceFileRequest.FileName;
+					}
 				}
 			}
 		}
@@ -319,7 +335,7 @@ namespace DistCL
 					Dictionary<CompileArtifactDescription, Stream> streams;
 					var errorCode = RunCompiler(clPath, input.Arguments, srcName, tmpPath, out streams);
 
-					return new CompileOutput(errorCode == 0, errorCode, streams, null);
+					return new CompileOutput(errorCode, streams, null);
 				}
 				finally
 				{

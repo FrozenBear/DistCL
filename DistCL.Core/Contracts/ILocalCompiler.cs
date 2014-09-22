@@ -65,7 +65,7 @@ namespace DistCL
 	[MessageContract(WrapperNamespace = GeneralSettings.LocalCompilerMessageNamespace)]
 	public class LocalCompileOutput : CompileOutput
 	{
-		public LocalCompileOutput(CompileStatus status, Stream resultData) : base(status, resultData)
+		public LocalCompileOutput(CompileResult result, Stream resultData) : base(result, resultData)
 		{
 		}
 
@@ -74,7 +74,7 @@ namespace DistCL
 			int exitCode,
 			IDictionary<CompileArtifactDescription, Stream> streams,
 			IEnumerable<CompileArtifactDescription> artifacts)
-			: base(success, exitCode, streams, artifacts)
+			: base(exitCode, streams, artifacts)
 		{
 		}
 	}

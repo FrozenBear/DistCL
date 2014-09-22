@@ -92,7 +92,7 @@
     <None Include="Service References\RemoteCompilerService\DistCL.RemoteCompilerService.CompileOutput.datasource">
       <DependentUpon>Reference.svcmap</DependentUpon>
     </None>
-    <None Include="Service References\RemoteCompilerService\DistCL.RemoteCompilerService.CompileStatus.datasource">
+    <None Include="Service References\RemoteCompilerService\DistCL.RemoteCompilerService.CompileResult.datasource">
       <DependentUpon>Reference.svcmap</DependentUpon>
     </None>
     <None Include="Service References\RemoteCompilerService\DistCL.RemoteCompilerService.PreprocessToken.datasource">

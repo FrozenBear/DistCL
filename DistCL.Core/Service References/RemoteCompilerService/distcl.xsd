@@ -20,7 +20,7 @@
     </xs:complexType>
   </xs:element>
   <xs:element xmlns:q2="http://schemas.microsoft.com/Message" name="ResultData" type="q2:StreamBody" />
-  <xs:element xmlns:q3="urn:distcl:compiler:messages" name="Status" nillable="true" type="q3:CompileStatus" />
+  <xs:element xmlns:q3="urn:distcl:compiler:messages" name="Result" nillable="true" type="q3:CompileResult" />
   <xs:element name="IsReady">
     <xs:complexType>
       <xs:sequence />
@@ -35,6 +35,7 @@
   </xs:element>
   <xs:element xmlns:q4="http://schemas.microsoft.com/Message" name="Src" type="q4:StreamBody" />
   <xs:element name="Arguments" nillable="true" type="xs:string" />
+  <xs:element name="CompilationToken" nillable="true" type="xs:string" />
   <xs:element name="CompilerVersion" nillable="true" type="xs:string" />
   <xs:element name="SrcLength" type="xs:long" />
   <xs:element name="SrcName" nillable="true" type="xs:string" />
