@@ -2,6 +2,7 @@
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Globalization;
 using System.IO;
 using System.ServiceModel;
 using System.Text;
@@ -23,7 +24,7 @@ namespace DistCL
 		private readonly Semaphore _semaphore;
 		private readonly object _acquireWorkersSyncRoot = new object();
 		private readonly int _maxWorkersCount;
-		private ManualResetEventSlim _preprocessWaitEventSlim = new ManualResetEventSlim();
+		private readonly ManualResetEventSlim _preprocessWaitEventSlim = new ManualResetEventSlim();
 
 		private readonly ICompilerServicesCollection _compilerServices;
 		private readonly Logger _compilerLogger = new Logger("COMPILER");
@@ -289,6 +290,86 @@ namespace DistCL
 			return ready;
 		}
 
+		private class SourceFileExchange : IDisposable
+		{
+			readonly ManualResetEventSlim _sourceFileIsRequested = new ManualResetEventSlim();
+			private string _requestedSourceFile;
+
+			readonly ManualResetEventSlim _sourceFileIsReady = new ManualResetEventSlim();
+			private string _readySourceFile;
+
+			private bool _isDisposed;
+
+			public string RequestSourceFile(string fileName)
+			{
+				_sourceFileIsReady.Reset();
+				_requestedSourceFile = fileName;
+				_sourceFileIsRequested.Set();
+
+				_sourceFileIsReady.Wait();
+				return _readySourceFile;
+			}
+
+			public string GetSourceFileRequest()
+			{
+				lock (_sourceFileIsRequested)
+				{
+					_sourceFileIsRequested.Wait();
+					return _requestedSourceFile;
+				}
+			}
+
+			public void SetSourceFileResponse(string fileName)
+			{
+				_sourceFileIsRequested.Reset();
+				_readySourceFile = fileName;
+				_sourceFileIsReady.Set();
+			}
+
+			public bool IsDisposed
+			{
+				get { return _isDisposed; }
+			}
+
+			public void Dispose()
+			{
+				_requestedSourceFile = null;
+				_sourceFileIsRequested.Set();
+
+				lock (_sourceFileIsRequested)
+				{
+					_sourceFileIsRequested.Dispose();
+				}
+
+				_sourceFileIsReady.Dispose();
+				_isDisposed = true;
+			}
+		}
+
+		private class CompilationProcess
+		{
+			private readonly SourceFileExchange _fileExchange;
+			private readonly Task<CompileOutput> _compilationTask;
+
+			public CompilationProcess(SourceFileExchange fileExchange, Task<CompileOutput> compilationTask)
+			{
+				_fileExchange = fileExchange;
+				_compilationTask = compilationTask;
+			}
+
+			public SourceFileExchange FileExchange
+			{
+				get { return _fileExchange; }
+			}
+
+			public Task<CompileOutput> CompilationTask
+			{
+				get { return _compilationTask; }
+			}
+		}
+
+		readonly Dictionary<string, CompilationProcess> _compilationProcesses = new Dictionary<string, CompilationProcess>();
+
 		CompileOutput ICompiler.Compile(CompileInput input)
 		{
 			CompilerLogger.DebugFormat("Received compile request '{0}'", input.SrcName);
@@ -303,63 +384,136 @@ namespace DistCL
 				});
 			}
 
-			AcquireWorkers(CompileWorkerCount);
+			var compilationToken = input.CompilationToken ?? Guid.NewGuid().ToString();
 
-			CompilerLogger.InfoFormat("Processing '{0}'...", input.SrcName);
+			var tmpPath = Path.Combine(Path.GetTempPath(), compilationToken);
 
-			try
+			if (!Directory.Exists(tmpPath))
+				Directory.CreateDirectory(tmpPath);
+
+			var pathRoot = Path.GetPathRoot(input.SrcName);
+			var srcName = Path.Combine(
+				tmpPath,
+				pathRoot == null
+					? "_"
+					: Path.GetInvalidPathChars()
+						.Aggregate(pathRoot, (current, ipc) => current.Replace(ipc.ToString(CultureInfo.InvariantCulture), string.Empty)),
+				Path.GetDirectoryName(input.SrcName),
+				Path.GetFileName(input.SrcName));
+			using (var src = File.OpenWrite(srcName))
 			{
-				string clPath;
-				if (!CompilerVersions.TryGetValue(input.CompilerVersion, out clPath))
-				{
-					var error = string.Format("Compiler with specified version not found ({0})", input.CompilerVersion);
-					CompilerLogger.Warn(error);
-					throw new Exception(error);
-				}
+				CompilerLogger.DebugFormat("Copying source to {0}...", srcName);
+				input.Src.CopyTo(src);
+				CompilerLogger.Debug("Source copied to local file");
+			}
 
-				var tmpPath = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
+			CompilationProcess compilationProcess;
+			lock (_compilationProcesses)
+			{
+				_compilationProcesses.TryGetValue(compilationToken, out compilationProcess);
+			}
 
-				if (!Directory.Exists(tmpPath))
-					Directory.CreateDirectory(tmpPath);
+			if (compilationProcess != null)
+			{
+				compilationProcess.FileExchange.SetSourceFileResponse(srcName);
+			}
+			else
+			{
+				var fileExchange = new SourceFileExchange();
 
-				try
-				{
-					var srcName = Path.Combine(tmpPath, Path.GetFileName(input.SrcName));
-					using (var src = File.OpenWrite(srcName))
+				compilationProcess = new CompilationProcess(
+					fileExchange,
+					Task.Run(delegate
 					{
-						CompilerLogger.DebugFormat("Copying source to {0}...", srcName);
-						input.Src.CopyTo(src);
-						CompilerLogger.Debug("Source copied to local file");
-					}
+						AcquireWorkers(CompileWorkerCount);
 
-					Dictionary<CompileArtifactDescription, Stream> streams;
-					var errorCode = RunCompiler(clPath, input.Arguments, srcName, tmpPath, out streams);
+						CompilerLogger.InfoFormat("Processing '{0}'...", input.SrcName);
 
-					return new CompileOutput(errorCode, streams, null);
-				}
-				finally
+						try
+						{
+							string clPath;
+							if (!CompilerVersions.TryGetValue(input.CompilerVersion, out clPath))
+							{
+								var error = string.Format("Compiler with specified version not found ({0})", input.CompilerVersion);
+								CompilerLogger.Warn(error);
+								throw new Exception(error);
+							}
+
+							try
+							{
+								Dictionary<CompileArtifactDescription, Stream> streams;
+								var errorCode = RunCompiler(
+									clPath,
+									input.Arguments,
+									srcName,
+									tmpPath,
+									fileExchange.RequestSourceFile,
+									out streams);
+
+								return new CompileOutput(errorCode, streams, null);
+							}
+							finally
+							{
+								Directory.Delete(tmpPath, true);
+							}
+						}
+						catch (Exception e)
+						{
+							CompilerLogger.LogException(string.Format("Exception in CompileInternal({0})", input.SrcName), e);
+							throw;
+						}
+						finally
+						{
+							ReleaseWorkers(CompileWorkerCount);
+							stopwatch.Stop();
+							CompilerLogger.InfoFormat("Processing of '{0}' completed ({1})", input.SrcName, stopwatch.Elapsed);
+						}
+					}));
+
+				lock (_compilationProcesses)
 				{
-					Directory.Delete(tmpPath, true);
+					_compilationProcesses.Add(compilationToken, compilationProcess);
 				}
 			}
-			catch (Exception e)
+
+			var tasksSyncRoot = new object();
+
+			var fileRequestWaitTask = Task.Run(delegate
 			{
-				CompilerLogger.LogException(string.Format("Exception in CompileInternal({0})", input.SrcName), e);
-				throw;
-			}
-			finally
+				lock (tasksSyncRoot)
+				{
+					// ReSharper disable once AccessToDisposedClosure
+					return compilationProcess.FileExchange.IsDisposed ? null : compilationProcess.FileExchange.GetSourceFileRequest();
+				}
+			});
+
+			if (Task.WaitAny(compilationProcess.CompilationTask, fileRequestWaitTask) == 0)
 			{
-				ReleaseWorkers(CompileWorkerCount);
-				stopwatch.Stop();
-				CompilerLogger.InfoFormat("Processing of '{0}' completed ({1})", input.SrcName, stopwatch.Elapsed);
+				var compileOutput = compilationProcess.CompilationTask.Result;
+
+				lock (_compilationProcesses)
+				{
+					_compilationProcesses.Remove(compilationToken);
+				}
+				lock (tasksSyncRoot)
+				{
+					compilationProcess.FileExchange.Dispose();
+				}
+
+				return compileOutput;
 			}
+			
+			return new CompileOutput(compilationToken, fileRequestWaitTask.Result);
 		}
+
+		private delegate string GetCachedFileNameDelegate(string sourceFileName);
 
 		private int RunCompiler(
 			string clPath,
 			string commmandLine,
-			string inputPath,
-			string outputPath,
+			string inputPath,	// obsolete ?
+			string outputPath,	// obsolete ?
+			GetCachedFileNameDelegate getFileName,
 			out Dictionary<CompileArtifactDescription, Stream> streams)
 		{
 			streams = new Dictionary<CompileArtifactDescription, Stream>();
