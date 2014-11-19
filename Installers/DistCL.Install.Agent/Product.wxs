@@ -63,6 +63,10 @@
             <Component Id="DistCL.Core.dll" Guid="30D638B0-97B0-4F7A-B9F3-1047EB59C243">
               <File Id="DistCL.Core.dll" KeyPath="yes" Source="$(var.OUT_DIR)\DistCL.Core.dll" />
             </Component>
+            <Component Id="DistCL.InjectLib.dll" Guid="2495E6B4-CF06-4DE1-8451-1D5BFEFD3BDA">
+              <File Id="DistCL.InjectLib.dll" KeyPath="yes" Source="$(var.OUT_DIR)\DistCL.InjectLib.dll" />
+            </Component>
+
             <Component Id="DistCL.Service.exe" Guid="354CA3DA-2D22-42A0-AA30-E7343F09871B">
               <File Id="DistCL.Service.exe" KeyPath="yes" Source="$(var.OUT_DIR)\DistCL.Service.exe">
                 <netfx:NativeImage Id="DistCL.Core.dll" Platform="all" Priority="2" AppBaseDirectory="INSTALLDIR"/>
@@ -86,6 +90,7 @@
       <ComponentRef Id="DistCL.Service.exe.config_backup"/>
       <ComponentRef Id="DistCL.Service.exe.config"/>
       <ComponentRef Id="DistCL.Core.dll"/>
+      <ComponentRef Id="DistCL.InjectLib.dll"/>
       <ComponentRef Id="DistCL.Service.exe"/>
       <ComponentRef Id="DistCL.Utils.dll"/>
       <ComponentRef Id="log4net.dll"/>

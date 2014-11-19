@@ -2,7 +2,6 @@
 using System.Diagnostics;
 using System.IO;
 using System.Security.Permissions;
-using DistCL.Utils.ProcessExtensions;
 
 namespace DistCL.Utils
 {
@@ -10,14 +9,14 @@ namespace DistCL.Utils
 	public sealed class ProcessRunner
 	{
 
-		public static ProcessEx Run(
+		public static int Run(
 			string fileName,
 			string arguments,
 			TextWriter stdOutput,
 			TextWriter stdErr,
 			string workingDirectory)
 		{
-			var process = new ProcessEx();
+			var process = new Process();
 			using (process)
 			{
 				process.StartInfo.FileName = fileName;
@@ -27,7 +26,6 @@ namespace DistCL.Utils
 				process.StartInfo.RedirectStandardOutput = true;
 				process.StartInfo.RedirectStandardError = true;
 				process.StartInfo.WorkingDirectory = workingDirectory;
-				process.StartInfo.CreationFlags = ProcessCreationFlags.CREATE_SUSPENDED;
 
 				process.OutputDataReceived += (sender, args) =>
 					{ if (!String.IsNullOrEmpty(args.Data)) stdOutput.WriteLine(args.Data); };
@@ -37,22 +35,16 @@ namespace DistCL.Utils
 
 				process.Start();
 
-				return process;
+				process.BeginOutputReadLine();
+				process.BeginErrorReadLine();
+
+				if (!process.HasExited)
+				{
+					process.WaitForExit();
+				}
+
+				return process.ExitCode;
 			}
 		}
-
-		public static int Wakeup(ProcessEx process)
-		{
-			process.BeginOutputReadLine();
-			process.BeginErrorReadLine();
-
-			if (!process.HasExited)
-			{
-				process.WaitForExit();
-			}
-
-			return process.ExitCode;
-		}
-
 	}
 }

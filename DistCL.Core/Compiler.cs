@@ -3,13 +3,19 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Runtime.Remoting;
+using System.Runtime.Remoting.Channels.Ipc;
+using System.Security.Principal;
 using System.ServiceModel;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using DistCL.Hooks;
 using DistCL.Proxies;
 using DistCL.Utils;
 using System.Linq;
+using DistCL.Utils.ProcessExtensions;
+using EasyHook;
 using Microsoft.Win32;
 
 namespace DistCL
@@ -30,6 +36,9 @@ namespace DistCL
 		private readonly Logger _localLogger = new Logger("LOCAL");
 		readonly ConcurrentDictionary<Guid, string> _preprocessTokens = new ConcurrentDictionary<Guid, string>();
 		private readonly Dictionary<string, string> _compilerVersions;
+
+		private RemoteHooks IpcInterface { get; set; }
+		private String ChannelName = null;
 
 		internal Compiler(CompilerServicesCollection compilerServices)
 		{
@@ -356,10 +365,9 @@ namespace DistCL
 			const int bufferSize = 4086;
 			var encoding = new UTF8Encoding(false);
 
-			int exitCode;
-
 			var objFilename = Path.Combine(outputPath, fileName);
 
+			int exitCode = 0;
 			using (var outWriter = new StreamWriter(stdOutStream, encoding, bufferSize, true))
 			using (var errWriter = new StreamWriter(stdErrStream, encoding, bufferSize, true))
 			{
@@ -369,7 +377,34 @@ namespace DistCL
 
 				CompilerLogger.DebugFormat("Call compiler '{0}' with cmdline '{1}'", Utils.CompilerSettings.CLExeFilename, commmandLine);
 
-				exitCode = ProcessRunner.Run(clPath, commmandLine, outWriter, errWriter, outputPath);
+				ChannelName = null;
+				IpcInterface = new RemoteHooks();
+				IpcServerChannel channel = RemoteHooking.IpcCreateServer<RemoteHooks>(ref ChannelName,
+																						 WellKnownObjectMode.Singleton,
+																						 IpcInterface, WellKnownSidType.WorldSid);
+
+				var process = ProcessRunner.Run(clPath, commmandLine, outWriter, errWriter, outputPath);
+
+				RemoteHooking.InjectEx(
+					Process.GetCurrentProcess().Id,
+					process.Id,
+					process.MainThreadId,
+					0x20000000,
+					System.IO.Path.Combine(System.IO.Path.GetDirectoryName(typeof(Compiler).Assembly.Location), "DistCL.InjectLib.dll"),
+					System.IO.Path.Combine(System.IO.Path.GetDirectoryName(typeof(Compiler).Assembly.Location), "DistCL.InjectLib.dll"),
+					true,
+					false,
+					false,
+					ChannelName);
+
+				RemoteHooking.WakeUpProcess();
+
+				exitCode = ProcessRunner.Wakeup(process);
+
+				process.Dispose();
+
+				RemotingServices.Disconnect(IpcInterface);
+				IpcInterface = null;
 
 				var message = string.Format("Compilation is completed with exit code {0}", exitCode);
 				if (exitCode == 0)

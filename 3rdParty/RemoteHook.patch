@@ -1,0 +1,19 @@
+--- RemoteHook_old.cs	2014-09-27 19:37:58.641165900 +0400
++++ RemoteHook.cs	2014-09-27 19:40:39.210349900 +0400
+@@ -242,6 +242,7 @@
+ 
+             Properties["name"] = ChannelName;
+             Properties["portName"] = ChannelName;
++            Properties["exclusiveAddressUse"] = false;
+ 
+             DiscretionaryAcl DACL = new DiscretionaryAcl(false, false, 1);
+ 
+@@ -605,7 +606,7 @@
+             return GCHandle.Alloc(InPassThruStream.GetBuffer(), GCHandleType.Pinned);
+         }
+ 
+-        internal static void InjectEx(
++        public static void InjectEx(
+             Int32 InHostPID,
+             Int32 InTargetPID,
+             Int32 InWakeUpTID,

@@ -60,6 +60,7 @@ namespace DistCL.Client
 		private bool _pchCreation;
 
 		private const char ArgSeparator = ' ';
+		private const char McppArgPrefix = '-';
 
 		private readonly HashSet<string> _sourceExtensions = new HashSet<string> { ".cpp", ".cc", ".c" };
 
@@ -140,7 +141,8 @@ namespace DistCL.Client
 						continue;
 					}
 
-					if (arg.StartsWith("D", 1) || arg.StartsWith("I", 1))
+					string argName = arg.Substring(1);
+					if (argName.StartsWith("D") || argName.StartsWith("I"))
 					{
 						if (arg.Length <= 2)
 						{
@@ -155,27 +157,27 @@ namespace DistCL.Client
 
 						localCmdLine.Append(arg.QuoteString() + ArgSeparator);
 					}
-					else if (arg.StartsWith("V", 1))
+					else if (argName.StartsWith("V"))
 					{
 						// depracated
 					}
-					else if (arg.StartsWith("FI", 1) || arg.StartsWith("Yu", 1) || arg.StartsWith("Fp", 1) || arg.StartsWith("Fd", 1))
+					else if (argName.StartsWith("FI") || argName.StartsWith("Yu") || argName.StartsWith("Fp") || argName.StartsWith("Fd"))
 					{
 						// To opimize disributed compilation we will exclude whole PCH handling and forced include (for POA it is pch-server.h file)
 						// TODO: We need to make this customizible in future
 					}
-					else if (arg.StartsWith("Yc", 1))
+					else if (argName.StartsWith("Yc"))
 					{
 						Logger.Warn("Pre-compiled headers are not supported for distributed builds. These options will be ignored.");
 						_pchCreation = true;
 					}
-					else if (arg.StartsWith("Zi", 1) || arg.StartsWith("ZI", 1))
+					else if (argName.StartsWith("Zi") || argName.StartsWith("ZI"))
 					{
 						// replace with /Z7
 						localCmdLine.Append("/Z7" + ArgSeparator);
 						remoteCmdLine.Append("/Z7" + ArgSeparator);
 					}
-					else if (arg.StartsWith("Fo", 1))
+					else if (argName.StartsWith("Fo"))
 					{
 						// output object file name
 						_outputFiles.Add(new OutputArtefact(CompileArtifactType.Obj, arg.Substring(3)));
@@ -187,7 +189,7 @@ namespace DistCL.Client
 						_localCompileOnly = true;
 					}
 					// TODO fix '-' option flag here
-					else if (arg.Equals("/LD", StringComparison.Ordinal) || arg.Equals("/LDd", StringComparison.Ordinal) || arg.Equals("/LN", StringComparison.Ordinal) || arg.StartsWith("/link"))
+					else if (argName.Equals("LD", StringComparison.Ordinal) || argName.Equals("LDd", StringComparison.Ordinal) || argName.Equals("LN", StringComparison.Ordinal) || argName.StartsWith("link"))
 					{
 						throw new NotSupportedException(String.Format("Linker option '{0}' is not supported for distributed builds", arg));
 					}
@@ -221,7 +223,6 @@ namespace DistCL.Client
 
 					_sourceFiles.Add(args[idx]);
 					localCmdLine.Append(arg.QuoteString() + ArgSeparator);
-
 				}
 
 				++idx;
@@ -233,6 +234,5 @@ namespace DistCL.Client
 			_localCmdLine = localCmdLine.ToString();
 			_remoteCmdLine = remoteCmdLine.ToString();
 		}
-
 	}
 }
