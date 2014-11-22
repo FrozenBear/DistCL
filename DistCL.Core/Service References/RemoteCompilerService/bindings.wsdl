@@ -107,7 +107,7 @@
         <soap12:body use="literal" />
       </wsdl:input>
       <wsdl:output name="LocalCompileOutput">
-        <soap12:header message="i0:LocalCompileOutput_Headers" part="Status" use="literal" />
+        <soap12:header message="i0:LocalCompileOutput_Headers" part="Result" use="literal" />
         <soap12:body use="literal" />
       </wsdl:output>
       <wsdl:fault name="CompilerNotFoundFaultContractFault">
@@ -132,13 +132,14 @@
       <soap12:operation soapAction="urn:distcl/ICompiler/Compile" style="document" />
       <wsdl:input name="CompileInput">
         <soap12:header message="i0:CompileInput_Headers" part="Arguments" use="literal" />
+        <soap12:header message="i0:CompileInput_Headers" part="CompilationToken" use="literal" />
         <soap12:header message="i0:CompileInput_Headers" part="CompilerVersion" use="literal" />
         <soap12:header message="i0:CompileInput_Headers" part="SrcLength" use="literal" />
         <soap12:header message="i0:CompileInput_Headers" part="SrcName" use="literal" />
         <soap12:body use="literal" />
       </wsdl:input>
       <wsdl:output name="CompileOutput">
-        <soap12:header message="i0:CompileOutput_Headers" part="Status" use="literal" />
+        <soap12:header message="i0:CompileOutput_Headers" part="Result" use="literal" />
         <soap12:body use="literal" />
       </wsdl:output>
       <wsdl:fault name="CompilerNotFoundFaultContractFault">
@@ -236,13 +237,14 @@
       <soap12:operation soapAction="urn:distcl/ICompiler/Compile" style="document" />
       <wsdl:input name="CompileInput">
         <soap12:header message="i0:CompileInput_Headers" part="Arguments" use="literal" />
+        <soap12:header message="i0:CompileInput_Headers" part="CompilationToken" use="literal" />
         <soap12:header message="i0:CompileInput_Headers" part="CompilerVersion" use="literal" />
         <soap12:header message="i0:CompileInput_Headers" part="SrcLength" use="literal" />
         <soap12:header message="i0:CompileInput_Headers" part="SrcName" use="literal" />
         <soap12:body use="literal" />
       </wsdl:input>
       <wsdl:output name="CompileOutput">
-        <soap12:header message="i0:CompileOutput_Headers" part="Status" use="literal" />
+        <soap12:header message="i0:CompileOutput_Headers" part="Result" use="literal" />
         <soap12:body use="literal" />
       </wsdl:output>
       <wsdl:fault name="CompilerNotFoundFaultContractFault">

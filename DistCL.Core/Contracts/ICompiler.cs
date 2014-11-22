@@ -16,28 +16,8 @@ namespace DistCL
 		bool IsReady();
 
 		[OperationContract]
-		[FaultContract(typeof(CompilerNotFoundFaultContract), Namespace = GeneralSettings.CompilerMessageNamespace)]
+		[FaultContract(typeof (CompilerNotFoundFaultContract), Namespace = GeneralSettings.CompilerMessageNamespace)]
 		CompileOutput Compile(CompileInput input);
-	}
-
-	[DataContract(Namespace = GeneralSettings.CompilerMessageNamespace)]
-	public class CompileStatus
-	{
-		public CompileStatus(bool success, int exitCode, CompileArtifactCookie[] cookies)
-		{
-			ExitCode = exitCode;
-			Success = success;
-			Cookies = cookies;
-		}
-
-		[DataMember]
-		public bool Success { get; private set; }
-
-		[DataMember]
-		public int ExitCode { get; private set; }
-
-		[DataMember]
-		public CompileArtifactCookie[] Cookies { get; private set; }
 	}
 
 	[MessageContract(WrapperNamespace = GeneralSettings.CompilerMessageNamespace)]
@@ -52,6 +32,9 @@ namespace DistCL
 			SrcLength = message.StreamLength;
 			Src = new ProxyStream(message);
 		}
+
+		[MessageHeader]
+		public string CompilationToken { get; set; }
 
 		[MessageHeader]
 		public string CompilerVersion { get; set; }
@@ -86,24 +69,28 @@ namespace DistCL
 	[MessageContract(WrapperNamespace = GeneralSettings.CompilerMessageNamespace)]
 	public class CompileOutput : IDisposable
 	{
-		private readonly CompileStatus _status;
+		private readonly CompileResult _result;
 		private Stream _resultData;
 
-		public CompileOutput(CompileStatus status, Stream resultData)
+		public CompileOutput(string compilationToken, string requiredFileName)
 		{
-			_status = status;
+			_result = new SourceFileRequest(compilationToken, requiredFileName);
+		}
+
+		public CompileOutput(CompileResult result, Stream resultData)
+		{
+			_result = result;
 			_resultData = resultData;
 		}
 
 		public CompileOutput(
-			bool success,
 			int exitCode,
 			IDictionary<CompileArtifactDescription, Stream> streams,
 			IEnumerable<CompileArtifactDescription> artifacts)
 		{
 			CompileArtifactCookie[] cookies;
 			_resultData = CompileResultHelper.Pack(streams, out cookies);
-			
+
 			// TODO remove redundant collections copy
 			if (artifacts != null)
 			{
@@ -112,13 +99,13 @@ namespace DistCL
 				cookies = list.ToArray();
 			}
 
-			_status = new CompileStatus(success, exitCode, cookies);
+			_result = new FinishedCompileResult(exitCode, cookies);
 		}
 
 		[MessageHeader]
-		public CompileStatus Status
+		public CompileResult Result
 		{
-			get { return _status; }
+			get { return _result; }
 		}
 
 		[MessageBodyMember]
@@ -135,5 +122,53 @@ namespace DistCL
 				_resultData = null;
 			}
 		}
+	}
+
+	[DataContract(Namespace = GeneralSettings.CompilerMessageNamespace)]
+	[KnownType(typeof(FinishedCompileResult))]
+	[KnownType(typeof(SourceFileRequest))]
+	public abstract class CompileResult
+	{
+		protected CompileResult(bool finished)
+		{
+			Finished = finished;
+		}
+
+		[DataMember]
+		public bool Finished { get; private set; }
+	}
+
+	[DataContract(Namespace = GeneralSettings.CompilerMessageNamespace)]
+	public class FinishedCompileResult : CompileResult
+	{
+		public FinishedCompileResult(int exitCode, CompileArtifactCookie[] cookies)
+			: base(true)
+		{
+			ExitCode = exitCode;
+			Cookies = cookies;
+		}
+
+		[DataMember]
+		public int ExitCode { get; private set; }
+
+		[DataMember]
+		public CompileArtifactCookie[] Cookies { get; private set; }
+	}
+
+	[DataContract(Namespace = GeneralSettings.CompilerMessageNamespace)]
+	public class SourceFileRequest : CompileResult
+	{
+		public SourceFileRequest(string compilationToken, string fileName)
+			: base(false)
+		{
+			CompilationToken = compilationToken;
+			FileName = fileName;
+		}
+
+		[DataMember]
+		public string FileName { get; private set; }
+
+		[DataMember]
+		public string CompilationToken { get; private set; }
 	}
 }

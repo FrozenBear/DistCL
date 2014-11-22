@@ -30,7 +30,7 @@
     <MetadataFile FileName="messages.xsd" MetadataType="Schema" ID="5137e8ae-09fa-463a-b77c-268f68455c30" SourceId="1" SourceUrl="net.tcp://localhost:8734/Compile/mex" />
     <MetadataFile FileName="Message.xsd" MetadataType="Schema" ID="bac19d42-11b6-41b8-969a-68f62f36bb97" SourceId="1" SourceUrl="net.tcp://localhost:8734/Compile/mex" />
     <MetadataFile FileName="messages1.xsd" MetadataType="Schema" ID="34fa2d34-66c4-4041-b734-976700f3e14a" SourceId="1" SourceUrl="net.tcp://localhost:8734/Compile/mex" />
-    <MetadataFile FileName="utils.xsd" MetadataType="Schema" ID="af0d5c8b-fe8b-4906-b164-6d45cab27cf9" SourceId="1" SourceUrl="net.tcp://localhost:8734/Compile/mex" />
+    <MetadataFile FileName="utils.xsd" MetadataType="Schema" ID="0a62364e-c25c-4bf1-89f3-45ec7c90b088" SourceId="1" SourceUrl="net.tcp://localhost:8734/Compile/mex" />
     <MetadataFile FileName="messages2.xsd" MetadataType="Schema" ID="717a2b89-7d76-4d55-aaf1-0a95583bb371" SourceId="1" SourceUrl="net.tcp://localhost:8734/Compile/mex" />
     <MetadataFile FileName="Arrays.xsd" MetadataType="Schema" ID="57bdc7a1-8a23-4223-b9e0-f7ef294901fa" SourceId="1" SourceUrl="net.tcp://localhost:8734/Compile/mex" />
   </Metadata>
